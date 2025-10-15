@@ -19,6 +19,7 @@ const Index = () => {
       ageRange: "7-8 anos",
       icon: Sparkles,
       color: "border-success hover:border-success",
+      background: "bg-success/20 hover:bg-success/30",
     },
     {
       id: "medium",
@@ -27,6 +28,7 @@ const Index = () => {
       ageRange: "9-10 anos",
       icon: Star,
       color: "border-secondary hover:border-secondary",
+      background: "bg-secondary/20 hover:bg-secondary/30",
     },
     {
       id: "hard",
@@ -35,6 +37,7 @@ const Index = () => {
       ageRange: "11-12 anos",
       icon: Rocket,
       color: "border-accent hover:border-accent",
+      background: "bg-accent/20 hover:bg-accent/30",
     },
     {
       id: "very-hard",
@@ -43,6 +46,7 @@ const Index = () => {
       ageRange: "13-14 anos",
       icon: Zap,
       color: "border-primary hover:border-primary",
+      background: "bg-primary/20 hover:bg-primary/30",
     },
   ];
 

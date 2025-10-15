@@ -7,6 +7,7 @@ interface DifficultyCardProps {
   ageRange: string;
   icon: LucideIcon;
   color: string;
+  background?: string;
   onClick: () => void;
 }
 
@@ -16,12 +17,13 @@ export const DifficultyCard = ({
   ageRange,
   icon: Icon,
   color,
+  background = "bg-card",
   onClick,
 }: DifficultyCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className={`p-6 cursor-pointer transition-smooth hover:scale-105 hover:shadow-glow border-2 ${color} bg-card shadow-card animate-scale-in group`}
+      className={`p-6 cursor-pointer transition-smooth hover:scale-105 hover:shadow-glow border-2 ${color} ${background} shadow-card animate-scale-in group`}
     >
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="p-4 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 group-hover:animate-bounce-gentle">
