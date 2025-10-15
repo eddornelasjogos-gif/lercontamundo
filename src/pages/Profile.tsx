@@ -1,3 +1,4 @@
+right-[-40px]) and keep layout consistent">
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ const Profile = () => {
       {/* HERO COLORIDO DO TOPO com cabeçalho colorido (agora com fundo gradient) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,80%)] opacity-60 blur-3xl" />
-        <div className="absolute top-1/2 right--40 h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
+        <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3C/svg%3E')] opacity-45" />
 
