@@ -36,21 +36,17 @@ const Math = () => {
       {/* HERO COLORIDO DO TOPO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(202,95%,84%)] via-[hsl(288,95%,86%)] to-[hsl(145,90%,84%)] shadow-soft">
         <div className="absolute -top-12 right-4 h-56 w-56 rounded-full bg-[hsl(286,100%,85%)] opacity-60 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-45" />
 
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
-              <div className="rounded-2xl px-4 py-3 md:px-6 md:py-4 shadow-card" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f2f5ff 40%, #eaf4ff 100%)", border: "1px solid rgba(0,0,0,.08)" }}>
-                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
-                  Área de Matemática
-                </h1>
-                <p className="text-black font-body">
-                  Resolva desafios e torne-se um mestre dos números!
-                </p>
+              <div className="inline-block rounded-2xl px-4 py-3 md:px-6 md:py-4 shadow-card" style={{ background: "linear-gradient(135deg, #ffd6e7 0%, #e3ffe5 60%, #e8f0ff 100%)", border: "1px solid rgba(0,0,0,.08)" }}>
+                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">Área de Matemática</h1>
+                <p className="text-black font-body">Resolva desafios e torne-se um mestre dos números!</p>
               </div>
             </div>
             <Mascot message="Matemática é divertida!" />
@@ -71,56 +67,52 @@ const Math = () => {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-45" />
 
           <div className="relative z-10 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {exercises.map((exercise) => {
-                const isCompleted = progress.completedExercises.includes(exercise.id);
+            {exercises.map((exercise) => {
+              const isCompleted = progress.completedExercises.includes(exercise.id);
 
-                return (
-                  <Card key={exercise.id} className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${isCompleted ? "border-success bg-success/5" : "border-border hover:border-secondary"}`}>
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-body font-bold px-3 py-1 rounded-full border ${difficultyColors[exercise.difficulty]}`}>{exercise.difficulty}</span>
-                          </div>
-                          <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">
-                            {exercise.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">{exercise.description}</p>
+              return (
+                <Card key={exercise.id} className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${isCompleted ? "border-success bg-success/5" : "border-border hover:border-secondary"}`}>
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-body font-bold px-3 py-1 rounded-full border ${difficultyColors[exercise.difficulty]}`}>{exercise.difficulty}</span>
                         </div>
-                        <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-secondary/10"}`}>
-                          {isCompleted ? (
-                            <CheckCircle className="w-5 h-5 text-success" />
-                          ) : (
-                            <Calculator className="w-5 h-5 text-secondary" />
-                          )}
-                        </div>
+                        <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">{exercise.title}</h3>
+                        <p className="text-sm text-muted-foreground">{exercise.description}</p>
                       </div>
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Trophy className="w-4 h-4" />
-                          <span>{exercise.exercises} exercícios</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-secondary fill-secondary" />
-                          <span>{exercise.xp} XP</span>
-                        </div>
+                      <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-secondary/10"}`}>
+                        {isCompleted ? (
+                          <CheckCircle className="w-5 h-5 text-success" />
+                        ) : (
+                          <Calculator className="w-5 h-5 text-secondary" />
+                        )}
                       </div>
-
-                      <Button
-                        variant={isCompleted ? "outline" : "secondary"}
-                        className="w-full"
-                        onClick={() => !isCompleted && handleCompleteExercise(exercise.id, exercise.xp)}
-                        disabled={isCompleted}
-                      >
-                        {isCompleted ? "✓ Completado" : "Começar Desafio"}
-                      </Button>
                     </div>
-                  </Card>
-                );
-              })}
-            </div>
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Trophy className="w-4 h-4" />
+                        <span>{exercise.exercises} exercícios</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-secondary fill-secondary" />
+                        <span>{exercise.xp} XP</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant={isCompleted ? "outline" : "secondary"}
+                      className="w-full"
+                      onClick={() => !isCompleted && handleCompleteExercise(exercise.id, exercise.xp)}
+                      disabled={isCompleted}
+                    >
+                      {isCompleted ? "✓ Completado" : "Começar Desafio"}
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </section>
       </div>
