@@ -15,6 +15,7 @@ const Math = () => {
     completeExercise(exerciseId, xpReward);
     toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
   };
+
   const exercises = [
     {
       id: 1,
@@ -64,9 +65,9 @@ const Math = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <img src={mathImage} alt="Matemática" className="w-20 h-20" />
             <div>
@@ -82,74 +83,92 @@ const Math = () => {
         </div>
 
         {/* Progress */}
-        <div className="mb-8">
+        <div>
           <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />
         </div>
 
-        {/* Exercises Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {exercises.map((exercise) => {
-            const isCompleted = progress.completedExercises.includes(exercise.id);
-            
-            return (
-              <Card
-                key={exercise.id}
-                className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${
-                  isCompleted ? "border-success bg-success/5" : "border-border hover:border-secondary"
-                }`}
-              >
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`text-xs font-body font-bold px-3 py-1 rounded-full border ${
-                            difficultyColors[exercise.difficulty]
-                          }`}
+        {/* Exercises Section */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(210,95%,82%)] via-[hsl(286,90%,80%)] to-[hsl(145,90%,78%)] px-6 py-12 shadow-glow md:px-12 md:py-16">
+          <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-[hsl(286,100%,85%)] opacity-70 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 -translate-x-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,88%)] opacity-60 blur-3xl" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M170 120c0 9.94-8.06 18-18 18s-18-8.06-18-18 8.06-18 18-18 18 8.06 18 18z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27155%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
+
+          <div className="relative z-10 space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-display font-bold text-foreground">Desafios Disponíveis</h2>
+              <p className="text-sm md:text-base text-foreground/80 font-body">
+                Escolha um desafio e acumule pontos para subir de nível!
+              </p>
+            </div>
+
+            <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {exercises.map((exercise) => {
+                  const isCompleted = progress.completedExercises.includes(exercise.id);
+
+                  return (
+                    <Card
+                      key={exercise.id}
+                      className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${
+                        isCompleted ? "border-success bg-success/5" : "border-border hover:border-secondary"
+                      }`}
+                    >
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs font-body font-bold px-3 py-1 rounded-full border ${
+                                  difficultyColors[exercise.difficulty]
+                                }`}
+                              >
+                                {exercise.difficulty}
+                              </span>
+                            </div>
+                            <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">
+                              {exercise.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {exercise.description}
+                            </p>
+                          </div>
+                          <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-secondary/10"}`}>
+                            {isCompleted ? (
+                              <CheckCircle className="w-5 h-5 text-success" />
+                            ) : (
+                              <Calculator className="w-5 h-5 text-secondary" />
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Trophy className="w-4 h-4" />
+                            <span>{exercise.exercises} exercícios</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-secondary fill-secondary" />
+                            <span>{exercise.xp} XP</span>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant={isCompleted ? "outline" : "secondary"}
+                          className="w-full"
+                          onClick={() => !isCompleted && handleCompleteExercise(exercise.id, exercise.xp)}
+                          disabled={isCompleted}
                         >
-                          {exercise.difficulty}
-                        </span>
+                          {isCompleted ? "✓ Completado" : "Começar Desafio"}
+                        </Button>
                       </div>
-                      <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">
-                        {exercise.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {exercise.description}
-                      </p>
-                    </div>
-                    <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-secondary/10"}`}>
-                      {isCompleted ? (
-                        <CheckCircle className="w-5 h-5 text-success" />
-                      ) : (
-                        <Calculator className="w-5 h-5 text-secondary" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Trophy className="w-4 h-4" />
-                      <span>{exercise.exercises} exercícios</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-secondary fill-secondary" />
-                      <span>{exercise.xp} XP</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    variant={isCompleted ? "outline" : "secondary"} 
-                    className="w-full"
-                    onClick={() => !isCompleted && handleCompleteExercise(exercise.id, exercise.xp)}
-                    disabled={isCompleted}
-                  >
-                    {isCompleted ? "✓ Completado" : "Começar Desafio"}
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
