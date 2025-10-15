@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import mathImage from "@/assets/math-numbers.png";
-import ColorHeader from "../components/ColorHeader";
+import ColorHeader from "../components/ColorHeader.tsx";
 
 const Math = () => {
   const { progress, completeExercise } = useProgress();
@@ -19,7 +19,7 @@ const Math = () => {
 
   const exercises = [
     { id: 1, title: "Soma Divertida", description: "Pratique adições básicas", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
-    { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
+    { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", dificuldade: "Fácil", exercises: 10, xp: 40, completed: false },
     { id: 3, title: "Multiplicação Estelar", description: "Tabuada interativa", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
     { id: 4, title: "Divisão Espacial", description: "Divida e conquiste", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
   ];
