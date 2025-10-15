@@ -74,10 +74,10 @@ const Profile = () => {
           <div className="text-center space-y-6">
             <Mascot className="mx-auto" />
             <div>
-              <h1 className="text-4xl font-display font-bold text-foreground mb-2">
+              <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] mb-2 leading-tight">
                 Meu Perfil
               </h1>
-              <p className="text-foreground/80 font-body">
+              <p className="text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] font-body">
                 Acompanhe seu progresso e conquistas!
               </p>
             </div>
