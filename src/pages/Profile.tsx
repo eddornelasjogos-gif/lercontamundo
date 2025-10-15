@@ -1,4 +1,4 @@
-right-[-40px]) and keep layout consistent">
+// src/pages/Profile.tsx
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,17 +13,65 @@ const Profile = () => {
   const { progress, resetProgress } = useProgress();
 
   const achievements = [
-    { id: "first-read", title: "Primeiro Passo", description: "Complete sua primeira leitura", icon: BookOpen, unlocked: progress.achievements.includes("first-read"), color: "text-success" },
-    { id: "number-master", title: "Mestre dos Números", description: "Resolva 50 exercícios de matemática", icon: Calculator, unlocked: progress.achievements.includes("number-master"), color: "text-secondary" },
-    { id: "dedicated-reader", title: "Leitor Dedicado", description: "Leia 10 histórias completas", icon: Trophy, unlocked: progress.achievements.includes("dedicated-reader"), color: "text-accent" },
-    { id: "star-bright", title: "Estrela Brilhante", description: "Alcance o nível 5", icon: Star, unlocked: progress.level >= 5, color: "text-primary" },
+    {
+      id: "first-read",
+      title: "Primeiro Passo",
+      description: "Complete sua primeira leitura",
+      icon: BookOpen,
+      unlocked: progress.achievements.includes("first-read"),
+      color: "text-success",
+    },
+    {
+      id: "number-master",
+      title: "Mestre dos Números",
+      description: "Resolva 50 exercícios de matemática",
+      icon: Calculator,
+      unlocked: progress.achievements.includes("number-master"),
+      color: "text-secondary",
+    },
+    {
+      id: "dedicated-reader",
+      title: "Leitor Dedicado",
+      description: "Leia 10 histórias completas",
+      icon: Trophy,
+      unlocked: progress.achievements.includes("dedicated-reader"),
+      color: "text-accent",
+    },
+    {
+      id: "star-bright",
+      title: "Estrela Brilhante",
+      description: "Alcance o nível 5",
+      icon: Star,
+      unlocked: progress.level >= 5,
+      color: "text-primary",
+    },
   ];
 
   const stats = [
-    { label: "Histórias Lidas", value: progress.storiesRead.toString(), icon: BookOpen, color: "gradient-primary" },
-    { label: "Exercícios Completos", value: progress.exercisesCompleted.toString(), icon: Calculator, color: "gradient-secondary" },
-    { label: "XP Total", value: progress.xp.toString(), icon: Star, color: "gradient-success" },
-    { label: "Conquistas", value: `${progress.achievements.length}/4`, icon: Award, color: "gradient-primary" },
+    {
+      label: "Histórias Lidas",
+      value: progress.storiesRead.toString(),
+      icon: BookOpen,
+      color: "gradient-primary",
+    },
+    {
+      label: "Exercícios Completos",
+      value: progress.exercisesCompleted.toString(),
+      icon: Calculator,
+      color: "gradient-secondary",
+    },
+    {
+      label: "XP Total",
+      value: progress.xp.toString(),
+      icon: Star,
+      color: "gradient-success",
+    },
+    {
+      label: "Conquistas",
+      value: `${progress.achievements.length}/4`,
+      icon: Award,
+      color: "gradient-primary",
+    },
   ];
 
   const handleReset = () => {
@@ -37,7 +85,7 @@ const Profile = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      {/* HERO COLORIDO DO TOPO com cabeçalho colorido (agora com fundo gradient) */}
+      {/* HERO COLORIDO DO TOPO com cabeçalho colorido */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
@@ -46,13 +94,14 @@ const Profile = () => {
 
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center">
-            <div className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card" style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%)" }}>
+            <div
+              className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card"
+              style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%)" }}
+            >
               <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white mb-2 leading-tight">
                 Meu Perfil
               </h1>
-              <p className="text-white/90 font-body">
-                Acompanhe seu progresso e conquistas!
-              </p>
+              <p className="text-white/90 font-body">Acompanhe seu progresso e conquistas!</p>
             </div>
           </div>
         </div>
@@ -83,7 +132,7 @@ const Profile = () => {
             <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm space-y-10">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {stats.map((stat) => (
-                  <Card key={stat.label} className={`p-6 text-center hover:shadow-glow transition-smooth border-2 border-border`}>
+                  <Card key={stat.label} className="p-6 text-center hover:shadow-glow transition-smooth border-2 border-border">
                     <div className="space-y-3">
                       <div className={`w-12 h-12 mx-auto rounded-full ${stat.color} flex items-center justify-center`}>
                         <stat.icon className="w-6 h-6 text-white" />
@@ -99,12 +148,17 @@ const Profile = () => {
                 <h3 className="text-2xl font-display font-bold text-foreground text-center">Coleção de Troféus</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {achievements.map((achievement) => (
-                    <Card key={achievement.id} className={`p-6 transition-smooth border-2 ${
-                      achievement.unlocked ? "border-primary shadow-card hover:shadow-glow" : "border-border opacity-50 grayscale"
-                    }`}>
+                    <Card
+                      key={achievement.id}
+                      className={`p-6 transition-smooth border-2 ${
+                        achievement.unlocked ? "border-primary shadow-card hover:shadow-glow" : "border-border opacity-50 grayscale"
+                      }`}
+                    >
                       <div className="flex items-start gap-4">
                         <div className={`p-3 rounded-full ${achievement.unlocked ? "gradient-primary" : "bg-muted"}`}>
-                          <achievement.icon className={`${achievement.unlocked ? "text-white" : "text-muted-foreground"} w-6 h-6`} />
+                          <achievement.icon
+                            className={`${achievement.unlocked ? "text-white" : "text-muted-foreground"} w-6 h-6`}
+                          />
                         </div>
                         <div className="flex-1">
                           <h4 className="text-lg font-display font-bold text-foreground mb-1">{achievement.title}</h4>
