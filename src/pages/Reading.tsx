@@ -51,7 +51,7 @@ const Reading = () => {
     },
   ];
 
-  const categories = ["Fábulas", "Contos Clássicos", "Contos", "Fábulas"];
+  const categories = ["Fábulas", "Contos Clássicos", "Contos"];
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
 
   const handleCompleteStory = (storyId: number, xpReward: number) => {
@@ -90,12 +90,11 @@ const Reading = () => {
         {/* Categories */}
         <div className="mb-10">
           <div className="flex flex-wrap items-center justify-center gap-3">
-            {categories.map((category, index) => {
-              const uniqueKey = `${category}-${index}`;
+            {categories.map((category) => {
               const isActive = selectedCategory === category;
               return (
                 <Button
-                  key={uniqueKey}
+                  key={category}
                   variant={isActive ? "gradient" : "outline"}
                   className="min-w-[160px] font-body font-semibold"
                   onClick={() => setSelectedCategory(category)}
