@@ -7,6 +7,7 @@ import ColorHeader from "@/components/ColorHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
+import ProfileIndicator from "@/components/ProfileIndicator";
 
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
@@ -55,10 +56,8 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Indicador laranja saltitante (de cima pra baixo) */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2" aria-label="indicator-track">
-            <div aria-label="indicator" className="w-6 h-6 rounded-full bg-orange-500 shadow-lg animate-bounce-vertical" />
-          </div>
+          {/* Indicador laranja saltitante (via componente dedicado) */}
+          <ProfileIndicator />
         </div>
       </section>
 
