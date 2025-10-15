@@ -37,7 +37,7 @@ const Profile = () => {
       <Navigation />
 
       {/* HERO COLORIDO DO TOPO com cabeçalho colorido (agora com fundo gradient) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-400 via-orange-500 to-yellow-500 shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 right--40 h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
@@ -45,14 +45,19 @@ const Profile = () => {
 
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center">
-            <div className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card" style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%)" }}>
-              <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white mb-2 leading-tight">
+            <div className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card" style={{ background: "linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #f59e0b 100%)" }}>
+              <h1 className="text-4xl md:text-5xl font-display font-extrabold text-foreground mb-2 leading-tight">
                 Meu Perfil
               </h1>
               <p className="text-white/90 font-body">
                 Acompanhe seu progresso e conquistas!
               </p>
             </div>
+          </div>
+
+          {/* Indicador laranja saltitante (de cima pra baixo) */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2" aria-label="indicator-track">
+            <div aria-label="indicator" className="w-6 h-6 rounded-full bg-orange-500 shadow-lg animate-bounce-vertical" />
           </div>
         </div>
       </section>
