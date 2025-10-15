@@ -39,13 +39,13 @@ const Profile = () => {
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
-        <div className="absolute bottom-[-40px] left-1/4 h-64 w-64 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
+        <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center space-y-6">
             <Mascot className="mx-auto" />
-            <div className="inline-block rounded-2xl bg-white/95 border border-white/80 px-5 py-4 shadow-card">
+            <div className="inline-block rounded-2xl bg-white/95 border border-white/80 px-5 py-4 shadow-card" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f0f5ff 40%, #e9f7ff 100%)", border: "1px solid rgba(0,0,0,.08)" }}>
               <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black mb-2 leading-tight">
                 Meu Perfil
               </h1>
@@ -84,50 +84,32 @@ const Profile = () => {
             <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm space-y-10">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {stats.map((stat) => (
-                  <Card
-                    key={stat.label}
-                    className="p-6 text-center hover:shadow-glow transition-smooth border-2 border-border"
-                  >
+                  <Card key={stat.label} className="p-6 text-center hover:shadow-glow transition-smooth border-2 border-border">
                     <div className="space-y-3">
                       <div className={`w-12 h-12 mx-auto rounded-full ${stat.color} flex items-center justify-center`}>
                         <stat.icon className="w-6 h-6 text-white" />
                       </div>
-                      <div className="text-3xl font-display font-bold text-foreground">
-                        {stat.value}
-                      </div>
-                      <div className="text-xs font-body text-muted-foreground">
-                        {stat.label}
-                      </div>
+                      <div className="text-3xl font-display font-bold text-foreground">{stat.value}</div>
+                      <div className="text-xs font-body text-muted-foreground">{stat.label}</div>
                     </div>
                   </Card>
                 ))}
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-2xl font-display font-bold text-foreground text-center">
-                  Coleção de Troféus
-                </h3>
+                <h3 className="text-2xl font-display font-bold text-foreground text-center">Coleção de Troféus</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {achievements.map((achievement) => (
-                    <Card
-                      key={achievement.id}
-                      className={`p-6 transition-smooth border-2 ${
-                        achievement.unlocked
-                          ? "border-primary shadow-card hover:shadow-glow"
-                          : "border-border opacity-50 grayscale"
-                      }`}
-                    >
+                    <Card key={achievement.id} className={`p-6 transition-smooth border-2 ${
+                        achievement.unlocked ? "border-primary shadow-card hover:shadow-glow" : "border-border opacity-50 grayscale"
+                      }`}>
                       <div className="flex items-start gap-4">
                         <div className={`p-3 rounded-full ${achievement.unlocked ? "gradient-primary" : "bg-muted"}`}>
                           <achievement.icon className={`${achievement.unlocked ? "text-white" : "text-muted-foreground"} w-6 h-6`} />
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-lg font-display font-bold text-foreground mb-1">
-                            {achievement.title}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {achievement.description}
-                          </p>
+                          <h4 className="text-lg font-display font-bold text-foreground mb-1">{achievement.title}</h4>
+                          <p className="text-sm text-muted-foreground">{achievement.description}</p>
                           {achievement.unlocked && (
                             <div className="mt-2 flex items-center gap-1 text-success">
                               <Trophy className="w-4 h-4" />

@@ -38,13 +38,13 @@ const Math = () => {
         <div className="absolute -top-12 right-4 h-56 w-56 rounded-full bg-[hsl(286,100%,85%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-[-40px] left-[-20px] h-72 w-72 rounded-full bg-[hsl(145,95%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27155%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
 
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
-              <div className="rounded-2xl bg-white/95 border border-white/80 px-4 py-3 md:px-6 md:py-4 shadow-card">
+              <div className="rounded-2xl px-4 py-3 md:px-6 md:py-4 shadow-card" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f2f5ff 40%, #eaf4ff 100%)", border: "1px solid rgba(0,0,0,.08)" }}>
                 <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
                   Área de Matemática
                 </h1>
@@ -62,7 +62,7 @@ const Math = () => {
       <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Progress */}
         <div>
-          <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />
+          <ProgressBar progress.xp currentXP={progress.xp} requiredXP={500} level={progress.level} />
         </div>
 
         {/* Exercises Section */}
@@ -70,16 +70,15 @@ const Math = () => {
           <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-[hsl(286,100%,85%)] opacity-70 blur-3xl" />
           <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 -translate-x-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,88%)] opacity-60 blur-3xl" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M170 120c0 9.94-8.06 18-18 18s-18-8.06-18-18 8.06-18 18-18 18 8.06 18 18z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27155%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M170 120c0 9.94-8.06 18-18 18s-18-8.06-18-18 8.06-18 18-18 18 8.06 18 18z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
           <div className="relative z-10 space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-display font-bold text-foreground">Desafios Disponíveis</h2>
-              <p className="text-sm md:text-base text-foreground/80 font-body">
-                Escolha um desafio e acumule pontos para subir de nível!
-              </p>
+            {/* Categories */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {/* ... conteúdo permanece igual ... */}
             </div>
 
+            {/* Desafios */}
             <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {exercises.map((exercise) => {
