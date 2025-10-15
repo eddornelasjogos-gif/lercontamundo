@@ -19,7 +19,7 @@ const Index = () => {
       ageRange: "7-8 anos",
       icon: Sparkles,
       color: "border-success hover:border-success",
-      background: "bg-success/20 hover:bg-success/30",
+      background: "bg-gradient-to-br from-emerald-300 via-emerald-200 to-emerald-100 hover:brightness-105",
     },
     {
       id: "medium",
@@ -28,7 +28,7 @@ const Index = () => {
       ageRange: "9-10 anos",
       icon: Star,
       color: "border-secondary hover:border-secondary",
-      background: "bg-secondary/20 hover:bg-secondary/30",
+      background: "bg-gradient-to-br from-sky-300 via-sky-200 to-sky-100 hover:brightness-105",
     },
     {
       id: "hard",
@@ -37,7 +37,7 @@ const Index = () => {
       ageRange: "11-12 anos",
       icon: Rocket,
       color: "border-accent hover:border-accent",
-      background: "bg-accent/20 hover:bg-accent/30",
+      background: "bg-gradient-to-br from-cyan-300 via-teal-200 to-emerald-100 hover:brightness-105",
     },
     {
       id: "very-hard",
@@ -46,13 +46,12 @@ const Index = () => {
       ageRange: "13-14 anos",
       icon: Zap,
       color: "border-primary hover:border-primary",
-      background: "bg-primary/20 hover:bg-primary/30",
+      background: "bg-gradient-to-br from-violet-300 via-fuchsia-200 to-pink-100 hover:brightness-105",
     },
   ];
 
   const handleDifficultySelect = (difficultyId: string) => {
     setSelectedDifficulty(difficultyId);
-    // Store difficulty in localStorage for later use
     localStorage.setItem("userDifficulty", difficultyId);
   };
 
@@ -60,7 +59,6 @@ const Index = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
       
-      {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-40"
@@ -87,7 +85,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Difficulty Selection */}
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-display font-bold text-foreground mb-2">
