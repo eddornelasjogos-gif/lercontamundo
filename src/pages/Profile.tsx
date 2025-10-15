@@ -11,38 +11,10 @@ const Profile = () => {
   const { progress, resetProgress } = useProgress();
 
   const achievements = [
-    {
-      id: "first-read",
-      title: "Primeiro Passo",
-      description: "Complete sua primeira leitura",
-      icon: BookOpen,
-      unlocked: progress.achievements.includes("first-read"),
-      color: "text-success",
-    },
-    {
-      id: "number-master",
-      title: "Mestre dos Números",
-      description: "Resolva 50 exercícios de matemática",
-      icon: Calculator,
-      unlocked: progress.achievements.includes("number-master"),
-      color: "text-secondary",
-    },
-    {
-      id: "dedicated-reader",
-      title: "Leitor Dedicado",
-      description: "Leia 10 histórias completas",
-      icon: Trophy,
-      unlocked: progress.achievements.includes("dedicated-reader"),
-      color: "text-accent",
-    },
-    {
-      id: "star-bright",
-      title: "Estrela Brilhante",
-      description: "Alcance o nível 5",
-      icon: Star,
-      unlocked: progress.level >= 5,
-      color: "text-primary",
-    },
+    { id: "first-read", title: "Primeiro Passo", description: "Complete sua primeira leitura", icon: BookOpen, unlocked: progress.achievements.includes("first-read"), color: "text-success" },
+    { id: "number-master", title: "Mestre dos Números", description: "Resolva 50 exercícios de matemática", icon: Calculator, unlocked: progress.achievements.includes("number-master"), color: "text-secondary" },
+    { id: "dedicated-reader", title: "Leitor Dedicado", description: "Leia 10 histórias completas", icon: Trophy, unlocked: progress.achievements.includes("dedicated-reader"), color: "text-accent" },
+    { id: "star-bright", title: "Estrela Brilhante", description: "Alcance o nível 5", icon: Star, unlocked: progress.level >= 5, color: "text-primary" },
   ];
 
   const stats = [
@@ -70,10 +42,10 @@ const Profile = () => {
         <div className="absolute bottom-[-40px] left-1/4 h-64 w-64 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
-        <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center space-y-6">
             <Mascot className="mx-auto" />
-            <div>
+            <div className="inline-block rounded-2xl bg-white/95 border border-white/80 px-5 py-4 shadow-card">
               <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black mb-2 leading-tight">
                 Meu Perfil
               </h1>
@@ -146,16 +118,8 @@ const Profile = () => {
                       }`}
                     >
                       <div className="flex items-start gap-4">
-                        <div
-                          className={`p-3 rounded-full ${
-                            achievement.unlocked ? "gradient-primary" : "bg-muted"
-                          }`}
-                        >
-                          <achievement.icon
-                            className={`w-6 h-6 ${
-                              achievement.unlocked ? "text-white" : "text-muted-foreground"
-                            }`}
-                          />
+                        <div className={`p-3 rounded-full ${achievement.unlocked ? "gradient-primary" : "bg-muted"}`}>
+                          <achievement.icon className={`${achievement.unlocked ? "text-white" : "text-muted-foreground"} w-6 h-6`} />
                         </div>
                         <div className="flex-1">
                           <h4 className="text-lg font-display font-bold text-foreground mb-1">

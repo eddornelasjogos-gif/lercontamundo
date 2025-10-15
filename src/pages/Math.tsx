@@ -17,42 +17,10 @@ const Math = () => {
   };
 
   const exercises = [
-    {
-      id: 1,
-      title: "Soma Divertida",
-      description: "Pratique adições básicas",
-      difficulty: "Fácil",
-      exercises: 10,
-      xp: 40,
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Subtração Mágica",
-      description: "Aprenda a subtrair",
-      difficulty: "Fácil",
-      exercises: 10,
-      xp: 40,
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "Multiplicação Estelar",
-      description: "Tabuada interativa",
-      difficulty: "Médio",
-      exercises: 15,
-      xp: 60,
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "Divisão Espacial",
-      description: "Divida e conquiste",
-      difficulty: "Médio",
-      exercises: 15,
-      xp: 60,
-      completed: false,
-    },
+    { id: 1, title: "Soma Divertida", description: "Pratique adições básicas", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
+    { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
+    { id: 3, title: "Multiplicação Estelar", description: "Tabuada interativa", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
+    { id: 4, title: "Divisão Espacial", description: "Divida e conquiste", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
   ];
 
   const difficultyColors: Record<string, string> = {
@@ -72,11 +40,11 @@ const Math = () => {
         <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27155%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
-        <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
-              <div>
+              <div className="rounded-2xl bg-white/95 border border-white/80 px-4 py-3 md:px-6 md:py-4 shadow-card">
                 <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
                   Área de Matemática
                 </h1>

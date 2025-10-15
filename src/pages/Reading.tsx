@@ -13,42 +13,10 @@ const Reading = () => {
   const { progress, completeStory } = useProgress();
 
   const stories = [
-    {
-      id: 1,
-      title: "A Cigarra e a Formiga",
-      category: "Fábulas",
-      duration: "5 min",
-      xp: 50,
-      stars: 3,
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Chapeuzinho Vermelho",
-      category: "Contos Clássicos",
-      duration: "8 min",
-      xp: 75,
-      stars: 3,
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "Os Três Porquinhos",
-      category: "Contos",
-      duration: "6 min",
-      xp: 60,
-      stars: 3,
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "A Lebre e a Tartaruga",
-      category: "Fábulas",
-      duration: "4 min",
-      xp: 40,
-      stars: 3,
-      completed: false,
-    },
+    { id: 1, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 50, stars: 3, completed: false },
+    { id: 2, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 75, stars: 3, completed: false },
+    { id: 3, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3, completed: false },
+    { id: 4, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 40, stars: 3, completed: false },
   ];
 
   const categories = ["Fábulas", "Contos Clássicos", "Contos"];
@@ -72,11 +40,11 @@ const Reading = () => {
         <div className="absolute bottom-[-40px] left-10 h-72 w-72 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
 
-        <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={readingImage} alt="Leitura" className="w-20 h-20" />
-              <div>
+              <div className="rounded-2xl bg-white/95 border border-white/80 px-4 py-3 md:px-6 md:py-4 shadow-card">
                 <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
                   Área de Leitura
                 </h1>
