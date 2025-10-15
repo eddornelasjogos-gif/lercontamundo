@@ -77,10 +77,10 @@ const Reading = () => {
             <div className="flex items-center gap-4">
               <img src={readingImage} alt="Leitura" className="w-20 h-20" />
               <div>
-                <h1 className="text-4xl font-display font-bold text-foreground">
+                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
                   Área de Leitura
                 </h1>
-                <p className="text-foreground/80 font-body">
+                <p className="text-black font-body">
                   Explore histórias mágicas e aprenda se divertindo!
                 </p>
               </div>

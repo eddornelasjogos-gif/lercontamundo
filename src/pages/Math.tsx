@@ -77,10 +77,10 @@ const Math = () => {
             <div className="flex items-center gap-4">
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
               <div>
-                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)] leading-tight">
+                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
                   Área de Matemática
                 </h1>
-                <p className="text-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)] font-body">
+                <p className="text-black font-body">
                   Resolva desafios e torne-se um mestre dos números!
                 </p>
               </div>
