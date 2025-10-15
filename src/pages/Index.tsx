@@ -71,15 +71,11 @@ const Index = () => {
         <div className="relative container mx-auto px-4 py-12 md:py-16">
           <div className="text-center space-y-6 max-w-4xl mx-auto">
             <Mascot message="Olá! Vamos aprender juntos?" />
-            <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground animate-scale-in">
-              Lêr + Conta{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-                Mundo
-              </span>
+            <h1 className="text-4xl md:text-6xl font-display font-bold text-orange-800 animate-scale-in">
+              Lêr + Conta Mundo
             </h1>
-            <p className="text-lg md:text-xl font-body text-muted-foreground max-w-2xl mx-auto">
-              Uma aventura mágica de aprendizado através da leitura e matemática!
-              Escolha seu nível e comece a explorar.
+            <p className="text-lg md:text-xl font-body text-orange-800 max-w-2xl mx-auto">
+              Uma aventura mágica de aprendizado através da leitura e matemática! Escolha seu nível e comece a explorar.
             </p>
           </div>
         </div>
