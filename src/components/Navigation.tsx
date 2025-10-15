@@ -13,7 +13,7 @@ export const Navigation = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border/70 shadow-soft md:top-0 md:bottom-auto md:border-b md:border-t-0">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border/70 shadow-soft md:top-0 md:bottom-auto md:border-b md:border-t-0">
       <div className="container mx-auto px-4">
         <div className="flex justify-around md:justify-center md:gap-8 py-3">
           {navItems.map(({ icon: Icon, label, path }) => {
