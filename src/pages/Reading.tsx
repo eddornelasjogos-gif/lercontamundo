@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import readingImage from "@/assets/reading-books.png";
+import ColorHeader from "@/components/ColorHeader";
 
 const Reading = () => {
   const { progress, completeStory } = useProgress();
@@ -33,25 +34,21 @@ const Reading = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      {/* HERO COLORIDO DO TOPO */}
+      {/* HERO COLORIDO DO TOPO (com Header colorido ao lado) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(302,95%,88%)] via-[hsl(48,100%,86%)] to-[hsl(198,95%,82%)] shadow-soft">
         <div className="absolute -top-14 -left-16 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
         <div className="absolute top-10 right-[-40px] h-56 w-56 rounded-full bg-[hsl(45,100%,88%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-[-40px] left-10 h-72 w-72 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
-
-        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
+        <div className="relative z-10 container mx-auto px-4 py-12 md:py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={readingImage} alt="Leitura" className="w-20 h-20" />
-              <div className="rounded-2xl px-4 py-3 md:px-6 md:py-4 shadow-card" style={{ background: "linear-gradient(135deg, #ffffff 0%, #f2f5ff 40%, #eaf4ff 100%)", border: "1px solid rgba(0,0,0,.08)" }}>
-                <h1 className="text-4xl md:text-5xl font-display font-extrabold text-black leading-tight">
-                  Área de Leitura
-                </h1>
-                <p className="text-black font-body">
-                  Explore histórias mágicas e aprenda se divertindo!
-                </p>
-              </div>
+              <ColorHeader
+                title="Área de Leitura"
+                subtitle="Explore histórias mágicas e aprenda se divertindo!"
+                gradientFrom="#93c5fd"
+                gradientTo="#c4b5fd"
+              />
             </div>
             <Mascot message="Vamos ler juntos!" />
           </div>

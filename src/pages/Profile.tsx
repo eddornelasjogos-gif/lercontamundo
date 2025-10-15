@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Trophy, BookOpen, Calculator, Award } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
+import ColorHeader from "@/components/ColorHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
@@ -38,7 +39,7 @@ const Profile = () => {
       {/* HERO COLORIDO DO TOPO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
-        <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
+        <div className="absolute top-1/2 right--40 h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
@@ -71,8 +72,6 @@ const Profile = () => {
           <div className="absolute -top-20 -left-16 h-60 w-60 rounded-full bg-[hsl(320,100%,86%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 right-0 h-72 w-72 -translate-y-1/2 translate-x-1/4 rounded-full bg-[hsl(198,100%,82%)] opacity-70 blur-3xl" />
           <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,88%)] opacity-70 blur-3xl" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
-
           <div className="relative z-10 max-w-6xl mx-auto space-y-10">
             <div className="text-center">
               <h2 className="text-3xl font-display font-bold text-foreground">Suas Conquistas</h2>
