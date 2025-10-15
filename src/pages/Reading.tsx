@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,6 @@ import readingImage from "@/assets/reading-books.png";
 const Reading = () => {
   const { progress, completeStory } = useProgress();
 
-  const handleCompleteStory = (storyId: number, xpReward: number) => {
-    completeStory(storyId, xpReward);
-    toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
-  };
   const stories = [
     {
       id: 1,
@@ -54,6 +51,16 @@ const Reading = () => {
     },
   ];
 
+  const categories = ["Fábulas", "Contos Clássicos", "Contos", "Fábulas"];
+  const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
+
+  const handleCompleteStory = (storyId: number, xpReward: number) => {
+    completeStory(storyId, xpReward);
+    toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
+  };
+
+  const filteredStories = stories.filter((story) => story.category === selectedCategory);
+
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
@@ -80,11 +87,31 @@ const Reading = () => {
           <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />
         </div>
 
+        {/* Categories */}
+        <div className="mb-10">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {categories.map((category, index) => {
+              const uniqueKey = `${category}-${index}`;
+              const isActive = selectedCategory === category;
+              return (
+                <Button
+                  key={uniqueKey}
+                  variant={isActive ? "gradient" : "outline"}
+                  className="min-w-[160px] font-body font-semibold"
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Stories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stories.map((story) => {
+          {filteredStories.map((story) => {
             const isCompleted = progress.completedStories.includes(story.id);
-            
+
             return (
               <Card
                 key={story.id}
@@ -122,8 +149,8 @@ const Reading = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    variant={isCompleted ? "outline" : "gradient"} 
+                  <Button
+                    variant={isCompleted ? "outline" : "gradient"}
                     className="w-full"
                     onClick={() => !isCompleted && handleCompleteStory(story.id, story.xp)}
                     disabled={isCompleted}
