@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import mathImage from "@/assets/math-numbers.png";
-import ColorHeader from "@/components/ColorHeader";
+import ColorHeader from "../components/ColorHeader";
 
 const Math = () => {
   const { progress, completeExercise } = useProgress();
@@ -65,30 +65,29 @@ const Math = () => {
           <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-[hsl(286,100%,85%)] opacity-70 blur-3xl" />
           <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 -translate-x-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 left-12 h-48 w-48 -translate-y-1/2 rounded-full bg-[hsl(52,100%,88%)] opacity-80 blur-3xl" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-45" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
 
           <div className="relative z-10 space-y-8">
             {exercises.map((exercise) => {
               const isCompleted = progress.completedExercises.includes(exercise.id);
 
               return (
-                <Card key={exercise.id} className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${isCompleted ? "border-success bg-success/5" : "border-border hover:border-secondary"}`}>
+                <Card key={exercise.id} className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${isCompleted ? "border-success bg-success/5" : "border-border hover:border-primary"}`}>
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs font-body font-bold px-3 py-1 rounded-full border ${difficultyColors[exercise.difficulty]}`}>{exercise.difficulty}</span>
-                        </div>
+                      <div className="space-y-1">
+                        <span className="text-xs font-body font-semibold text-accent uppercase">
+                          {exercise.difficulty}
+                        </span>
                         <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">
                           {exercise.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground">{exercise.description}</p>
                       </div>
-                      <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-secondary/10"}`}>
+                      <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-primary/10"}`}>
                         {isCompleted ? (
                           <CheckCircle className="w-5 h-5 text-success" />
                         ) : (
-                          <Calculator className="w-5 h-5 text-secondary" />
+                          <Calculator className="w-5 h-5 text-primary" />
                         )}
                       </div>
                     </div>
