@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
-import heroImage from "@/assets/hero-bg.jpg";
+import mascotBackground from "@/assets/mascot-owl.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -59,9 +59,9 @@ const Index = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage: `url(${heroImage})`,
+            backgroundImage: `url(${mascotBackground})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
