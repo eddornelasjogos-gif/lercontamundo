@@ -65,23 +65,33 @@ const Math = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8 space-y-10">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <img src={mathImage} alt="Matemática" className="w-20 h-20" />
-            <div>
-              <h1 className="text-4xl font-display font-bold text-foreground">
-                Área de Matemática
-              </h1>
-              <p className="text-muted-foreground font-body">
-                Resolva desafios e torne-se um mestre dos números!
-              </p>
-            </div>
-          </div>
-          <Mascot message="Matemática é divertida!" />
-        </div>
+      {/* HERO COLORIDO DO TOPO */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(202,95%,84%)] via-[hsl(288,95%,86%)] to-[hsl(145,90%,84%)] shadow-soft">
+        <div className="absolute -top-12 right-4 h-56 w-56 rounded-full bg-[hsl(286,100%,85%)] opacity-60 blur-3xl" />
+        <div className="absolute bottom-[-40px] left-[-20px] h-72 w-72 rounded-full bg-[hsl(145,95%,80%)] opacity-60 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M100 40c0 11-9 20-20 20S60 51 60 40s9-20 20-20 20 9 20 20z%27 fill=%27%23ffffff29%27/%3E%3Ccircle cx=%2790%27 cy=%27155%27 r=%2726%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
 
+        <div className="container mx-auto px-4 py-10 md:py-14">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <img src={mathImage} alt="Matemática" className="w-20 h-20" />
+              <div>
+                <h1 className="text-4xl font-display font-bold text-foreground">
+                  Área de Matemática
+                </h1>
+                <p className="text-foreground/80 font-body">
+                  Resolva desafios e torne-se um mestre dos números!
+                </p>
+              </div>
+            </div>
+            <Mascot message="Matemática é divertida!" />
+          </div>
+        </div>
+      </section>
+
+      {/* CONTEÚDO PRINCIPAL */}
+      <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Progress */}
         <div>
           <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />

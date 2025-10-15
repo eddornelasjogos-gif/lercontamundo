@@ -63,20 +63,30 @@ const Profile = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8 space-y-10">
-        {/* Profile Header */}
-        <div className="text-center space-y-6">
-          <Mascot className="mx-auto" />
-          <div>
-            <h1 className="text-4xl font-display font-bold text-foreground mb-2">
-              Meu Perfil
-            </h1>
-            <p className="text-muted-foreground font-body">
-              Acompanhe seu progresso e conquistas!
-            </p>
+      {/* HERO COLORIDO DO TOPO */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
+        <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
+        <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
+        <div className="absolute bottom-[-40px] left-1/4 h-64 w-64 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Cpath d=%27M150 40a16 16 0 11-32 0 16 16 0 0132 0z%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%27110%27 cy=%27160%27 r=%2730%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-45" />
+
+        <div className="container mx-auto px-4 py-10 md:py-14">
+          <div className="text-center space-y-6">
+            <Mascot className="mx-auto" />
+            <div>
+              <h1 className="text-4xl font-display font-bold text-foreground mb-2">
+                Meu Perfil
+              </h1>
+              <p className="text-foreground/80 font-body">
+                Acompanhe seu progresso e conquistas!
+              </p>
+            </div>
           </div>
         </div>
+      </section>
 
+      {/* CONTEÚDO PRINCIPAL */}
+      <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Progress Section */}
         <div className="max-w-2xl mx-auto">
           <Card className="p-6 shadow-card border-2 border-primary/20">

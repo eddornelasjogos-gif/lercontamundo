@@ -65,23 +65,33 @@ const Reading = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8 space-y-10">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <img src={readingImage} alt="Leitura" className="w-20 h-20" />
-            <div>
-              <h1 className="text-4xl font-display font-bold text-foreground">
-                Área de Leitura
-              </h1>
-              <p className="text-muted-foreground font-body">
-                Explore histórias mágicas e aprenda se divertindo!
-              </p>
-            </div>
-          </div>
-          <Mascot message="Vamos ler juntos!" />
-        </div>
+      {/* HERO COLORIDO DO TOPO */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(302,95%,88%)] via-[hsl(48,100%,86%)] to-[hsl(198,95%,82%)] shadow-soft">
+        <div className="absolute -top-14 -left-16 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
+        <div className="absolute top-10 right-[-40px] h-56 w-56 rounded-full bg-[hsl(45,100%,88%)] opacity-60 blur-3xl" />
+        <div className="absolute bottom-[-40px] left-10 h-72 w-72 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
 
+        <div className="container mx-auto px-4 py-10 md:py-14">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <img src={readingImage} alt="Leitura" className="w-20 h-20" />
+              <div>
+                <h1 className="text-4xl font-display font-bold text-foreground">
+                  Área de Leitura
+                </h1>
+                <p className="text-foreground/80 font-body">
+                  Explore histórias mágicas e aprenda se divertindo!
+                </p>
+              </div>
+            </div>
+            <Mascot message="Vamos ler juntos!" />
+          </div>
+        </div>
+      </section>
+
+      {/* CONTEÚDO PRINCIPAL */}
+      <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Progress */}
         <div>
           <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />
