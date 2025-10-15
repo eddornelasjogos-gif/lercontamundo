@@ -58,7 +58,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
-      
+
       <div className="relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-40"
@@ -85,48 +85,59 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-display font-bold text-foreground mb-2">
-            Escolha Seu Nível
-          </h2>
-          <p className="text-muted-foreground font-body">
-            Selecione o nível que melhor combina com você
-          </p>
-        </div>
+      <div className="container mx-auto px-4 pb-12 md:pb-16">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(320,100%,83%)] via-[hsl(45,100%,78%)] to-[hsl(198,95%,80%)] px-6 py-12 shadow-glow md:px-12 md:py-16">
+          <div className="absolute -top-20 -left-16 h-56 w-56 rounded-full bg-[hsl(280,100%,80%)] opacity-70 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-72 w-72 translate-y-1/3 rounded-full bg-[hsl(198,100%,82%)] opacity-80 blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(45,100%,90%)] opacity-60 blur-3xl" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2720%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27160%27 cy=%2790%27 r=%2715%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2725%27 fill=%27%23ffffff33%27/%3E%3C/svg%3E')] opacity-40" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {difficulties.map((difficulty) => (
-            <DifficultyCard
-              key={difficulty.id}
-              {...difficulty}
-              onClick={() => handleDifficultySelect(difficulty.id)}
-            />
-          ))}
-        </div>
+          <div className="relative z-10 mx-auto max-w-7xl space-y-10">
+            <div className="text-center text-foreground">
+              <h2 className="text-3xl font-display font-bold mb-2">
+                Escolha Seu Nível
+              </h2>
+              <p className="text-muted-foreground font-body">
+                Selecione o nível que melhor combina com você
+              </p>
+            </div>
 
-        {selectedDifficulty && (
-          <div className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in">
-            <Button
-              variant="gradient"
-              size="lg"
-              onClick={() => navigate("/reading")}
-              className="font-display"
-            >
-              <BookOpen className="mr-2" />
-              Começar a Ler
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => navigate("/math")}
-              className="font-display"
-            >
-              <Calculator className="mr-2" />
-              Praticar Matemática
-            </Button>
+            <div className="rounded-3xl bg-white/60 p-6 md:p-8 shadow-soft backdrop-blur-sm">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {difficulties.map((difficulty) => (
+                  <DifficultyCard
+                    key={difficulty.id}
+                    {...difficulty}
+                    onClick={() => handleDifficultySelect(difficulty.id)}
+                  />
+                ))}
+              </div>
+
+              {selectedDifficulty && (
+                <div className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in">
+                  <Button
+                    variant="gradient"
+                    size="lg"
+                    onClick={() => navigate("/reading")}
+                    className="font-display"
+                  >
+                    <BookOpen className="mr-2" />
+                    Começar a Ler
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => navigate("/math")}
+                    className="font-display"
+                  >
+                    <Calculator className="mr-2" />
+                    Praticar Matemática
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </section>
       </div>
     </div>
   );
