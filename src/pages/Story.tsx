@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import cigarraAudio from "@/assets/audio/cigarra-formiga.m4a";
 import lebreAudio from "@/assets/audio/lebre-tartaruga.m4a";
 import leaoAudio from "@/assets/audio/leao-rato.m4a";
+import raposaAudio from "@/assets/audio/raposa-uvas.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -452,6 +453,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={leaoAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 104 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={raposaAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
