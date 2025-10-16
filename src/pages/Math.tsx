@@ -70,6 +70,15 @@ const Math = () => {
 
       {/* HERO COLORIDO DO TOPO (com Header colorido ao lado) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(202,95%,84%)] via-[hsl(288,95%,86%)] to-[hsl(145,90%,84%)] shadow-soft">
+        {/* Mascote de fundo no HERO */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `url(${mascotBackground})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
         <div className="absolute -top-12 right-4 h-56 w-56 rounded-full bg-[hsl(286,100%,85%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
@@ -98,7 +107,7 @@ const Math = () => {
         </div>
 
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(210,95%,82%)] via-[hsl(286,90%,80%)] to-[hsl(145,90%,78%)] px-6 py-12 shadow-glow md:px-12 md:py-16">
-          {/* Mascote de fundo */}
+          {/* Mascote de fundo na seção principal */}
           <div
             className="absolute inset-0 opacity-20 z-0"
             style={{

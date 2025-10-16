@@ -116,6 +116,15 @@ const Reading = () => {
 
       {/* HERO COLORIDO DO TOPO (com Header colorido ao lado) */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(302,95%,88%)] via-[hsl(48,100%,86%)] to-[hsl(198,95%,82%)] shadow-soft">
+        {/* Mascote de fundo no HERO */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `url(${mascotBackground})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
         <div className="absolute -top-14 -left-16 h-64 w-64 rounded-full bg-[hsl(320,100%,86%)] opacity-60 blur-3xl" />
         <div className="absolute top-10 right-[-40px] h-56 w-56 rounded-full bg-[hsl(45,100%,88%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-[-40px] left-10 h-72 w-72 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
@@ -146,7 +155,7 @@ const Reading = () => {
 
         {/* Stories Section */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(198,95%,80%)] via-[hsl(315,93%,82%)] to-[hsl(45,98%,75%)] px-6 py-10 shadow-glow md:px-12 md:py-14">
-          {/* Mascote de fundo */}
+          {/* Mascote de fundo na seção principal */}
           <div
             className="absolute inset-0 opacity-20 z-0"
             style={{
