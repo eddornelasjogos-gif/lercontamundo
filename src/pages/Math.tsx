@@ -84,7 +84,7 @@ const Math = () => {
                 gradientTo="#f472b6"
               />
             </div>
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-col items-center gap-3">
               <LevelSelector value={selectedDifficulty} onChange={(d) => setSelectedDifficulty(d)} />
               <Mascot message="Matemática é divertida!" />
             </div>

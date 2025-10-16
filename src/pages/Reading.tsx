@@ -134,7 +134,7 @@ const Reading = () => {
                 gradientTo="#c4b5fd"
               />
             </div>
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-col items-center gap-3">
               <LevelSelector value={userDifficulty} onChange={(d) => setUserDifficulty(d)} />
               <Mascot message="Vamos ler juntos!" />
             </div>
