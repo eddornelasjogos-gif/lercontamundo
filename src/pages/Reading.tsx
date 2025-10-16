@@ -29,7 +29,7 @@ const Reading = () => {
   }, [userDifficulty]);
 
   // Predefined lists with popular/known story titles for each difficulty level.
-  // The 'easy' difficulty contains exactly 5 Fábulas (101-105) e 5 Contos (111-115).
+  // The 'easy' difficulty contains exactly 5 Fábulas (101-105) and 5 Contos (111-115).
   const storiesByDifficulty = {
     easy: [
       // Fábulas (101-105)
@@ -180,6 +180,14 @@ const Reading = () => {
                   return (
                     <Card
                       key={story.id}
+                      onClick={() => navigate(`/reading/${story.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          navigate(`/reading/${story.id}`);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                       className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${
                         isCompleted ? "border-success bg-success/5" : "border-border hover:border-primary"
                       }`}
@@ -217,7 +225,11 @@ const Reading = () => {
                         <Button
                           variant={isCompleted ? "outline" : "gradient"}
                           className="w-full"
-                          onClick={() => navigate(`/reading/${story.id}`)}
+                          onClick={(e) => {
+                            // prevent the click on the button from bubbling up and causing double navigation side-effects
+                            e.stopPropagation();
+                            navigate(`/reading/${story.id}`);
+                          }}
                         >
                           {isCompleted ? "✓ Completado" : "Começar Leitura"}
                         </Button>
