@@ -10,6 +10,7 @@ import Math from "./pages/Math";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Story from "./pages/Story";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/reading" element={<Reading />} />
