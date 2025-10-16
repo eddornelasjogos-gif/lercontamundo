@@ -155,28 +155,53 @@ const Narrator = ({ text, title = "Narração", lang = "pt-BR" }: NarratorProps)
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
+      {/* Cabeçalho e controles empilhados para evitar overflow */}
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-full bg-primary/10">
             <Volume2 className="w-5 h-5 text-primary" />
           </div>
           <span className="font-display font-bold text-foreground">{title}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="secondary" onClick={handlePlay} aria-label={isPaused ? "Retomar narração" : "Iniciar narração"}>
+
+        <div className="flex flex-col items-stretch gap-2 w-full">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="w-full"
+            onClick={handlePlay}
+            aria-label={isPaused ? "Retomar narração" : "Iniciar narração"}
+          >
             <Play className="w-4 h-4 mr-1" />
-            {isPaused ? "Retomar" : isSpeaking ? "Reproduzindo" : "Ouvir"}
+            {isPaused ? "Retomar" : isSpeaking ? "Reproduzindo" : "Reproduzir"}
           </Button>
-          <Button size="sm" variant="outline" onClick={handlePause} disabled={!isSpeaking || isPaused} aria-label="Pausar narração">
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full"
+            onClick={handlePause}
+            disabled={!isSpeaking || isPaused}
+            aria-label="Pausar narração"
+          >
             <Pause className="w-4 h-4 mr-1" />
             Pausar
           </Button>
-          <Button size="sm" variant="outline" onClick={handleStop} disabled={!isSpeaking && index === 0} aria-label="Parar narração">
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full"
+            onClick={handleStop}
+            disabled={!isSpeaking && index === 0}
+            aria-label="Parar narração"
+          >
             <Square className="w-4 h-4 mr-1" />
             Parar
           </Button>
         </div>
       </div>
+
       <Progress value={progress} className="h-2" />
       <p className="text-xs text-muted-foreground">
         {selectedVoice
