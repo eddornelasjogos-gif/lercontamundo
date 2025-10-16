@@ -7,7 +7,7 @@ interface AchievementToastProps {
 
 export const AchievementToast = ({ icon: Icon, title }: AchievementToastProps) => {
   return (
-    <div className="flex items-center gap-4 p-4 w-80 rounded-2xl border-2 border-amber-300 shadow-glow gradient-trophy animate-scale-in">
+    <div className="flex items-center gap-4 p-4 w-80 rounded-2xl border-2 border-amber-300 shadow-glow gradient-trophy animate-scale-in cursor-pointer">
       <div className="flex-shrink-0 p-3 bg-white/30 rounded-full animate-pulse-glow">
         <Icon className="w-8 h-8 text-white" />
       </div>
