@@ -8,26 +8,60 @@ import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import mathImage from "@/assets/math-numbers.png";
 import ColorHeader from "../components/ColorHeader.tsx";
+import LevelSelector from "@/components/LevelSelector";
+import { useState, useEffect } from "react";
+
+type Difficulty = "easy" | "medium" | "hard" | "very-hard";
+const STORAGE_KEY = "userDifficulty";
 
 const Math = () => {
   const { progress, completeExercise } = useProgress();
+
+  const initialDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(initialDifficulty);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, selectedDifficulty);
+  }, [selectedDifficulty]);
 
   const handleCompleteExercise = (exerciseId: number, xpReward: number) => {
     completeExercise(exerciseId, xpReward);
     toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
   };
 
-  const exercises = [
-    { id: 1, title: "Soma Divertida", description: "Pratique adições básicas", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
-    { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
-    { id: 3, title: "Multiplicação Estelar", description: "Tabuada interativa", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
-    { id: 4, title: "Divisão Espacial", description: "Divida e conquiste", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
-  ];
+  const exercisesByDifficulty: Record<Difficulty, Array<any>> = {
+    easy: [
+      { id: 1, title: "Soma Divertida", description: "Pratique adições básicas", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
+      { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
+      { id: 3, title: "Contando com Objetos", description: "Quantos são?", difficulty: "Fácil", exercises: 8, xp: 30, completed: false },
+      { id: 4, title: "Formas e Números", description: "Combina formas com números", difficulty: "Fácil", exercises: 6, xp: 25, completed: false },
+    ],
+    medium: [
+      { id: 10, title: "Multiplicação Estelar", description: "Tabuada interativa", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
+      { id: 11, title: "Divisão Espacial", description: "Divida e conquiste", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
+      { id: 12, title: "Frações Simples", description: "Aprenda frações básicas", difficulty: "Médio", exercises: 12, xp: 55, completed: false },
+      { id: 13, title: "Medidas e Unidades", description: "Compreendendo medidas", difficulty: "Médio", exercises: 10, xp: 50, completed: false },
+    ],
+    hard: [
+      { id: 20, title: "Proporções e Razões", description: "Problemas de proporção", difficulty: "Difícil", exercises: 12, xp: 90, completed: false },
+      { id: 21, title: "Equações Básicas", description: "Introdução a equações", difficulty: "Difícil", exercises: 14, xp: 100, completed: false },
+      { id: 22, title: "Problemas de Texto", description: "Resolver usando lógica", difficulty: "Difícil", exercises: 16, xp: 110, completed: false },
+      { id: 23, title: "Geometria Básica", description: "Perímetros e áreas", difficulty: "Difícil", exercises: 12, xp: 95, completed: false },
+    ],
+    "very-hard": [
+      { id: 30, title: "Desafios Avançados", description: "Problemas complexos", difficulty: "Muito Difícil", exercises: 20, xp: 150, completed: false },
+      { id: 31, title: "Raciocínio Lógico Avançado", description: "Desafios de lógica", difficulty: "Muito Difícil", exercises: 18, xp: 140, completed: false },
+      { id: 32, title: "Mistura de Operações", description: "Misture tudo e resolva", difficulty: "Muito Difícil", exercises: 20, xp: 160, completed: false },
+    ],
+  };
+
+  const exercises = exercisesByDifficulty[selectedDifficulty];
 
   const difficultyColors: Record<string, string> = {
     Fácil: "text-success bg-success/10 border-success",
     Médio: "text-secondary bg-secondary/10 border-secondary",
     Difícil: "text-accent bg-accent/10 border-accent",
+    "Muito Difícil": "text-primary bg-primary/10 border-primary",
   };
 
   return (
@@ -50,7 +84,10 @@ const Math = () => {
                 gradientTo="#f472b6"
               />
             </div>
-            <Mascot message="Matemática é divertida!" />
+            <div className="flex flex-col items-end gap-3">
+              <LevelSelector value={selectedDifficulty} onChange={(d) => setSelectedDifficulty(d)} />
+              <Mascot message="Matemática é divertida!" />
+            </div>
           </div>
         </div>
       </section>

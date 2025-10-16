@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,19 +9,25 @@ import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import readingImage from "@/assets/reading-books.png";
 import ColorHeader from "@/components/ColorHeader";
+import LevelSelector from "@/components/LevelSelector";
+
+type Difficulty = "easy" | "medium" | "hard" | "very-hard";
+
+const STORAGE_KEY = "userDifficulty";
 
 const Reading = () => {
   const { progress, completeStory } = useProgress();
 
-  // Read the user's selected difficulty from localStorage (defaults to 'easy')
-  const userDifficulty = (localStorage.getItem("userDifficulty") as
-    | "easy"
-    | "medium"
-    | "hard"
-    | "very-hard") || "easy";
+  // Persisted difficulty with state so changing it re-renders the page
+  const initialDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
+  const [userDifficulty, setUserDifficulty] = useState<Difficulty>(initialDifficulty);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, userDifficulty);
+  }, [userDifficulty]);
 
   // Predefined lists with popular/known story titles for each difficulty level.
-  // The 'easy' difficulty now contains exactly 5 Fábulas (101-105) and 5 Contos (111-115).
+  // The 'easy' difficulty contains exactly 5 Fábulas (101-105) and 5 Contos (111-115).
   const storiesByDifficulty = {
     easy: [
       // Fábulas (101-105)
@@ -77,18 +83,6 @@ const Reading = () => {
       { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
       { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
       { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
-
-      // Aventura (311-320)
-      { id: 311, title: "A Lenda do Rei Arthur (trechos)", category: "Aventura", duration: "14 min", xp: 130, stars: 4 },
-      { id: 312, title: "As Viagens de Gulliver (trechos)", category: "Aventura", duration: "14 min", xp: 130, stars: 4 },
-      { id: 313, title: "O Senhor dos Anéis (trecho infantil)", category: "Aventura", duration: "16 min", xp: 150, stars: 4 },
-      { id: 314, title: "A Ilha Misteriosa (trechos)", category: "Aventura", duration: "15 min", xp: 140, stars: 4 },
-      { id: 315, title: "Robinson e seus Desafios", category: "Aventura", duration: "15 min", xp: 145, stars: 4 },
-      { id: 316, title: "Viagem ao Centro da Terra (trechos)", category: "Aventura", duration: "15 min", xp: 145, stars: 4 },
-      { id: 317, title: "O Tesouro Escondido", category: "Aventura", duration: "12 min", xp: 120, stars: 4 },
-      { id: 318, title: "Exploradores do Mar", category: "Aventura", duration: "13 min", xp: 125, stars: 4 },
-      { id: 319, title: "O Capitão Corajoso", category: "Aventura", duration: "13 min", xp: 125, stars: 4 },
-      { id: 320, title: "Mistérios do Farol", category: "Aventura", duration: "12 min", xp: 120, stars: 4 },
     ],
 
     "very-hard": [
@@ -98,23 +92,6 @@ const Reading = () => {
       { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
       { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
       { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 406, title: "O Morro dos Ventos Uivantes (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 407, title: "Madame Bovary (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 408, title: "O Retrato de Dorian Gray (trecho)", category: "Clássicos", duration: "19 min", xp: 190, stars: 5 },
-      { id: 409, title: "As Viagens de Gulliver (versão densa)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
-      { id: 410, title: "Sherlock Holmes: Contos Selecionados (trechos)", category: "Clássicos", duration: "18 min", xp: 185, stars: 5 },
-
-      // Mistério & Épicos (411-420)
-      { id: 411, title: "Sherlock Holmes: O Cão dos Baskervilles (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
-      { id: 412, title: "Drácula (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
-      { id: 413, title: "Frankenstein (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
-      { id: 414, title: "O Chamado de Cthulhu (resumo)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
-      { id: 415, title: "Os Mistérios de Paris (trecho)", category: "Mistério", duration: "19 min", xp: 190, stars: 5 },
-      { id: 416, title: "A Sombra do Vento (trecho)", category: "Mistério", duration: "19 min", xp: 190, stars: 5 },
-      { id: 417, title: "Contos de Poe (seleção)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
-      { id: 418, title: "Mistérios do Oriente (seleção)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
-      { id: 419, title: "Relatos de Aventuras Épicas", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
-      { id: 420, title: "Lendas Antigas e Épicos (seleção)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
     ],
   } as const;
 
@@ -123,6 +100,12 @@ const Reading = () => {
   // Derive categories from the selected difficulty's stories
   const categories = Array.from(new Set(stories.map((s) => s.category)));
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
+
+  // Reset selected category whenever difficulty changes
+  useEffect(() => {
+    const newCategories = Array.from(new Set(storiesByDifficulty[userDifficulty].map((s) => s.category)));
+    setSelectedCategory(newCategories[0]);
+  }, [userDifficulty]);
 
   const handleCompleteStory = (storyId: number, xpReward: number) => {
     completeStory(storyId, xpReward);
@@ -151,7 +134,10 @@ const Reading = () => {
                 gradientTo="#c4b5fd"
               />
             </div>
-            <Mascot message="Vamos ler juntos!" />
+            <div className="flex flex-col items-end gap-3">
+              <LevelSelector value={userDifficulty} onChange={(d) => setUserDifficulty(d)} />
+              <Mascot message="Vamos ler juntos!" />
+            </div>
           </div>
         </div>
       </section>
