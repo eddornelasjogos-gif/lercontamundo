@@ -7,6 +7,7 @@ import { Trophy } from "@/components/Trophy";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
+import { Mascot } from "@/components/Mascot";
 
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
@@ -59,18 +60,19 @@ const Profile = () => {
     },
   ];
 
-  // Lógica para exibir conquistas de sequência de forma progressiva
   const lastUnlockedStreakIndex = streakAchievements.findLastIndex((ach) =>
     progress.achievements.includes(ach.id)
   );
   
-  // Mostra todas as desbloqueadas + a próxima a ser desbloqueada
   const visibleStreakAchievements = streakAchievements.slice(0, lastUnlockedStreakIndex + 2);
 
   const achievementsToDisplay = [...baseAchievements, ...visibleStreakAchievements].map(ach => ({
     ...ach,
     unlocked: progress.achievements.includes(ach.id) || (ach.id === 'star-bright' && progress.level >= 5)
   }));
+
+  const unlockedAchievements = achievementsToDisplay.filter(ach => ach.unlocked);
+  const lockedAchievements = achievementsToDisplay.filter(ach => !ach.unlocked);
 
   const stats = [
     {
@@ -93,7 +95,7 @@ const Profile = () => {
     },
     {
       label: "Conquistas",
-      value: `${achievementsToDisplay.filter(a => a.unlocked).length}/${achievementsToDisplay.length}`,
+      value: `${unlockedAchievements.length}/${achievementsToDisplay.length}`,
       icon: Award,
       color: "gradient-primary",
     },
@@ -110,13 +112,10 @@ const Profile = () => {
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      {/* HERO COLORIDO DO TOPO com cabeçalho colorido */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(48,99%,86%)] via-[hsl(322,94%,86%)] to-[hsl(198,95%,84%)] shadow-soft">
         <div className="absolute -top-16 -left-10 h-64 w-64 rounded-full bg-[hsl(320,100%,80%)] opacity-60 blur-3xl" />
         <div className="absolute top-1/2 right-[-40px] h-72 w-72 -translate-y-1/2 rounded-full bg-[hsl(198,100%,84%)] opacity-60 blur-3xl" />
         <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3C/svg%3E')] opacity-45" />
-
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center">
             <div
@@ -132,16 +131,13 @@ const Profile = () => {
         </div>
       </section>
 
-      {/* CONTEÚDO PRINCIPAL */}
       <div className="container mx-auto px-4 py-8 space-y-10">
-        {/* Progress Section */}
         <div className="max-w-2xl mx-auto">
           <Card className="p-6 shadow-card border-2 border-primary/20">
             <ProgressBar currentXP={progress.xp} requiredXP={500} level={progress.level} />
           </Card>
         </div>
 
-        {/* Stats & Achievements */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(48,99%,82%)] via-[hsl(322,94%,82%)] to-[hsl(198,95%,78%)] px-6 py-12 shadow-soft md:px-12 md:py-16">
           <div className="absolute -top-20 -left-16 h-60 w-60 rounded-full bg-[hsl(320,100%,86%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 right-0 h-72 w-72 -translate-y-1/2 translate-x-1/4 rounded-full bg-[hsl(198,100%,82%)] opacity-70 blur-3xl" />
@@ -154,7 +150,7 @@ const Profile = () => {
               </p>
             </div>
 
-            <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm space-y-10">
+            <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm space-y-12">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {stats.map((stat) => (
                   <Card key={stat.label} className="p-6 text-center hover:shadow-glow transition-smooth border-2 border-border">
@@ -171,23 +167,33 @@ const Profile = () => {
 
               <div className="space-y-6">
                 <h3 className="text-2xl font-display font-bold text-foreground text-center">Galeria de Troféus</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                  {achievementsToDisplay.map((achievement) => (
-                    <Trophy
-                      key={achievement.id}
-                      icon={achievement.icon}
-                      title={achievement.title}
-                      description={achievement.description}
-                      unlocked={achievement.unlocked}
-                    />
-                  ))}
-                </div>
+                {unlockedAchievements.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {unlockedAchievements.map((achievement) => (
+                      <Trophy key={achievement.id} {...achievement} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Mascot message="Sua galeria está vazia. Continue jogando para conquistar o primeiro troféu!" />
+                  </div>
+                )}
               </div>
+
+              {lockedAchievements.length > 0 && (
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-display font-bold text-foreground text-center">Próximas Conquistas</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {lockedAchievements.map((achievement) => (
+                      <Trophy key={achievement.id} {...achievement} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Action Button */}
         <div className="text-center">
           <Button variant="outline" size="lg" onClick={handleReset}>
             Resetar Progresso
