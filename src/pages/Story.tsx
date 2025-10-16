@@ -11,6 +11,7 @@ import lebreAudio from "@/assets/audio/lebre-tartaruga.m4a";
 import leaoAudio from "@/assets/audio/leao-rato.m4a";
 import raposaAudio from "@/assets/audio/raposa-uvas.m4a";
 import galinhaAudio from "@/assets/audio/galinha-ovos-ouro.m4a";
+import patinhoFeioAudio from "@/assets/audio/patinho-feio.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -478,6 +479,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={galinhaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 111 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={patinhoFeioAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
