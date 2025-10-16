@@ -16,6 +16,7 @@ import joaoPeDeFeijaoAudio from "@/assets/audio/joao-pe-de-feijao.m4a";
 import cinderelaAudio from "@/assets/audio/cinderela.m4a";
 import brancaDeNeveAudio from "@/assets/audio/branca-de-neve.m4a";
 import flautistaHamelinAudio from "@/assets/audio/flautista-hamelin.m4a";
+import chapeuzinhoAudio from "@/assets/audio/chapeuzinho-vermelho.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -543,6 +544,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={flautistaHamelinAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 201 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={chapeuzinhoAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
