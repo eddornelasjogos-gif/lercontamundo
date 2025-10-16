@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { AchievementToast } from '@/components/AchievementToast';
 import { BookOpen, Library, Calculator, BrainCircuit, Flame } from 'lucide-react';
 
 export interface UserProgress {
@@ -51,7 +51,6 @@ const STREAK_ACHIEVEMENTS = [
 ];
 
 export const useUserProgress = () => {
-  const navigate = useNavigate();
   const [progress, setProgress] = useState<UserProgress>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -90,15 +89,7 @@ export const useUserProgress = () => {
         STREAK_ACHIEVEMENTS.forEach(ach => {
             if (newConsecutiveDays >= parseInt(ach.id.split('-')[1]) && !newAchievements.includes(ach.id)) {
                 newAchievements.push(ach.id);
-                toast('🏆 Nova Conquista! 🎉', {
-                  description: ach.title,
-                  duration: 5000,
-                  onClick: () => navigate('/profile'),
-                  action: {
-                    label: 'Ver Perfil',
-                    onClick: () => navigate('/profile'),
-                  },
-                });
+                toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
             }
         });
 
@@ -146,15 +137,7 @@ export const useUserProgress = () => {
       READING_ACHIEVEMENTS.forEach(ach => {
         if (newStoriesRead >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
-          toast('🏆 Nova Conquista! 🎉', {
-            description: ach.title,
-            duration: 5000,
-            onClick: () => navigate('/profile'),
-            action: {
-              label: 'Ver Perfil',
-              onClick: () => navigate('/profile'),
-            },
-          });
+          toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
         }
       });
       
@@ -182,15 +165,7 @@ export const useUserProgress = () => {
       MATH_ACHIEVEMENTS.forEach(ach => {
         if (newExercisesCompleted >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
-          toast('🏆 Nova Conquista! 🎉', {
-            description: ach.title,
-            duration: 5000,
-            onClick: () => navigate('/profile'),
-            action: {
-              label: 'Ver Perfil',
-              onClick: () => navigate('/profile'),
-            },
-          });
+          toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
         }
       });
       
