@@ -109,15 +109,21 @@ class Cell {
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
         
+        // Determine the direction for the impulse
         const direction = directionVector.magnitude() > 0.1
             ? directionVector.normalize()
             : this.velocity.magnitude() > 0.1 
                 ? this.velocity.normalize() 
                 : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
 
+        // Apply impulse to the new cell
         const ejectionImpulse = 30;
         newCell.velocity = this.velocity.add(direction.multiply(ejectionImpulse));
         newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        
+        // Apply a slight counter-impulse to the original cell to separate them slightly
+        this.velocity = this.velocity.add(direction.multiply(-ejectionImpulse * 0.1));
+
         return newCell;
     }
     return null;
