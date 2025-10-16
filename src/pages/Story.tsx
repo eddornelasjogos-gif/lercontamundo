@@ -1030,7 +1030,7 @@ const Story = () => {
           </Card>
 
           <div className="flex justify-between items-center gap-4">
-            <Button variant="outline" onClick={() => navigate(-1)}>
+            <Button variant="outline" onClick={() => navigate("/reading")}>
               Voltar
             </Button>
             <Button variant={buttonVariant} onClick={buttonAction}>
