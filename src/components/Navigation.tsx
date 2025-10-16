@@ -1,4 +1,4 @@
-import { Home, BookOpen, Calculator, User, Map } from "lucide-react";
+import { Home, BookOpen, Calculator, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -6,7 +6,9 @@ export const Navigation = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: Map, label: "Jornada", path: "/journey" },
+    { icon: Home, label: "Início", path: "/" },
+    { icon: BookOpen, label: "Leitura", path: "/reading" },
+    { icon: Calculator, label: "Matemática", path: "/math" },
     { icon: User, label: "Perfil", path: "/profile" },
   ];
 
@@ -15,7 +17,7 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-around items-center md:justify-center md:gap-8 py-3">
           {navItems.map(({ icon: Icon, label, path }) => {
-            const isActive = location.pathname.startsWith(path);
+            const isActive = location.pathname === path;
             return (
               <Link
                 key={path}

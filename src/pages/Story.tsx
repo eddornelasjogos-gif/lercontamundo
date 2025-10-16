@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
-import { journeyPath } from "@/data/journey-data";
 import cigarraAudio from "@/assets/audio/cigarra-formiga.m4a";
 import lebreAudio from "@/assets/audio/lebre-tartaruga.m4a";
 import leaoAudio from "@/assets/audio/leao-rato.m4a";
@@ -40,7 +39,84 @@ import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
 import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a";
 import robinsonCrusoeAudio from "@/assets/audio/robinson-crusoe.m4a";
-import ilhaDoTesouroAudio from "@/assets/audio/ilha-do-tesouro.m4a";
+import ilhaDoTesouroAudio from "@/assets/audio/ilha-do-tesouro.m4a"; // NOVO ÁUDIO IMPORTADO
+
+type Difficulty = "easy" | "medium" | "hard" | "very-hard";
+const STORAGE_KEY = "userDifficulty";
+
+interface StoryMetadata {
+  id: number;
+  title: string;
+  category: string;
+  xp: number;
+  stars: number;
+}
+
+// Metadados das histórias para determinar a ordem e a categoria
+const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
+    easy: [
+      // Fábulas
+      { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", xp: 25, stars: 2 },
+      { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", xp: 35, stars: 2 },
+      // Contos Clássicos
+      { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", xp: 65, stars: 3 },
+      { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", xp: 80, stars: 3 },
+      { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", xp: 90, stars: 4 },
+      { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", xp: 65, stars: 3 },
+      // Contos
+      { id: 211, title: "Os Três Porquinhos", category: "Contos", xp: 60, stars: 3 },
+      { id: 212, title: "Pedro e o Lobo", category: "Contos", xp: 55, stars: 3 },
+      { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", xp: 95, stars: 4 },
+      { id: 214, title: "Ali Babá e os Quarenta Ladrões (trechos)", category: "Contos", xp: 95, stars: 4 },
+      { id: 215, title: "O Rouxinol", category: "Contos", xp: 65, stars: 3 },
+      { id: 216, title: "Barba Azul (resumo)", category: "Contos", xp: 65, stars: 3 },
+      { id: 217, title: "A Fada Voadora", category: "Contos", xp: 60, stars: 3 },
+      { id: 218, title: "O Cavalo e o Homem", category: "Contos", xp: 60, stars: 3 },
+      { id: 219, title: "A Lenda da Lua", category: "Contos", xp: 65, stars: 3 },
+      { id: 220, title: "O Pescador e o Gênio", category: "Contos", xp: 70, stars: 3 },
+    ],
+    medium: [
+      // Fábulas
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", xp: 35, stars: 2 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", xp: 30, stars: 2 },
+      { id: 103, title: "O Leão e o Rato", category: "Fábulas", xp: 30, stars: 2 },
+      // Contos
+      { id: 111, title: "O Patinho Feio", category: "Contos", xp: 45, stars: 3 },
+      { id: 112, title: "João e o Pé de Feijão", category: "Contos", xp: 50, stars: 3 },
+      { id: 113, title: "Cinderela", category: "Contos", xp: 55, stars: 3 },
+      { id: 114, title: "Branca de Neve", category: "Contos", xp: 55, stars: 3 },
+      { id: 115, title: "O Flautista de Hamelin", category: "Contos", xp: 45, stars: 3 },
+      // Contos Clássicos
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", xp: 75, stars: 3 },
+      { id: 203, title: "Rapunzel", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", xp: 80, stars: 3 },
+    ],
+    hard: [
+      // Clássicos (301-310)
+      { id: 301, title: "Pinóquio", category: "Clássicos", xp: 120, stars: 4 },
+      { id: 302, title: "Alice no País das Maravilhas", category: "Clássicos", xp: 130, stars: 4 },
+      { id: 303, title: "As Aventuras de Robinson Crusoé", category: "Clássicos", xp: 150, stars: 4 },
+      { id: 304, title: "A Ilha do Tesouro", category: "Clássicos", xp: 140, stars: 4 },
+      { id: 305, title: "O Médico e o Monstro (trecho)", category: "Clássicos", xp: 125, stars: 4 },
+      { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", xp: 150, stars: 4 },
+      { id: 307, title: "Heidi (trechos)", category: "Clássicos", xp: 120, stars: 4 },
+      { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", xp: 130, stars: 4 },
+      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", xp: 140, stars: 4 },
+      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
+    ],
+    "very-hard": [
+      // Clássicos (trechos) (401-405)
+      { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", xp: 180, stars: 5 },
+      { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", xp: 180, stars: 5 },
+    ],
+} as const;
+
 
 const STORY_CONTENT: Record<
   number,
@@ -136,6 +212,7 @@ const STORY_CONTENT: Record<
       "A cidade de Hamelin foi invadida por ratos que devoravam colheitas e incomodavam os moradores. Um flautista vestindo roupas coloridas ofereceu-se para livrar a cidade do problema em troca de pagamento. O assentimento veio, e com sua flauta ele encantou os ratos, que o seguiram até o rio, onde se afogaram.\n\nOs cidadãos, satisfeitos, prometeram pagar ao flautista, mas, quando a tarefa foi cumprida, recusaram-se a honrar o acordo. Sentindo-se enganado e humilhado, o flautista planejou uma última demonstração de seu poder.\n\nEle tocou novamente sua flauta, porém desta vez suas melodias enfeitiçaram as crianças da cidade; elas o seguiram até uma montanha ou uma caverna, dependendo da versão, e desapareceram. A cidade ficou devastada pela perda e pelo remorso.\n\nA história é um lembrete sobre a importância de cumprir promessas e de tratar com justiça aqueles que ajudam. Mostra também o perigo da ingratidão e como ações sem honra podem trazer consequências dolorosas.",
   },
 
+  /* Nível médio (201–220) - textos completos */
   201: {
     id: 201,
     title: "Chapeuzinho Vermelho",
@@ -307,6 +384,7 @@ const STORY_CONTENT: Record<
       "Um pobre pescador lançou sua rede e, em vez de peixes, pescou um jarro de cobre selado. Ao abri-lo, um Gênio enorme e furioso saiu, prometendo matar o pescador por tê-lo libertado após séculos de prisão. O pescador, esperto, não se desesperou.\n\nEle duvidou que o Gênio fosse tão grande a ponto de caber de volta no jarro. O Gênio, ofendido, demonstrou seu poder voltando para o jarro. O pescador selou o jarro rapidamente, prendendo o Gênio novamente.\n\nO Gênio implorou para ser libertado, prometendo riquezas. O pescador, após negociar, libertou-o, mas exigiu que o Gênio o ajudasse a pescar. O Gênio, humilhado, cumpriu a promessa. O pescador aprendeu que a inteligência e a calma são mais poderosas que a força bruta, e que a astúcia pode transformar a ameaça em oportunidade.",
   },
 
+  /* Nível difícil (301–310) - textos completos */
   301: {
     id: 301,
     title: "Pinóquio",
@@ -397,6 +475,7 @@ const STORY_CONTENT: Record<
       "Uma coletânea de contos dos Irmãos Grimm convida a conhecer heróis humildes e corajosos: o Alfaiate Valente que derrota gigantes com astúcia, João e Maria que enfrentam uma casa de doces perigosa e um príncipe que aprende a ver além das aparências.\n\nEm cada história, provações pedem escolhas: seguir um caminho escuro, cumprir promessas difíceis ou dividir o pouco que se tem. A esperteza e a bondade, quando andam juntas, viram ferramentas poderosas contra a ganância e a mentira.\n\nAo final, não é a força que vence, mas a coragem aliada à compaixão. Quem ajuda o próximo encontra ajuda, quem cumpre a palavra encontra confiança, e quem aprende com os tropeços volta para casa transformado — pronto para escrever o próximo capítulo.",
   },
 
+  /* Nível muito difícil (401–405) - textos completos */
   401: {
     id: 401,
     title: "Dom Quixote (trechos)",
@@ -451,18 +530,31 @@ const Story = () => {
   const storyId = useMemo(() => (id ? parseInt(id, 10) : NaN), [id]);
   const story = STORY_CONTENT[storyId];
 
-  const currentStageIndex = journeyPath.findIndex(
-    (stage) => stage.type === 'reading' && stage.targetId === storyId
+  // 1. Determinar a dificuldade e categoria atual
+  const userDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
+  const currentStoryMetadata = STORY_METADATA_BY_DIFFICULTY[userDifficulty].find(
+    (meta) => meta.id === storyId
   );
 
-  const nextStage =
-    currentStageIndex !== -1 && currentStageIndex < journeyPath.length - 1
-      ? journeyPath[currentStageIndex + 1]
+  const storiesInCurrentCategory = useMemo(() => {
+    if (!currentStoryMetadata) return [];
+    return STORY_METADATA_BY_DIFFICULTY[userDifficulty].filter(
+      (meta) => meta.category === currentStoryMetadata.category
+    );
+  }, [userDifficulty, currentStoryMetadata]);
+
+  const currentStoryIndex = storiesInCurrentCategory.findIndex(
+    (meta) => meta.id === storyId
+  );
+
+  const nextStoryMetadata =
+    currentStoryIndex !== -1 && currentStoryIndex < storiesInCurrentCategory.length - 1
+      ? storiesInCurrentCategory[currentStoryIndex + 1]
       : undefined;
 
   useEffect(() => {
     if (!story) {
-      const t = setTimeout(() => navigate("/journey"), 800);
+      const t = setTimeout(() => navigate("/reading"), 800);
       return () => clearTimeout(t);
     }
   }, [story, navigate]);
@@ -481,29 +573,28 @@ const Story = () => {
     if (!isCompleted) {
       completeStory(storyId, story.xp);
       toast.success(`🎉 Você ganhou ${story.xp} XP por ler "${story.title}"!`);
+    } else {
+      toast("História já concluída.");
     }
-    navigate("/journey");
+    navigate("/reading");
   };
 
-  const handleNext = () => {
+  const handleNextStory = () => {
     if (!isCompleted) {
       completeStory(storyId, story.xp);
       toast.success(`🎉 Você ganhou ${story.xp} XP por ler "${story.title}"!`);
     }
     
-    if (nextStage) {
-      if (nextStage.type === 'reading') {
-        navigate(`/reading/${nextStage.targetId}`);
-      } else {
-        navigate(`/math/${nextStage.targetId}`);
-      }
+    if (nextStoryMetadata) {
+      navigate(`/reading/${nextStoryMetadata.id}`);
     } else {
-      navigate("/journey");
+      // Se for a última história, volta para a lista de leitura
+      navigate("/reading");
     }
   };
 
-  const buttonText = nextStage ? "Próxima Etapa" : "Concluir Jornada";
-  const buttonAction = handleNext;
+  const buttonText = nextStoryMetadata ? "Próxima História" : "Concluir Leitura";
+  const buttonAction = nextStoryMetadata ? handleNextStory : handleComplete;
   const buttonVariant = isCompleted ? "outline" : "gradient";
 
   return (
@@ -942,8 +1033,8 @@ const Story = () => {
           </Card>
 
           <div className="flex justify-between items-center gap-4">
-            <Button variant="outline" onClick={() => navigate("/journey")}>
-              Voltar para Jornada
+            <Button variant="outline" onClick={() => navigate("/reading")}>
+              Voltar
             </Button>
             <Button variant={buttonVariant} onClick={buttonAction}>
               {buttonText}

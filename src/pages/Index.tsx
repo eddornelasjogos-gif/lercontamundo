@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { DifficultyCard } from "@/components/DifficultyCard";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Star, Rocket, Zap, Map } from "lucide-react";
+import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 import { useState, useRef, useEffect } from "react";
 import mascotBackground from "@/assets/mascot-owl.png";
 
@@ -64,7 +65,9 @@ const Index = () => {
   }, [selectedDifficulty]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
+      <Navigation />
+
       <div className="relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-40"
@@ -117,16 +120,25 @@ const Index = () => {
               {selectedDifficulty && (
                 <div
                   ref={buttonsSectionRef}
-                  className="flex justify-center mt-12 animate-scale-in"
+                  className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in"
                 >
                   <Button
                     variant="gradient"
                     size="lg"
-                    onClick={() => navigate("/journey")}
-                    className="font-display text-lg"
+                    onClick={() => navigate("/reading")}
+                    className="font-display"
                   >
-                    <Map className="mr-2" />
-                    Iniciar Jornada
+                    <BookOpen className="mr-2" />
+                    Começar a Ler
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => navigate("/math")}
+                    className="font-display"
+                  >
+                    <Calculator className="mr-2" />
+                    Praticar Matemática
                   </Button>
                 </div>
               )}
