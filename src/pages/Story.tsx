@@ -32,6 +32,7 @@ import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a";
 import aliBabaAudio from "@/assets/audio/ali-baba-ladroes.m4a";
 import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
 import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
+import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -842,6 +843,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={barbaAzulAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 217 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={aFadaVoadoraAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
