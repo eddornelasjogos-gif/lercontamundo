@@ -2,7 +2,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Trophy as TrophyIcon, BookOpen, Calculator, Award, Flame } from "lucide-react";
+import { Star, Trophy as TrophyIcon, BookOpen, Calculator, Award, Flame, Library, BrainCircuit } from "lucide-react";
 import { Trophy } from "@/components/Trophy";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
@@ -12,61 +12,38 @@ import { Mascot } from "@/components/Mascot";
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
 
-  const baseAchievements = [
-    {
-      id: "first-read",
-      title: "Primeiro Passo",
-      description: "Complete sua primeira leitura",
-      icon: BookOpen,
-    },
-    {
-      id: "dedicated-reader",
-      title: "Leitor Dedicado",
-      description: "Leia 10 histórias completas",
-      icon: TrophyIcon,
-    },
-    {
-      id: "number-master",
-      title: "Mestre dos Números",
-      description: "Resolva 50 exercícios de matemática",
-      icon: Calculator,
-    },
-    {
-      id: "star-bright",
-      title: "Estrela Brilhante",
-      description: "Alcance o nível 5",
-      icon: Star,
-    },
+  // Definição completa de todas as conquistas
+  const allAchievements = [
+    // Base
+    { id: "star-bright", title: "Estrela Brilhante", description: "Alcance o nível 5", icon: Star },
+    // Leitura
+    { id: 'reading-1', title: 'Iniciante na Leitura', description: 'Leia 5 histórias', icon: BookOpen },
+    { id: 'reading-2', title: 'Leitor Casual', description: 'Leia 10 histórias', icon: BookOpen },
+    { id: 'reading-3', title: 'Leitor Voraz', description: 'Leia 25 histórias', icon: Library },
+    { id: 'reading-4', title: 'Devorador de Livros', description: 'Leia 50 histórias', icon: Library },
+    // Matemática
+    { id: 'math-1', title: 'Iniciante nos Números', description: 'Resolva 5 exercícios', icon: Calculator },
+    { id: 'math-2', title: 'Matemático Casual', description: 'Resolva 10 exercícios', icon: Calculator },
+    { id: 'math-3', title: 'Mestre da Lógica', description: 'Resolva 25 exercícios', icon: BrainCircuit },
+    { id: 'math-4', title: 'Gênio dos Cálculos', description: 'Resolva 50 exercícios', icon: BrainCircuit },
+    // Sequência
+    { id: "streak-3", title: "Consistente", description: "Acesse por 3 dias seguidos", icon: Flame },
+    { id: "streak-7", title: "Determinado", description: "Acesse por 7 dias seguidos", icon: Flame },
+    { id: "streak-15", title: "Imparável", description: "Acesse por 15 dias seguidos", icon: Flame },
   ];
 
-  const streakAchievements = [
-    {
-      id: "streak-3",
-      title: "Consistente",
-      description: "Acesse por 3 dias seguidos",
-      icon: Flame,
-    },
-    {
-      id: "streak-7",
-      title: "Determinado",
-      description: "Acesse por 7 dias seguidos",
-      icon: Flame,
-    },
-    {
-      id: "streak-15",
-      title: "Imparável",
-      description: "Acesse por 15 dias seguidos",
-      icon: Flame,
-    },
-  ];
+  const getVisibleAchievements = (seriesIds: string[]) => {
+    const lastUnlockedIndex = seriesIds.findLastIndex(id => progress.achievements.includes(id));
+    const visibleIds = seriesIds.slice(0, lastUnlockedIndex + 2);
+    return allAchievements.filter(ach => visibleIds.includes(ach.id));
+  };
 
-  const lastUnlockedStreakIndex = streakAchievements.findLastIndex((ach) =>
-    progress.achievements.includes(ach.id)
-  );
-  
-  const visibleStreakAchievements = streakAchievements.slice(0, lastUnlockedStreakIndex + 2);
+  const readingAchievements = getVisibleAchievements(['reading-1', 'reading-2', 'reading-3', 'reading-4']);
+  const mathAchievements = getVisibleAchievements(['math-1', 'math-2', 'math-3', 'math-4']);
+  const streakAchievements = getVisibleAchievements(['streak-3', 'streak-7', 'streak-15']);
+  const baseAchievements = allAchievements.filter(ach => ach.id === 'star-bright');
 
-  const achievementsToDisplay = [...baseAchievements, ...visibleStreakAchievements].map(ach => ({
+  const achievementsToDisplay = [...baseAchievements, ...readingAchievements, ...mathAchievements, ...streakAchievements].map(ach => ({
     ...ach,
     unlocked: progress.achievements.includes(ach.id) || (ach.id === 'star-bright' && progress.level >= 5)
   }));
@@ -75,30 +52,10 @@ const Profile = () => {
   const lockedAchievements = achievementsToDisplay.filter(ach => !ach.unlocked);
 
   const stats = [
-    {
-      label: "Histórias Lidas",
-      value: progress.storiesRead.toString(),
-      icon: BookOpen,
-      color: "gradient-primary",
-    },
-    {
-      label: "Exercícios Completos",
-      value: progress.exercisesCompleted.toString(),
-      icon: Calculator,
-      color: "gradient-secondary",
-    },
-    {
-      label: "Dias Consecutivos",
-      value: progress.consecutiveDays.toString(),
-      icon: Flame,
-      color: "gradient-success",
-    },
-    {
-      label: "Conquistas",
-      value: `${unlockedAchievements.length}/${achievementsToDisplay.length}`,
-      icon: Award,
-      color: "gradient-primary",
-    },
+    { label: "Histórias Lidas", value: progress.storiesRead.toString(), icon: BookOpen, color: "gradient-primary" },
+    { label: "Exercícios Completos", value: progress.exercisesCompleted.toString(), icon: Calculator, color: "gradient-secondary" },
+    { label: "Dias Consecutivos", value: progress.consecutiveDays.toString(), icon: Flame, color: "gradient-success" },
+    { label: "Conquistas", value: `${unlockedAchievements.length}/${allAchievements.length}`, icon: Award, color: "gradient-primary" },
   ];
 
   const handleReset = () => {
@@ -118,13 +75,8 @@ const Profile = () => {
         <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,90%)] opacity-70 blur-3xl" />
         <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="text-center">
-            <div
-              className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card"
-              style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%)" }}
-            >
-              <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white mb-2 leading-tight">
-                Meu Perfil
-              </h1>
+            <div className="inline-block rounded-2xl border border-white/80 px-5 py-4 shadow-card" style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #3b82f6 100%)" }}>
+              <h1 className="text-4xl md:text-5xl font-display font-extrabold text-white mb-2 leading-tight">Meu Perfil</h1>
               <p className="text-white/90 font-body">Acompanhe seu progresso e conquistas!</p>
             </div>
           </div>
@@ -145,9 +97,7 @@ const Profile = () => {
           <div className="relative z-10 max-w-6xl mx-auto space-y-10">
             <div className="text-center">
               <h2 className="text-3xl font-display font-bold text-foreground">Suas Estatísticas</h2>
-              <p className="text-sm md:text-base text-foreground/80 font-body">
-                Veja como você está progredindo em sua jornada de aprendizado!
-              </p>
+              <p className="text-sm md:text-base text-foreground/80 font-body">Veja como você está progredindo em sua jornada de aprendizado!</p>
             </div>
 
             <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm space-y-12">

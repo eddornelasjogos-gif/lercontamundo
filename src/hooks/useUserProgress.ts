@@ -28,12 +28,26 @@ const DEFAULT_PROGRESS: UserProgress = {
 const STORAGE_KEY = 'ler-conta-mundo-progress';
 const DAILY_REWARD_XP = 25;
 
+// Novas trilhas de conquistas
+const READING_ACHIEVEMENTS = [
+  { id: 'reading-1', required: 5, title: 'Iniciante na Leitura' },
+  { id: 'reading-2', required: 10, title: 'Leitor Casual' },
+  { id: 'reading-3', required: 25, title: 'Leitor Voraz' },
+  { id: 'reading-4', required: 50, title: 'Devorador de Livros' },
+];
+
+const MATH_ACHIEVEMENTS = [
+  { id: 'math-1', required: 5, title: 'Iniciante nos Números' },
+  { id: 'math-2', required: 10, title: 'Matemático Casual' },
+  { id: 'math-3', required: 25, title: 'Mestre da Lógica' },
+  { id: 'math-4', required: 50, title: 'Gênio dos Cálculos' },
+];
+
 export const useUserProgress = () => {
   const [progress, setProgress] = useState<UserProgress>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const storedProgress = JSON.parse(stored);
-      // Garante que o progresso carregado tenha todos os campos do padrão
       return { ...DEFAULT_PROGRESS, ...storedProgress };
     }
     return DEFAULT_PROGRESS;
@@ -48,7 +62,7 @@ export const useUserProgress = () => {
     const todayStr = today.toISOString().split('T')[0];
 
     if (progress.lastLoginDate === todayStr) {
-      return; // Já logou hoje, não faz nada
+      return;
     }
 
     const yesterday = new Date(today);
@@ -61,12 +75,10 @@ export const useUserProgress = () => {
       const newAchievements = [...prev.achievements];
 
       if (prev.lastLoginDate === yesterdayStr) {
-        // Continua a sequência
         newConsecutiveDays++;
-        bonusXP = newConsecutiveDays * 5; // Bônus de 5 XP por dia de sequência
+        bonusXP = newConsecutiveDays * 5;
         toast.success(`🔥 Sequência de ${newConsecutiveDays} dias! +${bonusXP} XP bônus!`);
 
-        // Checar conquistas de sequência
         if (newConsecutiveDays >= 3 && !newAchievements.includes('streak-3')) {
           newAchievements.push('streak-3');
           toast.info("🏆 Nova Conquista: Sequência de 3 dias!");
@@ -81,7 +93,6 @@ export const useUserProgress = () => {
         }
 
       } else {
-        // Quebrou a sequência ou é o primeiro login
         newConsecutiveDays = 1;
       }
 
@@ -121,12 +132,14 @@ export const useUserProgress = () => {
       const newStoriesRead = prev.storiesRead + 1;
       
       const newAchievements = [...prev.achievements];
-      if (newStoriesRead === 1 && !newAchievements.includes('first-read')) {
-        newAchievements.push('first-read');
-      }
-      if (newStoriesRead === 10 && !newAchievements.includes('dedicated-reader')) {
-        newAchievements.push('dedicated-reader');
-      }
+      
+      // Verifica conquistas de leitura
+      READING_ACHIEVEMENTS.forEach(ach => {
+        if (newStoriesRead >= ach.required && !newAchievements.includes(ach.id)) {
+          newAchievements.push(ach.id);
+          toast.info(`🏆 Nova Conquista: ${ach.title}!`);
+        }
+      });
       
       return {
         ...prev,
@@ -148,9 +161,14 @@ export const useUserProgress = () => {
       const newExercisesCompleted = prev.exercisesCompleted + 1;
       
       const newAchievements = [...prev.achievements];
-      if (newExercisesCompleted === 50 && !newAchievements.includes('number-master')) {
-        newAchievements.push('number-master');
-      }
+
+      // Verifica conquistas de matemática
+      MATH_ACHIEVEMENTS.forEach(ach => {
+        if (newExercisesCompleted >= ach.required && !newAchievements.includes(ach.id)) {
+          newAchievements.push(ach.id);
+          toast.info(`🏆 Nova Conquista: ${ach.title}!`);
+        }
+      });
       
       return {
         ...prev,
