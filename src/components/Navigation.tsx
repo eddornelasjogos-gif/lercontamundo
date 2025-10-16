@@ -16,7 +16,7 @@ export const Navigation = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-t border-border/70 shadow-soft md:top-0 md:bottom-auto md:border-b md:border-t-0">
       <div className="container mx-auto px-4">
-        <div className="flex justify-around items-center md:justify-center md:gap-8 py-3">
+        <div className="flex justify-between items-center md:justify-center md:gap-8 py-3">
           {navItems.map(({ icon: Icon, label, path }) => {
             const isActive = location.pathname === path;
             return (
@@ -24,7 +24,7 @@ export const Navigation = () => {
                 key={path}
                 to={path}
                 className={cn(
-                  "flex flex-col md:flex-row items-center gap-1 md:gap-2 px-4 py-2 rounded-full transition-smooth",
+                  "flex flex-col md:flex-row items-center gap-1 md:gap-2 px-2 md:px-4 py-2 rounded-full transition-smooth",
                   isActive
                     ? "gradient-primary text-white shadow-soft"
                     : "text-muted-foreground hover:text-primary hover:bg-primary/15"
