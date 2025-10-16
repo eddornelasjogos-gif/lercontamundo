@@ -14,6 +14,7 @@ import galinhaAudio from "@/assets/audio/galinha-ovos-ouro.m4a";
 import patinhoFeioAudio from "@/assets/audio/patinho-feio.m4a";
 import joaoPeDeFeijaoAudio from "@/assets/audio/joao-pe-de-feijao.m4a";
 import cinderelaAudio from "@/assets/audio/cinderela.m4a";
+import brancaDeNeveAudio from "@/assets/audio/branca-de-neve.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -517,6 +518,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={cinderelaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 114 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={brancaDeNeveAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
