@@ -212,106 +212,6 @@ const STORY_CONTENT: Record<
       "Pequeno no tamanho, grande na esperteza: assim era o Pequeno Polegar. Em tempos de fome, ele percebeu que os pais planejavam abandonar os filhos na floresta e tentou marcar o caminho com migalhas, que os pássaros comeram.\n\nPerdidos, os irmãos enfrentaram perigos e a casa de um ogro. Com astúcia, o menino trocou gorros, enganou inimigos e salvou a todos. Ao final, recuperou riquezas do ogro e levou a família à segurança.\n\nA história mostra que coragem e inteligência podem proteger quem amamos mesmo nas maiores dificuldades.",
   },
 
-  211: {
-    id: 211,
-    title: "Os Três Porquinhos",
-    category: "Contos",
-    duration: "6 min",
-    xp: 60,
-    text:
-      "Três porquinhos resolveram construir suas casas. Um usou palha, outro madeira e o terceiro, tijolos. Logo apareceu um lobo, que soprou e derrubou as duas primeiras casas.\n\nOs porquinhos correram para a casa de tijolos, que resistiu a todos os sopros. Furioso, o lobo tentou entrar pela chaminé, mas queimou o rabo e fugiu.\n\nAssim, eles aprenderam que trabalho cuidadoso e planejamento dão segurança — e que pressa pode sair caro.",
-  },
-
-  212: {
-    id: 212,
-    title: "Pedro e o Lobo",
-    category: "Contos",
-    duration: "6 min",
-    xp: 55,
-    text:
-      "Pedro vivia perto de um bosque com seu avô, que o alertava sobre os perigos do lobo. Curioso e corajoso, Pedro ignorou os avisos e saltou a cerca.\n\nQuando o lobo apareceu, ameaçando os animais, Pedro montou um plano com a ajuda do pássaro e capturou o lobo sem ferir ninguém. A aldeia o aplaudiu, mas ele reconheceu o valor dos conselhos do avô.\n\nA aventura ensina a equilibrar ousadia e prudência, e a proteger os amigos com inteligência.",
-  },
-
-  213: {
-    id: 213,
-    title: "Simbad, o Marinheiro (trechos)",
-    category: "Contos",
-    duration: "10 min",
-    xp: 95,
-    text:
-      "Simbad contou sete grandes viagens: em uma, amarrou-se ao pé de uma ave roc para escapar de uma ilha perigosa; em outra, enfrentou criaturas marinhas gigantes e tempestades que engoliam navios.\n\nEm cada aventura, usou coragem e inteligência para retornar com tesouros e histórias. Conheceu reis, mercadores e povos distantes, aprendendo que o mar exige respeito e preparo.\n\nDe volta a Bagdá, partilhava suas riquezas e lembrava que a melhor fortuna é a experiência conquistada com coragem e prudência.",
-  },
-
-  214: {
-    id: 214,
-    title: "Ali Babá e os Quarenta Ladrões (trechos)",
-    category: "Contos",
-    duration: "10 min",
-    xp: 95,
-    text:
-      "Ali Babá descobriu por acaso uma caverna que se abria com as palavras mágicas “Abre-te, Sésamo”. Ali, os quarenta ladrões escondiam tesouros. Ele pegou um pouco para sua família, sem ambição cega.\n\nQuando os ladrões suspeitaram, tentaram invadir a casa de Ali Babá. A esperteza de Morgiana, a criada leal, frustrou os planos mais de uma vez, salvando a todos.\n\nPor fim, os ladrões foram derrotados. Ali Babá compreendeu que riqueza sem justiça é perigosa — e que a lealdade pode valer mais do que ouro.",
-  },
-
-  215: {
-    id: 215,
-    title: "O Rouxinol",
-    category: "Contos",
-    duration: "7 min",
-    xp: 65,
-    text:
-      "O imperador apaixonou-se pelo canto de um rouxinol que vivia nos jardins do palácio. Encantado por um pássaro mecânico luxuoso, esqueceu o rouxinol verdadeiro, que partiu entristecido.\n\nQuando o imperador adoeceu, o pássaro mecânico não pôde ajudá-lo. O rouxinol real voltou, cantou para ele e trouxe esperança e cura.\n\nDesde então, o imperador passou a valorizar a beleza autêntica e a simplicidade que tocam o coração.",
-  },
-
-  216: {
-    id: 216,
-    title: "Barba Azul (resumo)",
-    category: "Contos",
-    duration: "7 min",
-    xp: 65,
-    text:
-      "Barba Azul era um homem rico e temido, com um passado cercado de mistérios. Antes de viajar, entregou à esposa todas as chaves, proibindo-a de abrir um pequeno quarto.\n\nMovida pela curiosidade, ela abriu a porta e encontrou provas dos crimes do marido. Barba Azul descobriu e quis puni-la, mas os irmãos da moça chegaram a tempo, o derrotaram e a libertaram.\n\nLivre, ela dividiu os bens com a família e usou sua experiência para ajudar outras pessoas a reconhecerem sinais de perigo e a pedirem ajuda.",
-  },
-
-  217: {
-    id: 217,
-    title: "A Fada Voadora",
-    category: "Contos",
-    duration: "6 min",
-    xp: 60,
-    text:
-      "Numa aldeia cercada por campos, uma fadinha apareceu e prometeu ajudar se todos cuidassem da natureza e uns dos outros. Com pequenos encantos, ensinou as crianças a plantar, a dividir e a escutar.\n\nUm forasteiro ganancioso tentou explorar o vilarejo. A fada, com astúcia e união dos moradores, mostrou que egoísmo seca as fontes. O visitante aprendeu a lição e partiu.\n\nA aldeia prosperou com cooperação, e a fada seguiu viagem, deixando sementes de gentileza por onde passava.",
-  },
-
-  218: {
-    id: 218,
-    title: "O Cavalo e o Homem",
-    category: "Contos",
-    duration: "6 min",
-    xp: 60,
-    text:
-      "Um jovem lavrador e seu cavalo formavam uma dupla inseparável. Entre enchentes e estradas lamacentas, aprenderam a confiar um no outro.\n\nCerta vez, num torneio de resistência, o cavalo salvou o dono de um acidente, preferindo protegê-lo a vencer a prova. A coragem silenciosa do animal comoveu a vila.\n\nDesde então, todos compreenderam que amizade e cuidado valem mais do que troféus.",
-  },
-
-  219: {
-    id: 219,
-    title: "A Lenda da Lua",
-    category: "Contos",
-    duration: "7 min",
-    xp: 65,
-    text:
-      "Diziam que um velho guardião cuidava da lua e escolhia, a cada década, um mensageiro para ouvir as histórias do povo. Um jovem curioso atravessou vales e rios para chegar até ele.\n\nNo caminho, recolheu relatos de pescadores, artesãos e viajantes, percebendo que a luz da lua parecia mais brilhante quanto mais histórias guardava. Ao encontrar o guardião, entendeu: a lua refletia a memória das pessoas.\n\nO jovem voltou e passou a preservar contos e canções, iluminando a sua comunidade com lembranças que não se apagam.",
-  },
-
-  220: {
-    id: 220,
-    title: "O Pescador e o Gênio",
-    category: "Contos",
-    duration: "8 min",
-    xp: 70,
-    text:
-      "Um pescador humilde encontrou uma ânfora selada. Ao abri-la, libertou um gênio que, enfurecido por séculos de prisão, ameaçou castigá-lo. O pescador, sereno, propôs um teste: se o gênio era tão poderoso, seria capaz de caber novamente na ânfora?\n\nVanglorioso, o gênio entrou — e o pescador o fechou de novo. Só então negociou sua liberdade em troca de um juramento de proteção. O gênio, impressionado com a inteligência do homem, cumpriu a palavra e concedeu um presente útil à aldeia.\n\nAssim, o pescador mostrou que prudência e inteligência podem transformar perigos em oportunidades para o bem comum.",
-  },
-
   /* Nível difícil (301–310) - textos completos */
   301: {
     id: 301,
@@ -411,6 +311,57 @@ const STORY_CONTENT: Record<
     xp: 125,
     text:
       "Início — Uma coletânea de contos dos Irmãos Grimm convida a conhecer heróis humildes e corajosos: o Alfaiate Valente que derrota gigantes com astúcia, João e Maria que enfrentam uma casa de doces perigosa e um príncipe que aprende a ver além das aparências.\n\nMeio — Em cada história, provações pedem escolhas: seguir um caminho escuro, cumprir promessas difíceis ou dividir o pouco que se tem. A esperteza e a bondade, quando andam juntas, viram ferramentas poderosas contra a ganância e a mentira.\n\nFim — Ao final, não é a força que vence, mas a coragem aliada à compaixão. Quem ajuda o próximo encontra ajuda, quem cumpre a palavra encontra confiança, e quem aprende com os tropeços volta para casa transformado — pronto para escrever o próximo capítulo.",
+  },
+
+  /* Nível muito difícil (401–405) - textos completos com Início, Meio e Fim */
+  401: {
+    id: 401,
+    title: "Dom Quixote (trechos)",
+    category: "Clássicos",
+    duration: "18 min",
+    xp: 180,
+    text:
+      "Início — Alonso Quixano, um fidalgo que adorava ler livros de cavalaria, decidiu tornar-se cavaleiro andante com o nome de Dom Quixote. Montado em Rocinante e com uma bacia de barbeiro como elmo, partiu pelo campo em busca de aventuras, levando no coração a ideia de defender os fracos e honrar sua dama, Dulcineia.\n\nMeio — Acompanhado de Sancho Pança, um vizinho leal e divertido, Quixote enfrentou “gigantes” que eram moinhos de vento, “exércitos” que eram rebanhos e “castelos” que eram estalagens. Entre confusões e boas intenções, Sancho tentava equilibrar fantasia e realidade, aprendendo sobre amizade e coragem no caminho.\n\nFim — Dom Quixote retornou à sua aldeia, cansado e doente. Recuperou a lucidez, reconheceu seus enganos e se despediu das aventuras com serenidade. Sua história lembra que a imaginação pode nos levar longe, mas é a prudência e o cuidado com os outros que nos mantêm no caminho certo.",
+  },
+
+  402: {
+    id: 402,
+    title: "Moby Dick (trechos)",
+    category: "Clássicos",
+    duration: "20 min",
+    xp: 200,
+    text:
+      "Início — Ishmael, em busca de trabalho e de mar aberto, embarcou no baleeiro Pequod. O capitão Ahab revelou uma missão pessoal: caçar Moby Dick, a grande baleia branca que o havia ferido, e que agora simbolizava sua obsessão.\n\nMeio — Pelo mundo, a tripulação enfrentou tempestades e mares gelados, avistando baleias e ouvindo presságios. Starbuck, o imediato, temia que a fúria de Ahab colocasse todos em risco. Ainda assim, o capitão seguia firme, cada encontro com o oceano alimentando seu desejo de vingança.\n\nFim — Ao finalmente encontrarem Moby Dick, travou-se uma batalha feroz. A baleia destruiu o navio e afundou o Pequod. Apenas Ishmael sobreviveu, agarrado a um caixote-boia, para contar a história. A aventura mostra como a obsessão pode engolir tudo ao redor e como a humildade diante da natureza é essencial.",
+  },
+
+  403: {
+    id: 403,
+    title: "Guerra e Paz (trecho simplificado)",
+    category: "Clássicos",
+    duration: "20 min",
+    xp: 200,
+    text:
+      "Início — Em meio às guerras napoleônicas, famílias russas como os Bolkonsky e os Rostov viviam entre bailes, estudos e sonhos. Pierre, Andrei e Natasha buscavam sentido para a vida, enquanto o país se preparava para tempos difíceis.\n\nMeio — A guerra trouxe perdas, coragem e escolhas. Andrei enfrentou o campo de batalha; Pierre questionou quem desejava ser; Natasha amadureceu entre erros e perdões. Em cada mudança, amizade e compaixão mantiveram acesa a esperança.\n\nFim — Com a paz, veio também a reconstrução. Os personagens encontraram novos caminhos, percebendo que o valor da vida está nas pessoas que amamos, na responsabilidade com a comunidade e na capacidade de recomeçar com humildade e esperança.",
+  },
+
+  404: {
+    id: 404,
+    title: "Os Irmãos Karamázov (trecho)",
+    category: "Clássicos",
+    duration: "20 min",
+    xp: 200,
+    text:
+      "Início — Em uma família cheia de conflitos, o pai, Fiódor Karamázov, vivia em desordem, e seus filhos — Dmitri, Ivan e Aliócha — seguiam caminhos diferentes: paixão e impulsos, razão e dúvidas, fé e bondade.\n\nMeio — Desentendimentos e ressentimentos cresceram até um crime abalar a cidade. Enquanto suspeitas surgiam e perguntas sobre culpa, justiça e perdão apareciam, Aliócha procurava agir com gentileza, guiado por valores de empatia e cuidado.\n\nFim — A busca pela verdade levou a julgamentos e escolhas difíceis. Mesmo em meio à dor, Aliócha continuou a ajudar os que sofriam, especialmente os jovens, mostrando que responsabilidade, compaixão e amizade podem iluminar tempos sombrios.",
+  },
+
+  405: {
+    id: 405,
+    title: "Crime e Castigo (trecho)",
+    category: "Clássicos",
+    duration: "18 min",
+    xp: 180,
+    text:
+      "Início — Em São Petersburgo, Raskólnikov, um estudante pobre e angustiado, acreditou que algumas pessoas teriam o direito de ultrapassar regras em nome de um bem maior. Em crise, decidiu cometer um crime terrível.\n\nMeio — Após o ato, o remorso e o medo tomaram conta dele. Doente e dividido por dentro, Raskólnikov conheceu Sônia, uma jovem de coração generoso, que o escutou e o incentivou a buscar a verdade e a assumir a responsabilidade por seus atos.\n\nFim — Raskólnikov confessou e foi condenado à Sibéria. Com o tempo e com o apoio de Sônia, começou uma lenta transformação interior, encontrando no reconhecimento da culpa o primeiro passo para a renovação e para uma vida mais honesta.",
   },
 };
 
