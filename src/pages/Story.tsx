@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
+import cigarraAudio from "@/assets/audio/cigarra-formiga.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -418,6 +419,18 @@ const Story = () => {
               </div>
             </div>
           </Card>
+
+          {storyId === 101 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={cigarraAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
 
           <Card className="p-6 shadow-soft">
             <article className="prose max-w-none text-foreground">
