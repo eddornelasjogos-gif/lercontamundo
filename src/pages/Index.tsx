@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { DifficultyCard } from "@/components/DifficultyCard";
-import { Mascot } from "@/components/Mascot";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
@@ -70,7 +69,6 @@ const Index = () => {
         />
         <div className="relative container mx-auto px-4 py-12 md:py-16">
           <div className="text-center space-y-6 max-w-4xl mx-auto">
-            <Mascot message="Olá! Vamos aprender juntos?" />
             <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 animate-bounce-gentle animate-scale-in">
               Lêr + Conta Mundo
             </h1>
