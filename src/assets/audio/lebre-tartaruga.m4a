@@ -1,0 +1,23 @@
+with attachment.
+
+Then, for the story rendering, I’ll open <dyad-write path="src/pages/Story.tsx"> to provide the entire file with the new import:
+
+I'll add at the top:
+
+```javascript
+import lebreAudio from "@/assets/audio/lebre-tartaruga.m4a";
+```
+
+Then, I will place the JSX block right after the audio card for storyId 101, ensuring that I don’t change any other code, particularly the imports for various dependencies.**Finalizing audio integration**
+
+I need to ensure the type attribute for the `<source>` tag is correct for the .m4a file, and using "audio/mp4" keeps it consistent since that was previously used. 
+
+I’ll suggest a refresh and summarize briefly. For the chat summary, I'll use the tag <dyad-chat-summary> and title it "Áudio adicionado à história A Lebre e a Tartaruga". 
+
+I’ll maintain the language in Portuguese and make sure the imports are intact, including cigarraAudio. Lastly, I see we need to add one more audio section following the existing 101 block. Let's generate that content and copy from the previous version while ensuring everything is correct.</think>Perfeito! Vou adicionar seu áudio à história “A Lebre e a Tartaruga” (ID 102), mantendo o mesmo estilo do player usado na história 101.
+
+- O arquivo será salvo em src/assets/audio/lebre-tartaruga.m4a.
+- A página de história (Story.tsx) será atualizada para importar e exibir o player quando a história for a de ID 102.
+
+<dyad-write path="src/assets/audio/lebre-tartaruga.m4a" description="Upload do áudio para a história 'A Lebre e a Tartaruga' (ID 102)">
+DYAD_ATTACHMENT_0
