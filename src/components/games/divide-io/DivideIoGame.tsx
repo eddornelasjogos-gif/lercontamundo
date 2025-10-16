@@ -64,6 +64,7 @@ class Cell {
   public radius: number;
   public velocity: Vector;
   public mergeCooldown = 0;
+  public ejectionTimer = 0;
 
   constructor(x: number, y: number, public color: string, initialMass: number) {
     this.position = new Vector(x, y);
@@ -79,6 +80,9 @@ class Cell {
   update() {
     if (this.mergeCooldown > 0) {
       this.mergeCooldown--;
+    }
+    if (this.ejectionTimer > 0) {
+        this.ejectionTimer--;
     }
     this.position = this.position.add(this.velocity);
     this.position.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.x));
@@ -105,8 +109,9 @@ class Cell {
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
         const direction = this.velocity.magnitude() > 0 ? this.velocity.normalize() : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
-        newCell.velocity = direction.multiply(15);
+        newCell.velocity = direction.multiply(25); // Increased ejection speed
         newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        newCell.ejectionTimer = 20; // Ignore joystick for 20 frames
         return newCell;
     }
     return null;
@@ -255,8 +260,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
 
     const direction = new Vector(joystickDirection.current.x, joystickDirection.current.y);
     playerCells.forEach(playerCell => {
-      const speed = 50 / playerCell.radius;
-      playerCell.velocity = direction.multiply(speed);
+      if (playerCell.ejectionTimer <= 0) {
+        const speed = 50 / playerCell.radius;
+        playerCell.velocity = direction.multiply(speed);
+      }
     });
 
     allCells.forEach(cell => {
