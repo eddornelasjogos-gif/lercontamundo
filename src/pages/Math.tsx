@@ -2,7 +2,6 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calculator, Star, Trophy, CheckCircle } from "lucide-react";
-import { Mascot } from "@/components/Mascot";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
@@ -86,7 +85,6 @@ const Math = () => {
             </div>
             <div className="flex flex-col items-center gap-3">
               <LevelSelector value={selectedDifficulty} onChange={(d) => setSelectedDifficulty(d)} />
-              <Mascot message="Matemática é divertida!" />
             </div>
           </div>
         </div>
