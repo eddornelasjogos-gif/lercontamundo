@@ -37,6 +37,87 @@ import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
 import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
 import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 
+type Difficulty = "easy" | "medium" | "hard" | "very-hard";
+const STORAGE_KEY = "userDifficulty";
+
+interface StoryMetadata {
+  id: number;
+  title: string;
+  category: string;
+  duration: string;
+  xp: number;
+  stars: number;
+}
+
+// Metadados das histórias para determinar a ordem e a categoria
+const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
+    easy: [
+      // Fábulas (101-105)
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 103, title: "O Leão e o Rato", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", duration: "3 min", xp: 25, stars: 2 },
+      { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+
+      // Contos (111-115)
+      { id: 111, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      { id: 112, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 50, stars: 3 },
+      { id: 113, title: "Cinderela", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 114, title: "Branca de Neve", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 115, title: "O Flautista de Hamelin", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+    ],
+
+    medium: [
+      // Contos Clássicos (201-210)
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 75, stars: 3 },
+      { id: 203, title: "Rapunzel", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", duration: "10 min", xp: 90, stars: 4 },
+      { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
+
+      // Contos (211-220)
+      { id: 211, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 212, title: "Pedro e o Lobo", category: "Contos", duration: "6 min", xp: 55, stars: 3 },
+      { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
+      { id: 214, title: "Ali Babá e os Quarenta Ladrões (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
+      { id: 215, title: "O Rouxinol", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 216, title: "Barba Azul (resumo)", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 217, title: "A Fada Voadora", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 218, title: "O Cavalo e o Homem", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 219, title: "A Lenda da Lua", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 220, title: "O Pescador e o Gênio", category: "Contos", duration: "8 min", xp: 70, stars: 3 },
+    ],
+
+    hard: [
+      // Clássicos (301-310)
+      { id: 301, title: "Pinóquio", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
+      { id: 302, title: "Alice no País das Maravilhas", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
+      { id: 303, title: "As Aventuras de Robinson Crusoé", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
+      { id: 304, title: "A Ilha do Tesouro", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
+      { id: 305, title: "O Médico e o Monstro (trecho)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
+      { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
+      { id: 307, title: "Heidi (trechos)", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
+      { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
+      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
+      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
+    ],
+
+    "very-hard": [
+      // Clássicos (trechos) (401-405)
+      { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+    ],
+} as const;
+
+
 const STORY_CONTENT: Record<
   number,
   { id: number; title: string; category: string; duration: string; xp: number; text: string }
@@ -434,7 +515,7 @@ const STORY_CONTENT: Record<
       "Uma coletânea de contos dos Irmãos Grimm convida a conhecer heróis humildes e corajosos: o Alfaiate Valente que derrota gigantes com astúcia, João e Maria que enfrentam uma casa de doces perigosa e um príncipe que aprende a ver além das aparências.\n\nEm cada história, provações pedem escolhas: seguir um caminho escuro, cumprir promessas difíceis ou dividir o pouco que se tem. A esperteza e a bondade, quando andam juntas, viram ferramentas poderosas contra a ganância e a mentira.\n\nAo final, não é a força que vence, mas a coragem aliada à compaixão. Quem ajuda o próximo encontra ajuda, quem cumpre a palavra encontra confiança, e quem aprende com os tropeços volta para casa transformado — pronto para escrever o próximo capítulo.",
   },
 
-  /* Nível muito difícil (401–405) - textos completos com Início, Meio e Fim */
+  /* Nível muito difícil (401–405) - textos completos */
   401: {
     id: 401,
     title: "Dom Quixote (trechos)",
@@ -494,6 +575,28 @@ const Story = () => {
   const storyId = useMemo(() => (id ? parseInt(id, 10) : NaN), [id]);
   const story = STORY_CONTENT[storyId];
 
+  // 1. Determinar a dificuldade e categoria atual
+  const userDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
+  const currentStoryMetadata = STORY_METADATA_BY_DIFFICULTY[userDifficulty].find(
+    (meta) => meta.id === storyId
+  );
+
+  const storiesInCurrentCategory = useMemo(() => {
+    if (!currentStoryMetadata) return [];
+    return STORY_METADATA_BY_DIFFICULTY[userDifficulty].filter(
+      (meta) => meta.category === currentStoryMetadata.category
+    );
+  }, [userDifficulty, currentStoryMetadata]);
+
+  const currentStoryIndex = storiesInCurrentCategory.findIndex(
+    (meta) => meta.id === storyId
+  );
+
+  const nextStoryMetadata =
+    currentStoryIndex !== -1 && currentStoryIndex < storiesInCurrentCategory.length - 1
+      ? storiesInCurrentCategory[currentStoryIndex + 1]
+      : undefined;
+
   useEffect(() => {
     if (!story) {
       const t = setTimeout(() => navigate("/reading"), 800);
@@ -520,6 +623,24 @@ const Story = () => {
     }
     navigate("/reading");
   };
+
+  const handleNextStory = () => {
+    if (!isCompleted) {
+      completeStory(storyId, story.xp);
+      toast.success(`🎉 Você ganhou ${story.xp} XP por ler "${story.title}"!`);
+    }
+    
+    if (nextStoryMetadata) {
+      navigate(`/reading/${nextStoryMetadata.id}`);
+    } else {
+      // Se for a última história, volta para a lista de leitura
+      navigate("/reading");
+    }
+  };
+
+  const buttonText = nextStoryMetadata ? "Próxima História" : "Concluir Leitura";
+  const buttonAction = nextStoryMetadata ? handleNextStory : handleComplete;
+  const buttonVariant = isCompleted ? "outline" : "gradient";
 
   return (
     <div className="min-h-screen pb-10 md:pt-10">
@@ -912,8 +1033,8 @@ const Story = () => {
             <Button variant="outline" onClick={() => navigate(-1)}>
               Voltar
             </Button>
-            <Button variant={isCompleted ? "outline" : "gradient"} onClick={handleComplete}>
-              {isCompleted ? "✓ Concluído" : "Concluir Leitura"}
+            <Button variant={buttonVariant} onClick={buttonAction}>
+              {buttonText}
             </Button>
           </div>
         </div>
