@@ -31,7 +31,12 @@ const DAILY_REWARD_XP = 25;
 export const useUserProgress = () => {
   const [progress, setProgress] = useState<UserProgress>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : DEFAULT_PROGRESS;
+    if (stored) {
+      const storedProgress = JSON.parse(stored);
+      // Garante que o progresso carregado tenha todos os campos do padrão
+      return { ...DEFAULT_PROGRESS, ...storedProgress };
+    }
+    return DEFAULT_PROGRESS;
   });
 
   useEffect(() => {
