@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,8 @@ type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
 
 const Reading = () => {
-  const { progress, completeStory } = useProgress();
+  const { progress } = useProgress();
+  const navigate = useNavigate();
 
   // Persisted difficulty with state so changing it re-renders the page
   const initialDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
@@ -106,11 +108,6 @@ const Reading = () => {
     const newCategories = Array.from(new Set(storiesByDifficulty[userDifficulty].map((s) => s.category)));
     setSelectedCategory(newCategories[0]);
   }, [userDifficulty]);
-
-  const handleCompleteStory = (storyId: number, xpReward: number) => {
-    completeStory(storyId, xpReward);
-    toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
-  };
 
   const filteredStories = stories.filter((story) => story.category === selectedCategory);
 
@@ -220,7 +217,7 @@ const Reading = () => {
                         <Button
                           variant={isCompleted ? "outline" : "gradient"}
                           className="w-full"
-                          onClick={() => !isCompleted && handleCompleteStory(story.id, story.xp)}
+                          onClick={() => !isCompleted && navigate(`/reading/${story.id}`)}
                           disabled={isCompleted}
                         >
                           {isCompleted ? "✓ Completado" : "Começar Leitura"}

@@ -9,6 +9,7 @@ import Reading from "./pages/Reading";
 import Math from "./pages/Math";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Story from "./pages/Story";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/reading" element={<Reading />} />
+            <Route path="/reading/:id" element={<Story />} />
             <Route path="/math" element={<Math />} />
             <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
