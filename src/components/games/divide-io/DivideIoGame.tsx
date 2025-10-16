@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
+import SplitButton from './SplitButton';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -17,7 +18,9 @@ const difficultySettings = {
 
 const WORLD_SIZE = 3000;
 const PELLET_COUNT = 300;
-const MIN_CELL_RADIUS = 10;
+const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
+const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
+const MERGE_COOLDOWN_FRAMES = 60 * 5; // 5 seconds at 60fps
 const MASS_TO_RADIUS_RATIO = 4;
 
 const getRandomColor = () => {
@@ -59,8 +62,7 @@ class Cell {
   public mass: number;
   public radius: number;
   public velocity: Vector;
-  public isSplitting = false;
-  private splitTimer = 0;
+  public mergeCooldown = 0;
 
   constructor(x: number, y: number, public color: string, initialMass: number) {
     this.position = new Vector(x, y);
@@ -74,16 +76,12 @@ class Cell {
   }
 
   update() {
+    if (this.mergeCooldown > 0) {
+      this.mergeCooldown--;
+    }
     this.position = this.position.add(this.velocity);
     this.position.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.x));
     this.position.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.y));
-    
-    if (this.isSplitting) {
-        this.splitTimer--;
-        if (this.splitTimer <= 0) {
-            this.isSplitting = false;
-        }
-    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -98,35 +96,53 @@ class Cell {
   }
   
   split() {
-    if (this.mass >= MIN_CELL_RADIUS * MIN_CELL_RADIUS && !this.isSplitting) {
-        this.isSplitting = true;
-        this.splitTimer = 30; // Cooldown frames
+    if (this.mass >= MIN_SPLIT_MASS) {
         const splitMass = this.mass / 2;
         this.mass = splitMass;
         this.radius = this.calculateRadius();
+        this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
-        const direction = this.velocity.normalize();
-        newCell.velocity = direction.multiply(15); // Propel the new cell
+        const direction = this.velocity.magnitude() > 0 ? this.velocity.normalize() : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+        newCell.velocity = direction.multiply(15);
+        newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
         return newCell;
     }
     return null;
   }
 }
 
-class Player extends Cell {
-  constructor(x: number, y: number, color: string) {
-    super(x, y, color, MIN_CELL_RADIUS * MIN_CELL_RADIUS);
-  }
-}
+class Player extends Cell {}
 
 class Bot extends Cell {
   private target: Vector | null = null;
   private threat: Vector | null = null;
   private decisionTimer = 0;
 
-  constructor(x: number, y: number, color: string, mass: number) {
-    super(x, y, color, mass);
+  updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number) {
+    this.decisionTimer--;
+    if (this.decisionTimer <= 0) {
+      this.findBestTarget(pellets, otherCells, aggression);
+      this.decisionTimer = 30;
+    }
+
+    let direction = new Vector(0, 0);
+    if (this.threat) {
+      direction = this.position.subtract(this.threat).normalize();
+    } else if (this.target) {
+      direction = this.target.subtract(this.position).normalize();
+      if (this.mass > MIN_SPLIT_MASS && Math.random() < splitChance) {
+        const targetDist = this.target.subtract(this.position).magnitude();
+        if (targetDist < this.radius * 5) {
+            const newBot = this.split();
+            if (newBot) otherCells.push(newBot);
+        }
+      }
+    }
+
+    const speed = 50 / this.radius;
+    this.velocity = direction.multiply(speed);
+    super.update();
   }
 
   findBestTarget(pellets: Pellet[], otherCells: Cell[], aggression: number) {
@@ -144,12 +160,12 @@ class Bot extends Cell {
       const dist = this.position.subtract(cell.position).magnitude();
       if (dist > perceptionRadius) continue;
 
-      if (cell.mass > this.mass * 1.1) { // It's a threat
+      if (cell.mass > this.mass * 1.1) {
         if (dist < minThreatDist) {
           minThreatDist = dist;
           closestThreat = cell;
         }
-      } else if (this.mass > cell.mass * 1.1) { // It's prey
+      } else if (this.mass > cell.mass * 1.1) {
         if (dist < minTargetDist && Math.random() < aggression) {
           minTargetDist = dist;
           bestTarget = cell;
@@ -173,32 +189,6 @@ class Bot extends Cell {
       }
     }
     this.target = bestTarget ? bestTarget.position : null;
-  }
-
-  updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number) {
-    this.decisionTimer--;
-    if (this.decisionTimer <= 0) {
-      this.findBestTarget(pellets, otherCells, aggression);
-      this.decisionTimer = 30; // Re-evaluate every 0.5 seconds
-    }
-
-    let direction = new Vector(0, 0);
-    if (this.threat) {
-      direction = this.position.subtract(this.threat).normalize();
-    } else if (this.target) {
-      direction = this.target.subtract(this.position).normalize();
-      if (this.mass > MIN_CELL_RADIUS * MIN_CELL_RADIUS * 4 && Math.random() < splitChance) {
-        const targetDist = this.target.subtract(this.position).magnitude();
-        if (targetDist < this.radius * 5) {
-            const newBot = this.split();
-            if (newBot) otherCells.push(newBot);
-        }
-      }
-    }
-
-    const speed = 50 / this.radius;
-    this.velocity = direction.multiply(speed);
-    super.update();
   }
 }
 
@@ -225,7 +215,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   const joystickDirection = useRef({ x: 0, y: 0 });
 
   const gameInstance = useRef({
-    player: new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3'),
+    playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3')],
     bots: [] as Bot[],
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
@@ -236,21 +226,38 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     joystickDirection.current = direction;
   }, []);
 
+  const handleSplit = useCallback(() => {
+    const newCells: Player[] = [];
+    const cellsToSplit = [...gameInstance.playerCells];
+    cellsToSplit.forEach(cell => {
+      const newCell = cell.split();
+      if (newCell) {
+        newCells.push(newCell as Player);
+      }
+    });
+    gameInstance.playerCells.push(...newCells);
+  }, [gameInstance]);
+
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const { player, bots, pellets, camera } = gameInstance;
-    const allCells = [player, ...bots];
+    const { playerCells, bots, pellets, camera } = gameInstance;
+    if (playerCells.length === 0) {
+      onGameOver(gameInstance.score);
+      return;
+    }
+
+    const allCells: Cell[] = [...playerCells, ...bots];
     const settings = difficultySettings[difficulty];
 
-    // Update player velocity based on joystick
     const direction = new Vector(joystickDirection.current.x, joystickDirection.current.y);
-    const speed = 50 / player.radius;
-    player.velocity = direction.multiply(speed);
+    playerCells.forEach(playerCell => {
+      const speed = 50 / playerCell.radius;
+      playerCell.velocity = direction.multiply(speed);
+    });
 
-    // Update all cells
     allCells.forEach(cell => {
         if (cell instanceof Bot) {
             cell.updateLogic(pellets, allCells, settings.botAggression, settings.botSplitChance);
@@ -258,6 +265,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
             cell.update();
         }
     });
+
+    // Player cell merging
+    for (let i = playerCells.length - 1; i >= 0; i--) {
+      for (let j = i - 1; j >= 0; j--) {
+        const cellA = playerCells[i];
+        const cellB = playerCells[j];
+        if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+          const dist = cellA.position.subtract(cellB.position).magnitude();
+          if (dist < cellA.radius + cellB.radius) {
+            cellA.mass += cellB.mass;
+            cellA.radius = cellA.calculateRadius();
+            playerCells.splice(j, 1);
+            i--;
+          }
+        }
+      }
+    }
 
     // Collision detection
     for (let i = allCells.length - 1; i >= 0; i--) {
@@ -281,26 +305,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
                     continue;
                 }
 
-                const deathDistance = predator.radius + prey.radius * 0.4;
-
+                const deathDistance = predator.radius - prey.radius * 0.3;
                 if (distance < deathDistance) {
                     predator.mass += prey.mass;
                     predator.radius = predator.calculateRadius();
                     
-                    if (prey === player) {
-                        onGameOver(gameInstance.score);
-                        return;
+                    const preyIndexInAll = allCells.indexOf(prey);
+                    if (preyIndexInAll > -1) {
+                      allCells.splice(preyIndexInAll, 1);
+                      if (preyIndexInAll < i) i--;
+                      if (preyIndexInAll < j) j--;
                     }
-                    
-                    const preyIndex = allCells.indexOf(prey);
-                    if (preyIndex > -1) {
-                        allCells.splice(preyIndex, 1);
-                        const botIndex = bots.indexOf(prey as Bot);
-                        if (botIndex > -1) bots.splice(botIndex, 1);
-                        
-                        if (preyIndex < i) i--;
-                        if (preyIndex < j) j--;
-                    }
+
+                    const preyIndexInPlayer = playerCells.indexOf(prey as Player);
+                    if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
+
+                    const preyIndexInBots = bots.indexOf(prey as Bot);
+                    if (preyIndexInBots > -1) bots.splice(preyIndexInBots, 1);
                 }
             }
         }
@@ -310,23 +331,30 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
         allCells.forEach(cell => {
+            if (!pellet) return;
             const dist = cell.position.subtract(pellet.position).magnitude();
             if (dist < cell.radius) {
                 cell.mass += 10;
                 cell.radius = cell.calculateRadius();
                 pellets.splice(i, 1);
-                pellets.push(new Pellet(getRandomColor()));
-                if (cell === player) {
-                    gameInstance.score = Math.floor(player.mass - (MIN_CELL_RADIUS * MIN_CELL_RADIUS));
-                }
             }
         });
     }
+    if (pellets.length < PELLET_COUNT) {
+      pellets.push(new Pellet(getRandomColor()));
+    }
 
-    // Update camera
-    camera.x += (player.position.x - camera.x) * 0.1;
-    camera.y += (player.position.y - camera.y) * 0.1;
-    camera.zoom = 50 / player.radius + 0.5;
+    gameInstance.score = Math.floor(playerCells.reduce((sum, cell) => sum + cell.mass, 0) - MIN_CELL_MASS);
+
+    // Update camera to follow center of mass
+    const totalMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+    const centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalMass;
+    const centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalMass;
+    const avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+    
+    camera.x += (centerX - camera.x) * 0.1;
+    camera.y += (centerY - camera.y) * 0.1;
+    camera.zoom = 50 / avgRadius + 0.5;
 
     // Drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -335,28 +363,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
 
-    // Draw grid
     ctx.strokeStyle = '#eee';
     ctx.lineWidth = 1;
-    for (let x = 0; x <= WORLD_SIZE; x += 50) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, WORLD_SIZE);
-        ctx.stroke();
-    }
-    for (let y = 0; y <= WORLD_SIZE; y += 50) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(WORLD_SIZE, y);
-        ctx.stroke();
-    }
+    for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
+    for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
 
     pellets.forEach(p => p.draw(ctx));
     allCells.sort((a, b) => a.mass - b.mass).forEach(c => c.draw(ctx));
 
     ctx.restore();
 
-    // Draw HUD
     ctx.fillStyle = '#333';
     ctx.font = 'bold 20px Quicksand';
     ctx.textAlign = 'left';
@@ -374,9 +390,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Initialize game state
     const settings = difficultySettings[difficulty];
-    gameInstance.player = new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3');
+    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3')];
     gameInstance.bots = Array.from({ length: settings.botCount }, () => new Bot(
         Math.random() * WORLD_SIZE,
         Math.random() * WORLD_SIZE,
@@ -399,6 +414,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
+      <SplitButton onSplit={handleSplit} />
     </div>
   );
 };
