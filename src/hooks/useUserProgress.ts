@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from "sonner";
+import { AchievementToast } from '@/components/AchievementToast';
+import { BookOpen, Library, Calculator, BrainCircuit, Flame } from 'lucide-react';
 
 export interface UserProgress {
   xp: number;
@@ -28,19 +30,24 @@ const DEFAULT_PROGRESS: UserProgress = {
 const STORAGE_KEY = 'ler-conta-mundo-progress';
 const DAILY_REWARD_XP = 25;
 
-// Novas trilhas de conquistas
 const READING_ACHIEVEMENTS = [
-  { id: 'reading-1', required: 5, title: 'Iniciante na Leitura' },
-  { id: 'reading-2', required: 10, title: 'Leitor Casual' },
-  { id: 'reading-3', required: 25, title: 'Leitor Voraz' },
-  { id: 'reading-4', required: 50, title: 'Devorador de Livros' },
+  { id: 'reading-1', required: 5, title: 'Iniciante na Leitura', icon: BookOpen },
+  { id: 'reading-2', required: 10, title: 'Leitor Casual', icon: BookOpen },
+  { id: 'reading-3', required: 25, title: 'Leitor Voraz', icon: Library },
+  { id: 'reading-4', required: 50, title: 'Devorador de Livros', icon: Library },
 ];
 
 const MATH_ACHIEVEMENTS = [
-  { id: 'math-1', required: 5, title: 'Iniciante nos Números' },
-  { id: 'math-2', required: 10, title: 'Matemático Casual' },
-  { id: 'math-3', required: 25, title: 'Mestre da Lógica' },
-  { id: 'math-4', required: 50, title: 'Gênio dos Cálculos' },
+  { id: 'math-1', required: 5, title: 'Iniciante nos Números', icon: Calculator },
+  { id: 'math-2', required: 10, title: 'Matemático Casual', icon: Calculator },
+  { id: 'math-3', required: 25, title: 'Mestre da Lógica', icon: BrainCircuit },
+  { id: 'math-4', required: 50, title: 'Gênio dos Cálculos', icon: BrainCircuit },
+];
+
+const STREAK_ACHIEVEMENTS = [
+    { id: "streak-3", title: "Consistente", icon: Flame },
+    { id: "streak-7", title: "Determinado", icon: Flame },
+    { id: "streak-15", title: "Imparável", icon: Flame },
 ];
 
 export const useUserProgress = () => {
@@ -79,18 +86,12 @@ export const useUserProgress = () => {
         bonusXP = newConsecutiveDays * 5;
         toast.success(`🔥 Sequência de ${newConsecutiveDays} dias! +${bonusXP} XP bônus!`);
 
-        if (newConsecutiveDays >= 3 && !newAchievements.includes('streak-3')) {
-          newAchievements.push('streak-3');
-          toast.info("🏆 Nova Conquista: Sequência de 3 dias!");
-        }
-        if (newConsecutiveDays >= 7 && !newAchievements.includes('streak-7')) {
-          newAchievements.push('streak-7');
-          toast.info("🏆 Nova Conquista: Sequência de 7 dias!");
-        }
-        if (newConsecutiveDays >= 15 && !newAchievements.includes('streak-15')) {
-          newAchievements.push('streak-15');
-          toast.info("🏆 Nova Conquista: Sequência de 15 dias!");
-        }
+        STREAK_ACHIEVEMENTS.forEach(ach => {
+            if (newConsecutiveDays >= parseInt(ach.id.split('-')[1]) && !newAchievements.includes(ach.id)) {
+                newAchievements.push(ach.id);
+                toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
+            }
+        });
 
       } else {
         newConsecutiveDays = 1;
@@ -133,11 +134,10 @@ export const useUserProgress = () => {
       
       const newAchievements = [...prev.achievements];
       
-      // Verifica conquistas de leitura
       READING_ACHIEVEMENTS.forEach(ach => {
         if (newStoriesRead >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
-          toast.info(`🏆 Nova Conquista: ${ach.title}!`);
+          toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
         }
       });
       
@@ -162,11 +162,10 @@ export const useUserProgress = () => {
       
       const newAchievements = [...prev.achievements];
 
-      // Verifica conquistas de matemática
       MATH_ACHIEVEMENTS.forEach(ach => {
         if (newExercisesCompleted >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
-          toast.info(`🏆 Nova Conquista: ${ach.title}!`);
+          toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
         }
       });
       
