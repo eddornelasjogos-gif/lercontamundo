@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Star, Clock, CheckCircle } from "lucide-react";
+import { BookOpen, Star, CheckCircle } from "lucide-react";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import readingImage from "@/assets/reading-books.png";
@@ -30,64 +30,64 @@ const Reading = () => {
   const storiesByDifficulty = {
     easy: [
       // Fábulas
-      { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", duration: "3 min", xp: 25, stars: 2 },
-      { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+      { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", xp: 25, stars: 2 },
+      { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", xp: 35, stars: 2 },
       // Contos Clássicos
-      { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
-      { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
-      { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", duration: "10 min", xp: 90, stars: 4 },
-      { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", xp: 65, stars: 3 },
+      { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", xp: 80, stars: 3 },
+      { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", xp: 90, stars: 4 },
+      { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", xp: 65, stars: 3 },
       // Contos
-      { id: 211, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
-      { id: 212, title: "Pedro e o Lobo", category: "Contos", duration: "6 min", xp: 55, stars: 3 },
-      { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
-      { id: 214, title: "Ali Babá e os Quarenta Ladrões (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
-      { id: 215, title: "O Rouxinol", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
-      { id: 216, title: "Barba Azul (resumo)", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
-      { id: 217, title: "A Fada Voadora", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
-      { id: 218, title: "O Cavalo e o Homem", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
-      { id: 219, title: "A Lenda da Lua", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
-      { id: 220, title: "O Pescador e o Gênio", category: "Contos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 211, title: "Os Três Porquinhos", category: "Contos", xp: 60, stars: 3 },
+      { id: 212, title: "Pedro e o Lobo", category: "Contos", xp: 55, stars: 3 },
+      { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", xp: 95, stars: 4 },
+      { id: 214, title: "Ali Babá e os Quarenta Ladrões (trechos)", category: "Contos", xp: 95, stars: 4 },
+      { id: 215, title: "O Rouxinol", category: "Contos", xp: 65, stars: 3 },
+      { id: 216, title: "Barba Azul (resumo)", category: "Contos", xp: 65, stars: 3 },
+      { id: 217, title: "A Fada Voadora", category: "Contos", xp: 60, stars: 3 },
+      { id: 218, title: "O Cavalo e o Homem", category: "Contos", xp: 60, stars: 3 },
+      { id: 219, title: "A Lenda da Lua", category: "Contos", xp: 65, stars: 3 },
+      { id: 220, title: "O Pescador e o Gênio", category: "Contos", xp: 70, stars: 3 },
     ],
     medium: [
       // Fábulas
-      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
-      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
-      { id: 103, title: "O Leão e o Rato", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", xp: 35, stars: 2 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", xp: 30, stars: 2 },
+      { id: 103, title: "O Leão e o Rato", category: "Fábulas", xp: 30, stars: 2 },
       // Contos
-      { id: 111, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
-      { id: 112, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 50, stars: 3 },
-      { id: 113, title: "Cinderela", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
-      { id: 114, title: "Branca de Neve", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
-      { id: 115, title: "O Flautista de Hamelin", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      { id: 111, title: "O Patinho Feio", category: "Contos", xp: 45, stars: 3 },
+      { id: 112, title: "João e o Pé de Feijão", category: "Contos", xp: 50, stars: 3 },
+      { id: 113, title: "Cinderela", category: "Contos", xp: 55, stars: 3 },
+      { id: 114, title: "Branca de Neve", category: "Contos", xp: 55, stars: 3 },
+      { id: 115, title: "O Flautista de Hamelin", category: "Contos", xp: 45, stars: 3 },
       // Contos Clássicos
-      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 75, stars: 3 },
-      { id: 203, title: "Rapunzel", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", xp: 75, stars: 3 },
+      { id: 203, title: "Rapunzel", category: "Contos Clássicos", xp: 70, stars: 3 },
+      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", xp: 80, stars: 3 },
     ],
     hard: [
       // Clássicos (301-310)
-      { id: 301, title: "Pinóquio", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
-      { id: 302, title: "Alice no País das Maravilhas", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
-      { id: 303, title: "As Aventuras de Robinson Crusoé", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
-      { id: 304, title: "A Ilha do Tesouro", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
-      { id: 305, title: "O Médico e o Monstro (trecho)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
-      { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
-      { id: 307, title: "Heidi (trechos)", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
-      { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
-      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
-      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
+      { id: 301, title: "Pinóquio", category: "Clássicos", xp: 120, stars: 4 },
+      { id: 302, title: "Alice no País das Maravilhas", category: "Clássicos", xp: 130, stars: 4 },
+      { id: 303, title: "As Aventuras de Robinson Crusoé", category: "Clássicos", xp: 150, stars: 4 },
+      { id: 304, title: "A Ilha do Tesouro", category: "Clássicos", xp: 140, stars: 4 },
+      { id: 305, title: "O Médico e o Monstro (trecho)", category: "Clássicos", xp: 125, stars: 4 },
+      { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", xp: 150, stars: 4 },
+      { id: 307, title: "Heidi (trechos)", category: "Clássicos", xp: 120, stars: 4 },
+      { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", xp: 130, stars: 4 },
+      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", xp: 140, stars: 4 },
+      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
     ],
     "very-hard": [
       // Clássicos (trechos) (401-405)
-      { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
-      { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
-      { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
-      { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", xp: 180, stars: 5 },
+      { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", xp: 200, stars: 5 },
+      { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", xp: 180, stars: 5 },
     ],
   } as const;
 
@@ -224,10 +224,6 @@ const Reading = () => {
                         </div>
 
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{story.duration}</span>
-                          </div>
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 text-secondary fill-secondary" />
                             <span>{story.xp} XP</span>
