@@ -9,6 +9,7 @@ import mascotBackground from "@/assets/mascot-owl.png";
 const Index = () => {
   const navigate = useNavigate();
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [scrollTrigger, setScrollTrigger] = useState(0);
   const buttonsSectionRef = useRef<HTMLDivElement>(null);
 
   const difficulties = [
@@ -53,16 +54,17 @@ const Index = () => {
   const handleDifficultySelect = (difficultyId: string) => {
     setSelectedDifficulty(difficultyId);
     localStorage.setItem("userDifficulty", difficultyId);
+    setScrollTrigger(c => c + 1);
   };
 
   useEffect(() => {
-    if (selectedDifficulty && buttonsSectionRef.current) {
+    if (scrollTrigger > 0 && buttonsSectionRef.current) {
       buttonsSectionRef.current.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
     }
-  }, [selectedDifficulty]);
+  }, [scrollTrigger]);
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
