@@ -12,57 +12,66 @@ import { toast } from "sonner";
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
 
-  const achievements = [
+  const baseAchievements = [
     {
       id: "first-read",
       title: "Primeiro Passo",
       description: "Complete sua primeira leitura",
       icon: BookOpen,
-      unlocked: progress.achievements.includes("first-read"),
     },
     {
       id: "dedicated-reader",
       title: "Leitor Dedicado",
       description: "Leia 10 histórias completas",
       icon: Trophy,
-      unlocked: progress.achievements.includes("dedicated-reader"),
     },
     {
       id: "number-master",
       title: "Mestre dos Números",
       description: "Resolva 50 exercícios de matemática",
       icon: Calculator,
-      unlocked: progress.achievements.includes("number-master"),
     },
     {
       id: "star-bright",
       title: "Estrela Brilhante",
       description: "Alcance o nível 5",
       icon: Star,
-      unlocked: progress.level >= 5,
     },
+  ];
+
+  const streakAchievements = [
     {
       id: "streak-3",
       title: "Consistente",
       description: "Acesse por 3 dias seguidos",
       icon: Flame,
-      unlocked: progress.achievements.includes("streak-3"),
     },
     {
       id: "streak-7",
       title: "Determinado",
       description: "Acesse por 7 dias seguidos",
       icon: Flame,
-      unlocked: progress.achievements.includes("streak-7"),
     },
     {
       id: "streak-15",
       title: "Imparável",
       description: "Acesse por 15 dias seguidos",
       icon: Flame,
-      unlocked: progress.achievements.includes("streak-15"),
     },
   ];
+
+  // Lógica para exibir conquistas de sequência de forma progressiva
+  const lastUnlockedStreakIndex = streakAchievements.findLastIndex((ach) =>
+    progress.achievements.includes(ach.id)
+  );
+  
+  // Mostra todas as desbloqueadas + a próxima a ser desbloqueada
+  const visibleStreakAchievements = streakAchievements.slice(0, lastUnlockedStreakIndex + 2);
+
+  const achievementsToDisplay = [...baseAchievements, ...visibleStreakAchievements].map(ach => ({
+    ...ach,
+    unlocked: progress.achievements.includes(ach.id) || (ach.id === 'star-bright' && progress.level >= 5)
+  }));
 
   const stats = [
     {
@@ -85,7 +94,7 @@ const Profile = () => {
     },
     {
       label: "Conquistas",
-      value: `${progress.achievements.length}/${achievements.length}`,
+      value: `${achievementsToDisplay.filter(a => a.unlocked).length}/${achievementsToDisplay.length}`,
       icon: Award,
       color: "gradient-primary",
     },
@@ -164,7 +173,7 @@ const Profile = () => {
               <div className="space-y-6">
                 <h3 className="text-2xl font-display font-bold text-foreground text-center">Coleção de Troféus</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {achievements.map((achievement) => (
+                  {achievementsToDisplay.map((achievement) => (
                     <Card
                       key={achievement.id}
                       className={`p-6 transition-smooth border-2 ${
