@@ -4,10 +4,8 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Star, Clock, CheckCircle } from "lucide-react";
-import { Mascot } from "@/components/Mascot";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
-import { toast } from "sonner";
 import readingImage from "@/assets/reading-books.png";
 import ColorHeader from "@/components/ColorHeader";
 import LevelSelector from "@/components/LevelSelector";
@@ -88,7 +86,7 @@ const Reading = () => {
     ],
 
     "very-hard": [
-      // Clássicos (trechos) (401-410)
+      // Clássicos (trechos) (401-405)
       { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
       { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
       { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
@@ -133,7 +131,6 @@ const Reading = () => {
             </div>
             <div className="flex flex-col items-center gap-3">
               <LevelSelector value={userDifficulty} onChange={(d) => setUserDifficulty(d)} />
-              <Mascot message="Vamos ler juntos!" />
             </div>
           </div>
         </div>
