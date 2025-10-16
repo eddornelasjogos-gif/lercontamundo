@@ -107,8 +107,6 @@ class Cell {
         this.radius = this.calculateRadius();
         this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
         
-        const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
-        
         // Determine the direction for the impulse
         const direction = directionVector.magnitude() > 0.1
             ? directionVector.normalize()
@@ -116,12 +114,23 @@ class Cell {
                 ? this.velocity.normalize() 
                 : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
 
-        // Apply impulse to the new cell
-        const ejectionImpulse = 30;
+        // Calculate initial position offset to ensure separation
+        const offsetDistance = this.radius + 5; // Radius of the new cell + a small gap
+        const offset = direction.multiply(offsetDistance);
+
+        const newCell = new (this.constructor as any)(
+            this.position.x + offset.x, 
+            this.position.y + offset.y, 
+            this.color, 
+            splitMass
+        );
+        
+        // Apply a strong impulse to the new cell
+        const ejectionImpulse = 100; 
         newCell.velocity = this.velocity.add(direction.multiply(ejectionImpulse));
         newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
         
-        // Apply a slight counter-impulse to the original cell to separate them slightly
+        // Apply a slight counter-impulse to the original cell
         this.velocity = this.velocity.add(direction.multiply(-ejectionImpulse * 0.1));
 
         return newCell;
