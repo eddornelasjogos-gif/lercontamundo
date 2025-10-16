@@ -20,31 +20,101 @@ const Reading = () => {
     | "hard"
     | "very-hard") || "easy";
 
-  // Predefined lists with popular/known story titles for each difficulty level
+  // Predefined lists with popular/known story titles for each difficulty level.
+  // The 'easy' difficulty now contains exactly 5 Fábulas (101-105) and 5 Contos (111-115).
   const storiesByDifficulty = {
     easy: [
-      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 50, stars: 3 },
-      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 40, stars: 3 },
-      { id: 103, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
-      { id: 104, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 55, stars: 3 },
+      // Fábulas (101-105)
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 103, title: "O Leão e o Rato", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", duration: "3 min", xp: 25, stars: 2 },
+      { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+
+      // Contos (111-115)
+      { id: 111, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      { id: 112, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 50, stars: 3 },
+      { id: 113, title: "Cinderela", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 114, title: "Branca de Neve", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 115, title: "O Flautista de Hamelin", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
     ],
+
     medium: [
-      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 75, stars: 3 },
-      { id: 202, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
-      { id: 203, title: "Pedro e o Lobo", category: "Música & Contos", duration: "6 min", xp: 50, stars: 3 },
-      { id: 204, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      // Contos Clássicos (201-210)
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 75, stars: 3 },
+      { id: 203, title: "Rapunzel", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", duration: "10 min", xp: 90, stars: 4 },
+      { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
+
+      // Contos (211-220)
+      { id: 211, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 212, title: "Pedro e o Lobo", category: "Contos", duration: "6 min", xp: 55, stars: 3 },
+      { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
+      { id: 214, title: "Ali Babá e os Quarenta Ladrões (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
+      { id: 215, title: "O Rouxinol", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 216, title: "Barba Azul (resumo)", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 217, title: "A Fada Voadora", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 218, title: "O Cavalo e o Homem", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 219, title: "A Lenda da Lua", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
+      { id: 220, title: "O Pescador e o Gênio", category: "Contos", duration: "8 min", xp: 70, stars: 3 },
     ],
+
     hard: [
+      // Clássicos (301-310)
       { id: 301, title: "Pinóquio", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
-      { id: 302, title: "Alice no País das Maravilhas", category: "Fantasia", duration: "14 min", xp: 130, stars: 4 },
-      { id: 303, title: "A Ilha do Tesouro", category: "Aventura", duration: "15 min", xp: 140, stars: 4 },
-      { id: 304, title: "As Aventuras de Robinson Crusoé", category: "Aventura", duration: "16 min", xp: 150, stars: 4 },
+      { id: 302, title: "Alice no País das Maravilhas", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
+      { id: 303, title: "As Aventuras de Robinson Crusoé", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
+      { id: 304, title: "A Ilha do Tesouro", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
+      { id: 305, title: "O Médico e o Monstro (trecho)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
+      { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", duration: "16 min", xp: 150, stars: 4 },
+      { id: 307, title: "Heidi (trechos)", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
+      { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", duration: "14 min", xp: 130, stars: 4 },
+      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
+      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
+
+      // Aventura (311-320)
+      { id: 311, title: "A Lenda do Rei Arthur (trechos)", category: "Aventura", duration: "14 min", xp: 130, stars: 4 },
+      { id: 312, title: "As Viagens de Gulliver (trechos)", category: "Aventura", duration: "14 min", xp: 130, stars: 4 },
+      { id: 313, title: "O Senhor dos Anéis (trecho infantil)", category: "Aventura", duration: "16 min", xp: 150, stars: 4 },
+      { id: 314, title: "A Ilha Misteriosa (trechos)", category: "Aventura", duration: "15 min", xp: 140, stars: 4 },
+      { id: 315, title: "Robinson e seus Desafios", category: "Aventura", duration: "15 min", xp: 145, stars: 4 },
+      { id: 316, title: "Viagem ao Centro da Terra (trechos)", category: "Aventura", duration: "15 min", xp: 145, stars: 4 },
+      { id: 317, title: "O Tesouro Escondido", category: "Aventura", duration: "12 min", xp: 120, stars: 4 },
+      { id: 318, title: "Exploradores do Mar", category: "Aventura", duration: "13 min", xp: 125, stars: 4 },
+      { id: 319, title: "O Capitão Corajoso", category: "Aventura", duration: "13 min", xp: 125, stars: 4 },
+      { id: 320, title: "Mistérios do Farol", category: "Aventura", duration: "12 min", xp: 120, stars: 4 },
     ],
+
     "very-hard": [
+      // Clássicos (trechos) (401-410)
       { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 402, title: "As Viagens de Gulliver (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
-      { id: 403, title: "Moby Dick (trechos)", category: "Aventura", duration: "20 min", xp: 200, stars: 5 },
-      { id: 404, title: "Sherlock Holmes (contos)", category: "Mistério", duration: "18 min", xp: 190, stars: 5 },
+      { id: 402, title: "Moby Dick (trechos)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 403, title: "Guerra e Paz (trecho simplificado)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 404, title: "Os Irmãos Karamázov (trecho)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 405, title: "Crime e Castigo (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 406, title: "O Morro dos Ventos Uivantes (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 407, title: "Madame Bovary (trecho)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 408, title: "O Retrato de Dorian Gray (trecho)", category: "Clássicos", duration: "19 min", xp: 190, stars: 5 },
+      { id: 409, title: "As Viagens de Gulliver (versão densa)", category: "Clássicos", duration: "20 min", xp: 200, stars: 5 },
+      { id: 410, title: "Sherlock Holmes: Contos Selecionados (trechos)", category: "Clássicos", duration: "18 min", xp: 185, stars: 5 },
+
+      // Mistério & Épicos (411-420)
+      { id: 411, title: "Sherlock Holmes: O Cão dos Baskervilles (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
+      { id: 412, title: "Drácula (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
+      { id: 413, title: "Frankenstein (trecho)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
+      { id: 414, title: "O Chamado de Cthulhu (resumo)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
+      { id: 415, title: "Os Mistérios de Paris (trecho)", category: "Mistério", duration: "19 min", xp: 190, stars: 5 },
+      { id: 416, title: "A Sombra do Vento (trecho)", category: "Mistério", duration: "19 min", xp: 190, stars: 5 },
+      { id: 417, title: "Contos de Poe (seleção)", category: "Mistério", duration: "18 min", xp: 185, stars: 5 },
+      { id: 418, title: "Mistérios do Oriente (seleção)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
+      { id: 419, title: "Relatos de Aventuras Épicas", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
+      { id: 420, title: "Lendas Antigas e Épicos (seleção)", category: "Mistério", duration: "20 min", xp: 200, stars: 5 },
     ],
   } as const;
 
