@@ -110,6 +110,207 @@ const STORY_CONTENT: Record<
     text:
       "A cidade de Hamelin foi invadida por ratos que devoravam colheitas e incomodavam os moradores. Um flautista vestindo roupas coloridas ofereceu-se para livrar a cidade do problema em troca de pagamento. O assentimento veio, e com sua flauta ele encantou os ratos, que o seguiram até o rio, onde se afogaram.\n\nOs cidadãos, satisfeitos, prometeram pagar ao flautista, mas, quando a tarefa foi cumprida, recusaram-se a honrar o acordo. Sentindo-se enganado e humilhado, o flautista planejou uma última demonstração de seu poder.\n\nEle tocou novamente sua flauta, porém desta vez suas melodias enfeitiçaram as crianças da cidade; elas o seguiram até uma montanha ou uma caverna, dependendo da versão, e desapareceram. A cidade ficou devastada pela perda e pelo remorso.\n\nA história é um lembrete sobre a importância de cumprir promessas e de tratar com justiça aqueles que ajudam. Mostra também o perigo da ingratidão e como ações sem honra podem trazer consequências dolorosas.",
   },
+
+  /* Nível médio (201–220) - textos completos */
+  201: {
+    id: 201,
+    title: "Chapeuzinho Vermelho",
+    category: "Contos Clássicos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Era uma vez uma menina muito querida por todos, que ganhou de sua avó um capuz vermelho. Desde então, passou a usá-lo sempre, e logo ficou conhecida como Chapeuzinho Vermelho.\n\nCerto dia, sua mãe pediu que levasse uma cesta de bolo e mel para a avó doente, que morava do outro lado da floresta. A mãe alertou: “Não fale com estranhos e não saia do caminho.” No percurso, Chapeuzinho encontrou um lobo muito esperto. Inocente, contou para onde ia e o que levava. O lobo sugeriu que ela colhesse flores para alegrar a avó e tomou um atalho.\n\nO lobo chegou primeiro, fingiu ser a neta e entrou na casa. Trancou a avó no armário (ou a devorou, em algumas versões) e vestiu suas roupas, deitando-se na cama. Quando Chapeuzinho entrou, estranhou: “Vovó, que olhos grandes!” “É para te ver melhor.” “Que orelhas grandes!” “É para te ouvir melhor.” “Que boca grande!” “É para te devorar!” Saltando, o lobo avançou sobre a menina.\n\nUm caçador que passava ouviu a confusão, entrou, salvou Chapeuzinho e libertou a avó. O lobo foi impedido de fazer mais maldades. Chapeuzinho prometeu não conversar com estranhos e seguir sempre os conselhos de quem a ama. E, desde então, as visitas à avó foram mais cuidadosas e felizes.",
+  },
+
+  202: {
+    id: 202,
+    title: "A Bela Adormecida",
+    category: "Contos Clássicos",
+    duration: "9 min",
+    xp: 75,
+    text:
+      "Num reino distante, nasceu uma princesa tão esperada que o rei realizou uma grande festa e chamou fadas madrinhas para conceder dons. Uma fada ressentida, não convidada, lançou uma maldição: ao completar quinze anos, a princesa espetaria o dedo num fuso e cairia em sono profundo.\n\nO rei mandou destruir todos os fusos do reino, mas no dia do aniversário, a princesa encontrou uma velha fiandeira numa torre e, curiosa, tocou o fuso. Caiu adormecida, e todo o castelo mergulhou em sono mágico. Uma floresta espessa cresceu ao redor, protegendo o lugar.\n\nTempos depois, muitos príncipes tentaram atravessar a mata e falharam. Um dia, um jovem príncipe chegou quando a floresta se abriu como por encanto. Ao ver a princesa, comovido, beijou-a. O feitiço se quebrou, todos despertaram e o castelo ganhou vida novamente.\n\nHouve festa, casamento e reconciliação. O reino aprendeu que nem todas as maldições são eternas e que paciência, coragem e cuidado podem acordar o que parece perdido.",
+  },
+
+  203: {
+    id: 203,
+    title: "Rapunzel",
+    category: "Contos Clássicos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Um casal desejava muito um filho. Durante a gravidez, a mulher ansiou por comer rapôncios (rapunzéis) do jardim de uma feiticeira. O marido pegou escondido, foi descoberto e, para evitar a fúria da bruxa, prometeu entregar a criança quando nascesse.\n\nA menina cresceu linda e recebeu o nome de Rapunzel. A feiticeira a criou numa torre sem portas, apenas com uma janela alta. “Rapunzel, jogue suas tranças!”, dizia a bruxa para subir. Um príncipe ouviu o canto da jovem, aprendeu o segredo das tranças e subiu. Eles se apaixonaram e planejaram fugir.\n\nA bruxa descobriu, cortou os cabelos de Rapunzel e a levou para o deserto. Quando o príncipe subiu, foi enganado e caiu sobre espinhos, ficando cego. Mesmo assim, ele vagou guiado pela lembrança da voz de Rapunzel.\n\nAnos depois, reencontraram-se. As lágrimas de Rapunzel curaram os olhos do príncipe. Eles voltaram ao reino, construíram uma vida livre e compreenderam que amor e esperança podem vencer o isolamento.",
+  },
+
+  204: {
+    id: 204,
+    title: "A Pequena Sereia (versão resumida)",
+    category: "Contos Clássicos",
+    duration: "9 min",
+    xp: 80,
+    text:
+      "No fundo do mar vivia uma jovem sereia curiosa, fascinada pelo mundo dos humanos. Em uma tempestade, salvou um príncipe e, desde então, desejou reencontrá-lo na superfície.\n\nDeterminada, procurou a bruxa do mar, que ofereceu um feitiço: pernas humanas em troca de sua voz. Cada passo doeria como lâminas, e se o príncipe amasse outra, a sereia se desfaria em espuma. Mesmo assim, ela aceitou. Na terra, fez amizade com o príncipe, mas ele não reconheceu que fora ela quem o salvara.\n\nSeduzido por outra princesa, o príncipe se casou. À sereia restou a chance de voltar ao mar se ferisse o amado, mas ela escolheu o amor e a bondade. Em algumas versões, tornou-se espuma; em outras, ganhou uma nova forma de existir e aprender.\n\nSeu destino, ainda que doloroso, fala de identidade, sacrifício e da busca por um lugar no mundo — e lembra que escolhas feitas por amor têm valor próprio.",
+  },
+
+  205: {
+    id: 205,
+    title: "O Príncipe Sapo",
+    category: "Contos Clássicos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Uma princesa deixou cair sua bola de ouro no lago. Um sapo apareceu e ofereceu ajuda em troca de amizade e hospitalidade no castelo. A princesa prometeu, mas ao recuperar a bola tentou fugir do acordo.\n\nO sapo foi até o castelo e pediu o combinado. A contragosto, a princesa o deixou comer à sua mesa e descansar em seu quarto. Em algumas versões, um gesto de ternura — um beijo, um abraço ou cumprir a palavra — quebra o encanto e transforma o sapo em príncipe.\n\nA princesa aprendeu sobre respeito às promessas e sobre olhar para além das aparências. O príncipe, libertado, mostrou gentileza e gratidão. Juntos, tornaram-se exemplo de responsabilidade e empatia.",
+  },
+
+  206: {
+    id: 206,
+    title: "Rumpelstiltskin",
+    category: "Contos Clássicos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Um moleiro gabou-se ao rei dizendo que sua filha transformava palha em ouro. O rei, ávido, trancou a jovem num celeiro e exigiu o impossível. Desesperada, ela recebeu a visita de um homenzinho misterioso, que fez o milagre em troca de seus colares, anéis e, por fim, da promessa do primeiro filho.\n\nQuando a moça casou com o rei e teve um bebê, o ser voltou para cobrar. Com pena, ofereceu-lhe um acordo: se ela descobrisse seu nome em três dias, ficaria com a criança. Mensageiros rodaram o reino até flagrarem o homenzinho dançando no bosque e cantando: “Ninguém sabe que me chamo Rumpelstiltskin.”\n\nAo ouvir o nome, o pacto se desfez. O pequeno enfureceu-se e desapareceu. A rainha salvou o filho e entendeu o peso das palavras — e de nunca aceitar acordos sem saber o preço.",
+  },
+
+  207: {
+    id: 207,
+    title: "A Rainha da Neve (trechos)",
+    category: "Contos Clássicos",
+    duration: "9 min",
+    xp: 80,
+    text:
+      "Cacos de um espelho mágico caíram nos olhos e no coração do menino Kai, tornando-o frio com quem amava. A Rainha da Neve o levou para um palácio gelado, onde tudo parecia perfeito, mas nada aquecia a alma.\n\nGerda, sua amiga, partiu numa longa jornada. Encontrou ajudantes inesperados — um corvo falante, uma senhora do jardim, um príncipe bondoso e até ladrões — e nunca desistiu. Cada gesto gentil abria um caminho.\n\nNo palácio, as lágrimas de Gerda caíram sobre Kai e derreteram o gelo do coração. Ele voltou a enxergar o mundo com calor e verdade. De mãos dadas, os dois regressaram, provando que amizade e amor vencem a frieza da indiferença.",
+  },
+
+  208: {
+    id: 208,
+    title: "A Gata Borralheira (versão clássica)",
+    category: "Contos Clássicos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Após a morte do pai, Cinderela ficou sob a tirania da madrasta e das irmãs, que a obrigavam a viver junto às cinzas da lareira. Mesmo assim, manteve a bondade.\n\nQuando o rei anunciou um baile, uma fada madrinha transformou abóbora em carruagem, ratos em cocheiros e trapos em vestido. A única condição: voltar antes da meia-noite. No baile, Cinderela encantou o príncipe, mas correu ao soar das doze badaladas, deixando um sapatinho de cristal.\n\nO príncipe procurou a dona do sapato por todo o reino. Ao encontrá-la, o calçado serviu. Cinderela foi reconhecida, casou-se com o príncipe e mostrou que gentileza e coragem podem superar a injustiça.",
+  },
+
+  209: {
+    id: 209,
+    title: "O Mágico de Oz (trechos)",
+    category: "Contos Clássicos",
+    duration: "10 min",
+    xp: 90,
+    text:
+      "Um ciclone levou Dorothy e seu cão Totó do Kansas para a Terra de Oz. Na estrada de tijolos amarelos, ela conheceu o Espantalho, que queria um cérebro, o Homem de Lata, que queria um coração, e o Leão, que buscava coragem.\n\nJuntos, enfrentaram perigos e foram ao encontro do Mágico na Cidade das Esmeraldas. Depois de muitas provas, descobriram que o Mágico era apenas um homem comum. Ainda assim, compreenderam que já possuíam aquilo que tanto buscavam: o Espantalho tinha ideias, o Homem de Lata era sensível, e o Leão, valente.\n\nCom a ajuda de sapatos mágicos, Dorothy voltou para casa e entendeu que não há lugar como o lar — e que nossas qualidades florescem quando caminhamos com amigos.",
+  },
+
+  210: {
+    id: 210,
+    title: "O Pequeno Polegar",
+    category: "Contos Clássicos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Pequeno no tamanho, grande na esperteza: assim era o Pequeno Polegar. Em tempos de fome, ele percebeu que os pais planejavam abandonar os filhos na floresta e tentou marcar o caminho com migalhas, que os pássaros comeram.\n\nPerdidos, os irmãos enfrentaram perigos e a casa de um ogro. Com astúcia, o menino trocou gorros, enganou inimigos e salvou a todos. Ao final, recuperou riquezas do ogro e levou a família à segurança.\n\nA história mostra que coragem e inteligência podem proteger quem amamos mesmo nas maiores dificuldades.",
+  },
+
+  211: {
+    id: 211,
+    title: "Os Três Porquinhos",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Três porquinhos resolveram construir suas casas. Um usou palha, outro madeira e o terceiro, tijolos. Logo apareceu um lobo, que soprou e derrubou as duas primeiras casas.\n\nOs porquinhos correram para a casa de tijolos, que resistiu a todos os sopros. Furioso, o lobo tentou entrar pela chaminé, mas queimou o rabo e fugiu.\n\nAssim, eles aprenderam que trabalho cuidadoso e planejamento dão segurança — e que pressa pode sair caro.",
+  },
+
+  212: {
+    id: 212,
+    title: "Pedro e o Lobo",
+    category: "Contos",
+    duration: "6 min",
+    xp: 55,
+    text:
+      "Pedro vivia perto de um bosque com seu avô, que o alertava sobre os perigos do lobo. Curioso e corajoso, Pedro ignorou os avisos e saltou a cerca.\n\nQuando o lobo apareceu, ameaçando os animais, Pedro montou um plano com a ajuda do pássaro e capturou o lobo sem ferir ninguém. A aldeia o aplaudiu, mas ele reconheceu o valor dos conselhos do avô.\n\nA aventura ensina a equilibrar ousadia e prudência, e a proteger os amigos com inteligência.",
+  },
+
+  213: {
+    id: 213,
+    title: "Simbad, o Marinheiro (trechos)",
+    category: "Contos",
+    duration: "10 min",
+    xp: 95,
+    text:
+      "Simbad contou sete grandes viagens: em uma, amarrou-se ao pé de uma ave roc para escapar de uma ilha perigosa; em outra, enfrentou criaturas marinhas gigantes e tempestades que engoliam navios.\n\nEm cada aventura, usou coragem e inteligência para retornar com tesouros e histórias. Conheceu reis, mercadores e povos distantes, aprendendo que o mar exige respeito e preparo.\n\nDe volta a Bagdá, partilhava suas riquezas e lembrava que a melhor fortuna é a experiência conquistada com coragem e prudência.",
+  },
+
+  214: {
+    id: 214,
+    title: "Ali Babá e os Quarenta Ladrões (trechos)",
+    category: "Contos",
+    duration: "10 min",
+    xp: 95,
+    text:
+      "Ali Babá descobriu por acaso uma caverna que se abria com as palavras mágicas “Abre-te, Sésamo”. Ali, os quarenta ladrões escondiam tesouros. Ele pegou um pouco para sua família, sem ambição cega.\n\nQuando os ladrões suspeitaram, tentaram invadir a casa de Ali Babá. A esperteza de Morgiana, a criada leal, frustrou os planos mais de uma vez, salvando a todos.\n\nPor fim, os ladrões foram derrotados. Ali Babá compreendeu que riqueza sem justiça é perigosa — e que a lealdade pode valer mais do que ouro.",
+  },
+
+  215: {
+    id: 215,
+    title: "O Rouxinol",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "O imperador apaixonou-se pelo canto de um rouxinol que vivia nos jardins do palácio. Encantado por um pássaro mecânico luxuoso, esqueceu o rouxinol verdadeiro, que partiu entristecido.\n\nQuando o imperador adoeceu, o pássaro mecânico não pôde ajudá-lo. O rouxinol real voltou, cantou para ele e trouxe esperança e cura.\n\nDesde então, o imperador passou a valorizar a beleza autêntica e a simplicidade que tocam o coração.",
+  },
+
+  216: {
+    id: 216,
+    title: "Barba Azul (resumo)",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Barba Azul era um homem rico e temido, com um passado cercado de mistérios. Antes de viajar, entregou à esposa todas as chaves, proibindo-a de abrir um pequeno quarto.\n\nMovida pela curiosidade, ela abriu a porta e encontrou provas dos crimes do marido. Barba Azul descobriu e quis puni-la, mas os irmãos da moça chegaram a tempo, o derrotaram e a libertaram.\n\nLivre, ela dividiu os bens com a família e usou sua experiência para ajudar outras pessoas a reconhecerem sinais de perigo e a pedirem ajuda.",
+  },
+
+  217: {
+    id: 217,
+    title: "A Fada Voadora",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Numa aldeia cercada por campos, uma fadinha apareceu e prometeu ajudar se todos cuidassem da natureza e uns dos outros. Com pequenos encantos, ensinou as crianças a plantar, a dividir e a escutar.\n\nUm forasteiro ganancioso tentou explorar o vilarejo. A fada, com astúcia e união dos moradores, mostrou que egoísmo seca as fontes. O visitante aprendeu a lição e partiu.\n\nA aldeia prosperou com cooperação, e a fada seguiu viagem, deixando sementes de gentileza por onde passava.",
+  },
+
+  218: {
+    id: 218,
+    title: "O Cavalo e o Homem",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Um jovem lavrador e seu cavalo formavam uma dupla inseparável. Entre enchentes e estradas lamacentas, aprenderam a confiar um no outro.\n\nCerta vez, num torneio de resistência, o cavalo salvou o dono de um acidente, preferindo protegê-lo a vencer a prova. A coragem silenciosa do animal comoveu a vila.\n\nDesde então, todos compreenderam que amizade e cuidado valem mais do que troféus.",
+  },
+
+  219: {
+    id: 219,
+    title: "A Lenda da Lua",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Diziam que um velho guardião cuidava da lua e escolhia, a cada década, um mensageiro para ouvir as histórias do povo. Um jovem curioso atravessou vales e rios para chegar até ele.\n\nNo caminho, recolheu relatos de pescadores, artesãos e viajantes, percebendo que a luz da lua parecia mais brilhante quanto mais histórias guardava. Ao encontrar o guardião, entendeu: a lua refletia a memória das pessoas.\n\nO jovem voltou e passou a preservar contos e canções, iluminando a sua comunidade com lembranças que não se apagam.",
+  },
+
+  220: {
+    id: 220,
+    title: "O Pescador e o Gênio",
+    category: "Contos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Um pescador humilde encontrou uma ânfora selada. Ao abri-la, libertou um gênio que, enfurecido por séculos de prisão, ameaçou castigá-lo. O pescador, sereno, propôs um teste: se o gênio era tão poderoso, seria capaz de caber novamente na ânfora?\n\nVanglorioso, o gênio entrou — e o pescador o fechou de novo. Só então negociou sua liberdade em troca de um juramento de proteção. O gênio, impressionado com a inteligência do homem, cumpriu a palavra e concedeu um presente útil à aldeia.\n\nAssim, o pescador mostrou que prudência e inteligência podem transformar perigos em oportunidades para o bem comum.",
+  },
 };
 
 const Story = () => {
@@ -118,12 +319,10 @@ const Story = () => {
   const { progress, completeStory } = useProgress();
 
   const storyId = useMemo(() => (id ? parseInt(id, 10) : NaN), [id]);
-
   const story = STORY_CONTENT[storyId];
 
   useEffect(() => {
     if (!story) {
-      // If story not found, go back to reading after a short delay
       const t = setTimeout(() => navigate("/reading"), 800);
       return () => clearTimeout(t);
     }
@@ -144,7 +343,7 @@ const Story = () => {
       completeStory(storyId, story.xp);
       toast.success(`🎉 Você ganhou ${story.xp} XP por ler "${story.title}"!`);
     } else {
-      toast(`História já concluída.`);
+      toast("História já concluída.");
     }
     navigate("/reading");
   };
@@ -152,7 +351,6 @@ const Story = () => {
   return (
     <div className="min-h-screen pb-10 md:pt-10">
       <Navigation />
-
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto space-y-6">
           <Card className="p-6 shadow-card border-2 border-primary/20">
