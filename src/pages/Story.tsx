@@ -341,7 +341,7 @@ const STORY_CONTENT: Record<
     duration: "12 min",
     xp: 120,
     text:
-      "Início — Gepeto, um carpinteiro bondoso, construiu um boneco de madeira e desejou que ele virasse um menino de verdade. Numa noite estrelada, uma fada atendeu ao pedido: deu vida ao boneco e o chamou de Pinóquio, pedindo que fosse corajoso, sincero e gentil. Sempre que mentisse, seu nariz cresceria.\n\nMeio — Curioso e impulsivo, Pinóquio faltou à escola e caiu em encrencas: foi preso por um titereiro ambicioso, enganado por uma raposa e um gato interesseiros e levado à Ilha dos Prazeres, onde meninos viravam burros por viverem de travessuras. Arrependido de suas escolhas, Pinóquio lembrou das palavras da fada e decidiu procurar Gepeto, que havia desaparecido ao tentar salvá-lo.\n\nFim — No mar, Pinóquio encontrou o pai dentro de uma enorme baleia. Com coragem, ajudou Gepeto a escapar e os dois voltaram para casa. O boneco passou a trabalhar, estudar e cuidar de quem amava. Por sua bravura e bondade, a fada o transformou em um menino de verdade, realizando o sonho de Gepeto.",
+      "Gepeto, um carpinteiro bondoso, construiu um boneco de madeira e desejou que ele virasse um menino de verdade. Numa noite estrelada, uma fada atendeu ao pedido: deu vida ao boneco e o chamou de Pinóquio, pedindo que fosse corajoso, sincero e gentil. Sempre que mentisse, seu nariz cresceria.\n\nCurioso e impulsivo, Pinóquio faltou à escola e caiu em encrencas: foi preso por um titereiro ambicioso, enganado por uma raposa e um gato interesseiros e levado à Ilha dos Prazeres, onde meninos viravam burros por viverem de travessuras. Arrependido de suas escolhas, Pinóquio lembrou das palavras da fada e decidiu procurar Gepeto, que havia desaparecido ao tentar salvá-lo.\n\nNo mar, Pinóquio encontrou o pai dentro de uma enorme baleia. Com coragem, ajudou Gepeto a escapar e os dois voltaram para casa. O boneco passou a trabalhar, estudar e cuidar de quem amava. Por sua bravura e bondade, a fada o transformou em um menino de verdade, realizando o sonho de Gepeto.",
   },
 
   302: {
@@ -351,7 +351,7 @@ const STORY_CONTENT: Record<
     duration: "14 min",
     xp: 130,
     text:
-      "Início — Em uma tarde preguiçosa, Alice viu um Coelho Branco correndo, olhando o relógio e murmurando que estava atrasado. Intrigada, ela o seguiu e caiu em uma toca que parecia não ter fim, entrando em um lugar estranho onde crescer e encolher era possível com um gole ou uma mordida.\n\nMeio — Alice encontrou criaturas excêntricas: o Gato de Cheshire, que desaparecia deixando apenas o sorriso; o Chapeleiro Maluco e a Lebre de Março, que viviam uma festa do chá sem fim; e uma rainha barulhenta que mandava cortar cabeças ao menor contragosto. Em cada encontro, Alice tentava entender as regras daquele mundo, que pareciam mudar a cada minuto.\n\nFim — Em um julgamento confuso no castelo da Rainha de Copas, Alice percebeu que todos agiam como num sonho. Ao reivindicar sua própria voz, tudo começou a se desfazer. Ela acordou no campo, ao lado da irmã, levando consigo a lembrança de que a imaginação pode tornar qualquer dia extraordinário.",
+      "Em uma tarde preguiçosa, Alice viu um Coelho Branco correndo, olhando o relógio e murmurando que estava atrasado. Intrigada, ela o seguiu e caiu em uma toca que parecia não ter fim, entrando em um lugar estranho onde crescer e encolher era possível com um gole ou uma mordida.\n\nAlice encontrou criaturas excêntricas: o Gato de Cheshire, que desaparecia deixando apenas o sorriso; o Chapeleiro Maluco e a Lebre de Março, que viviam uma festa do chá sem fim; e uma rainha barulhenta que mandava cortar cabeças ao menor contragosto. Em cada encontro, Alice tentava entender as regras daquele mundo, que pareciam mudar a cada minuto.\n\nEm um julgamento confuso no castelo da Rainha de Copas, Alice percebeu que todos agiam como num sonho. Ao reivindicar sua própria voz, tudo começou a se desfazer. Ela acordou no campo, ao lado da irmã, levando consigo a lembrança de que a imaginação pode tornar qualquer dia extraordinário.",
   },
 
   303: {
@@ -361,7 +361,7 @@ const STORY_CONTENT: Record<
     duration: "16 min",
     xp: 150,
     text:
-      "Início — Desejando ver o mundo, Robinson Crusoé embarcou contra a vontade da família. Em uma tempestade devastadora, seu navio naufragou e ele foi parar sozinho em uma ilha deserta. Sem ninguém por perto, precisou aprender a sobreviver.\n\nMeio — Com engenho e paciência, construiu abrigo, plantou, caçou e aproveitou o que restara do navio. Ao longo dos anos, registrou seus dias, manteve a fé e descobriu sinais de outros humanos: pegadas na areia e fogueiras distantes. Em certo dia, salvou um homem de um perigo e passou a chamá-lo de Sexta-Feira. Juntos, trabalharam, aprenderam um com o outro e transformaram a ilha em lar.\n\nFim — Quando um navio surgiu no horizonte, Robinson e Sexta-Feira ajudaram a impedir um motim a bordo e conquistaram a viagem de volta. Robinson retornou à civilização, mais maduro e grato, levando como tesouro as lições de coragem, amizade e perseverança que a ilha lhe deu.",
+      "Desejando ver o mundo, Robinson Crusoé embarcou contra a vontade da família. Em uma tempestade devastadora, seu navio naufragou e ele foi parar sozinho em uma ilha deserta. Sem ninguém por perto, precisou aprender a sobreviver.\n\nCom engenho e paciência, construiu abrigo, plantou, caçou e aproveitou o que restara do navio. Ao longo dos anos, registrou seus dias, manteve a fé e descobriu sinais de outros humanos: pegadas na areia e fogueiras distantes. Em certo dia, salvou um homem de um perigo e passou a chamá-lo de Sexta-Feira. Juntos, trabalharam, aprenderam um com o outro e transformaram a ilha em lar.\n\nQuando um navio surgiu no horizonte, Robinson e Sexta-Feira ajudaram a impedir um motim a bordo e conquistaram a viagem de volta. Robinson retornou à civilização, mais maduro e grato, levando como tesouro as lições de coragem, amizade e perseverança que a ilha lhe deu.",
   },
 
   304: {
@@ -371,7 +371,7 @@ const STORY_CONTENT: Record<
     duration: "15 min",
     xp: 140,
     text:
-      "Início — Jim Hawkins encontrou, entre os pertences de um velho marinheiro, um mapa que marcava o local de um tesouro enterrado. Com o doutor Livesey e o cavaleiro Trelawney, organizou uma expedição em um navio tripulado por homens misteriosos.\n\nMeio — A bordo, Jim descobriu que o cozinheiro, Long John Silver, era um astuto pirata que planejava um motim para tomar o mapa e a fortuna. Em terra, a tripulação se dividiu em dois grupos. Entre emboscadas, refúgios improvisados e coragem inesperada, Jim e seus amigos lutaram para manter o mapa seguro.\n\nFim — Após confrontos e reviravoltas, o grupo de Jim localizou o esconderijo e recuperou o tesouro. Long John Silver escapou com uma parte do ouro, e Jim voltou para casa mais sábio, sabendo que aventura e ambição podem caminhar juntas — mas que lealdade e amizade valem mais do que baús cheios.",
+      "Jim Hawkins encontrou, entre os pertences de um velho marinheiro, um mapa que marcava o local de um tesouro enterrado. Com o doutor Livesey e o cavaleiro Trelawney, organizou uma expedição em um navio tripulado por homens misteriosos.\n\nA bordo, Jim descobriu que o cozinheiro, Long John Silver, era um astuto pirata que planejava um motim para tomar o mapa e a fortuna. Em terra, a tripulação se dividiu em dois grupos. Entre emboscadas, refúgios improvisados e coragem inesperada, Jim e seus amigos lutaram para manter o mapa seguro.\n\nApós confrontos e reviravoltas, o grupo de Jim localizou o esconderijo e recuperou o tesouro. Long John Silver escapou com uma parte do ouro, e Jim voltou para casa mais sábio, sabendo que aventura e ambição podem caminhar juntas — mas que lealdade e amizade valem mais do que baús cheios.",
   },
 
   305: {
@@ -381,7 +381,7 @@ const STORY_CONTENT: Record<
     duration: "13 min",
     xp: 125,
     text:
-      "Início — Em Londres, o respeitado Dr. Jekyll pesquisava a natureza do bem e do mal no coração humano. Obcecado por separar essas forças, criou um soro capaz de mudar sua forma e seus impulsos.\n\nMeio — Ao ingerir a fórmula, Jekyll transformava-se no Sr. Hyde, uma versão sombria e descontrolada de si mesmo, que buscava prazeres e cometia violências. A cada transformação, Hyde ganhava força, enquanto Jekyll perdia o controle do próprio destino. Amigos e colegas percebiam mudanças estranhas, mas não entendiam o que se passava.\n\nFim — Em cartas reveladas no desfecho, Jekyll confessou a verdade: o experimento libertou impulsos que não podia dominar. Sem conseguir reverter os efeitos, ele deixou um alerta — reconhecer nossa dupla natureza é parte do caminho para fazer escolhas responsáveis. A história permanece como um espelho sobre ética e autocontrole.",
+      "Em Londres, o respeitado Dr. Jekyll pesquisava a natureza do bem e do mal no coração humano. Obcecado por separar essas forças, criou um soro capaz de mudar sua forma e seus impulsos.\n\nAo ingerir a fórmula, Jekyll transformava-se no Sr. Hyde, uma versão sombria e descontrolada de si mesmo, que buscava prazeres e cometia violências. A cada transformação, Hyde ganhava força, enquanto Jekyll perdia o controle do próprio destino. Amigos e colegas percebiam mudanças estranhas, mas não entendiam o que se passava.\n\nEm cartas reveladas no desfecho, Jekyll confessou a verdade: o experimento libertou impulsos que não podia dominar. Sem conseguir reverter os efeitos, ele deixou um alerta — reconhecer nossa dupla natureza é parte do caminho para fazer escolhas responsáveis. A história permanece como um espelho sobre ética e autocontrole.",
   },
 
   306: {
@@ -391,7 +391,7 @@ const STORY_CONTENT: Record<
     duration: "16 min",
     xp: 150,
     text:
-      "Início — Phileas Fogg, um cavalheiro britânico de hábitos precisos, apostou no clube que conseguiria dar a volta ao mundo em 80 dias. Partiu imediatamente com seu criado, Passepartout, levando um plano e um relógio impecável.\n\nMeio — Trem, navio, elefante e improvisos: a dupla cruzou continentes, salvou Aouda de um perigo e ganhou uma companheira de viagem. Um detetive, Fix, seguiu Fogg acreditando, por engano, que ele era um ladrão. Atrasos, tempestades e contratempos quase destruíram a aposta.\n\nFim — De volta a Londres, Fogg pensou ter perdido por alguns minutos. Porém, ao atravessar os fusos horários rumo ao leste, ganhara um dia. Descoberta a diferença, venceu a aposta. Mais importante, percebeu que a maior conquista foi encontrar amor e amizade no caminho, casando-se com Aouda.",
+      "Phileas Fogg, um cavalheiro britânico de hábitos precisos, apostou no clube que conseguiria dar a volta ao mundo em 80 dias. Partiu imediatamente com seu criado, Passepartout, levando um plano e um relógio impecável.\n\nTrem, navio, elefante e improvisos: a dupla cruzou continentes, salvou Aouda de um perigo e ganhou uma companheira de viagem. Um detetive, Fix, seguiu Fogg acreditando, por engano, que ele era um ladrão. Atrasos, tempestades e contratempos quase destruíram a aposta.\n\nDe volta a Londres, Fogg pensou ter perdido por alguns minutos. Porém, ao atravessar os fusos horários rumo ao leste, ganhara um dia. Descoberta a diferença, venceu a aposta. Mais importante, percebeu que a maior conquista foi encontrar amor e amizade no caminho, casando-se com Aouda.",
   },
 
   307: {
@@ -401,7 +401,7 @@ const STORY_CONTENT: Record<
     duration: "12 min",
     xp: 120,
     text:
-      "Início — Heidi, uma menina órfã, foi morar com o avô nas montanhas suíças. Entre cabras, prados e céu aberto, descobriu liberdade e afeto, fazendo amizade com Pedro, o pastor, e aprendendo a amar a vida simples.\n\nMeio — Levada à cidade para fazer companhia a Clara, uma menina frágil que vivia numa casa elegante, Heidi sentiu saudade das montanhas. Ainda assim, sua alegria iluminou os dias de Clara. Com cartas, lembranças e esperança, Heidi manteve vivo o sonho de voltar.\n\nFim — De volta aos Alpes, a menina recuperou o brilho, e Clara foi visitá-la. O ar puro e o esforço paciente ajudaram Clara a ganhar força e dar passos novamente. Entre risos, o avô percebeu que o coração encontra casa onde há amor, amizade e natureza.",
+      "Heidi, uma menina órfã, foi morar com o avô nas montanhas suíças. Entre cabras, prados e céu aberto, descobriu liberdade e afeto, fazendo amizade com Pedro, o pastor, e aprendendo a amar a vida simples.\n\nLevada à cidade para fazer companhia a Clara, uma menina frágil que vivia numa casa elegante, Heidi sentiu saudade das montanhas. Ainda assim, sua alegria iluminou os dias de Clara. Com cartas, lembranças e esperança, Heidi manteve vivo o sonho de voltar.\n\nDe volta aos Alpes, a menina recuperou o brilho, e Clara foi visitá-la. O ar puro e o esforço paciente ajudaram Clara a ganhar força e dar passos novamente. Entre risos, o avô percebeu que o coração encontra casa onde há amor, amizade e natureza.",
   },
 
   308: {
@@ -411,7 +411,7 @@ const STORY_CONTENT: Record<
     duration: "14 min",
     xp: 130,
     text:
-      "Início — Tom Sawyer vivia aventuras às margens do rio Mississippi. Arteiro e imaginativo, trocou elogios por trabalho quando convenceu os amigos de que pintar a cerca era um privilégio raro.\n\nMeio — Com Huck Finn e Becky, Tom explorou cavernas, ouviu conversas perigosas e testemunhou um crime cometido por Injun Joe. Entre sumiços e retornos triunfais, aprendeu a diferenciar bravura de imprudência.\n\nFim — Depois de enfrentar medos e labirintos, Tom e Huck encontraram um tesouro escondido. A cidade os recebeu como heróis. Entre responsabilidades novas e desejo por aventuras, Tom entendeu que crescer é equilibrar imaginação com escolhas certas.",
+      "Tom Sawyer vivia aventuras às margens do rio Mississippi. Arteiro e imaginativo, trocou elogios por trabalho quando convenceu os amigos de que pintar a cerca era um privilégio raro.\n\nCom Huck Finn e Becky, Tom explorou cavernas, ouviu conversas perigosas e testemunhou um crime cometido por Injun Joe. Entre sumiços e retornos triunfais, aprendeu a diferenciar bravura de imprudência.\n\nDepois de enfrentar medos e labirintos, Tom e Huck encontraram um tesouro escondido. A cidade os recebeu como heróis. Entre responsabilidades novas e desejo por aventuras, Tom entendeu que crescer é equilibrar imaginação com escolhas certas.",
   },
 
   309: {
@@ -421,7 +421,7 @@ const STORY_CONTENT: Record<
     duration: "15 min",
     xp: 140,
     text:
-      "Início — Em Paris, o bondoso Quasímodo, sineiro da catedral de Notre-Dame, vivia isolado por sua aparência. Ao conhecer Esmeralda, uma jovem dançarina livre e generosa, descobriu carinho e respeito que nunca havia sentido.\n\nMeio — O severo Frollo, consumido por obsessão, tentou controlar o destino de Esmeralda. A cidade ferveu em mal-entendidos, perseguições e julgamentos injustos. Quasímodo ofereceu abrigo na catedral, buscando protegê-la do mundo que a condenava sem ouvir seu coração.\n\nFim — Em um desfecho doloroso, a injustiça e o fanatismo levaram à tragédia. Ainda assim, a história deixou uma luz: a verdadeira beleza está na compaixão e na capacidade de enxergar a humanidade no outro, para além de aparência e preconceito.",
+      "Em Paris, o bondoso Quasímodo, sineiro da catedral de Notre-Dame, vivia isolado por sua aparência. Ao conhecer Esmeralda, uma jovem dançarina livre e generosa, descobriu carinho e respeito que nunca havia sentido.\n\nO severo Frollo, consumido por obsessão, tentou controlar o destino de Esmeralda. A cidade ferveu em mal-entendidos, perseguições e julgamentos injustos. Quasímodo ofereceu abrigo na catedral, buscando protegê-la do mundo que a condenava sem ouvir seu coração.\n\nEm um desfecho doloroso, a injustiça e o fanatismo levaram à tragédia. Ainda assim, a história deixou uma luz: a verdadeira beleza está na compaixão e na capacidade de enxergar a humanidade no outro, para além de aparência e preconceito.",
   },
 
   310: {
@@ -431,7 +431,7 @@ const STORY_CONTENT: Record<
     duration: "13 min",
     xp: 125,
     text:
-      "Início — Uma coletânea de contos dos Irmãos Grimm convida a conhecer heróis humildes e corajosos: o Alfaiate Valente que derrota gigantes com astúcia, João e Maria que enfrentam uma casa de doces perigosa e um príncipe que aprende a ver além das aparências.\n\nMeio — Em cada história, provações pedem escolhas: seguir um caminho escuro, cumprir promessas difíceis ou dividir o pouco que se tem. A esperteza e a bondade, quando andam juntas, viram ferramentas poderosas contra a ganância e a mentira.\n\nFim — Ao final, não é a força que vence, mas a coragem aliada à compaixão. Quem ajuda o próximo encontra ajuda, quem cumpre a palavra encontra confiança, e quem aprende com os tropeços volta para casa transformado — pronto para escrever o próximo capítulo.",
+      "Uma coletânea de contos dos Irmãos Grimm convida a conhecer heróis humildes e corajosos: o Alfaiate Valente que derrota gigantes com astúcia, João e Maria que enfrentam uma casa de doces perigosa e um príncipe que aprende a ver além das aparências.\n\nEm cada história, provações pedem escolhas: seguir um caminho escuro, cumprir promessas difíceis ou dividir o pouco que se tem. A esperteza e a bondade, quando andam juntas, viram ferramentas poderosas contra a ganância e a mentira.\n\nAo final, não é a força que vence, mas a coragem aliada à compaixão. Quem ajuda o próximo encontra ajuda, quem cumpre a palavra encontra confiança, e quem aprende com os tropeços volta para casa transformado — pronto para escrever o próximo capítulo.",
   },
 
   /* Nível muito difícil (401–405) - textos completos com Início, Meio e Fim */
@@ -442,7 +442,7 @@ const STORY_CONTENT: Record<
     duration: "18 min",
     xp: 180,
     text:
-      "Início — Alonso Quixano, um fidalgo que adorava ler livros de cavalaria, decidiu tornar-se cavaleiro andante com o nome de Dom Quixote. Montado em Rocinante e com uma bacia de barbeiro como elmo, partiu pelo campo em busca de aventuras, levando no coração a ideia de defender os fracos e honrar sua dama, Dulcineia.\n\nMeio — Acompanhado de Sancho Pança, um vizinho leal e divertido, Quixote enfrentou “gigantes” que eram moinhos de vento, “exércitos” que eram rebanhos e “castelos” que eram estalagens. Entre confusões e boas intenções, Sancho tentava equilibrar fantasia e realidade, aprendendo sobre amizade e coragem no caminho.\n\nFim — Dom Quixote retornou à sua aldeia, cansado e doente. Recuperou a lucidez, reconheceu seus enganos e se despediu das aventuras com serenidade. Sua história lembra que a imaginação pode nos levar longe, mas é a prudência e o cuidado com os outros que nos mantêm no caminho certo.",
+      "Alonso Quixano, um fidalgo que adorava ler livros de cavalaria, decidiu tornar-se cavaleiro andante com o nome de Dom Quixote. Montado em Rocinante e com uma bacia de barbeiro como elmo, partiu pelo campo em busca de aventuras, levando no coração a ideia de defender os fracos e honrar sua dama, Dulcineia.\n\nAcompanhado de Sancho Pança, um vizinho leal e divertido, Quixote enfrentou “gigantes” que eram moinhos de vento, “exércitos” que eram rebanhos e “castelos” que eram estalagens. Entre confusões e boas intenções, Sancho tentava equilibrar fantasia e realidade, aprendendo sobre amizade e coragem no caminho.\n\nDom Quixote retornou à sua aldeia, cansado e doente. Recuperou a lucidez, reconheceu seus enganos e se despediu das aventuras com serenidade. Sua história lembra que a imaginação pode nos levar longe, mas é a prudência e o cuidado com os outros que nos mantêm no caminho certo.",
   },
 
   402: {
@@ -452,7 +452,7 @@ const STORY_CONTENT: Record<
     duration: "20 min",
     xp: 200,
     text:
-      "Início — Ishmael, em busca de trabalho e de mar aberto, embarcou no baleeiro Pequod. O capitão Ahab revelou uma missão pessoal: caçar Moby Dick, a grande baleia branca que o havia ferido, e que agora simbolizava sua obsessão.\n\nMeio — Pelo mundo, a tripulação enfrentou tempestades e mares gelados, avistando baleias e ouvindo presságios. Starbuck, o imediato, temia que a fúria de Ahab colocasse todos em risco. Ainda assim, o capitão seguia firme, cada encontro com o oceano alimentando seu desejo de vingança.\n\nFim — Ao finalmente encontrarem Moby Dick, travou-se uma batalha feroz. A baleia destruiu o navio e afundou o Pequod. Apenas Ishmael sobreviveu, agarrado a um caixote-boia, para contar a história. A aventura mostra como a obsessão pode engolir tudo ao redor e como a humildade diante da natureza é essencial.",
+      "Ishmael, em busca de trabalho e de mar aberto, embarcou no baleeiro Pequod. O capitão Ahab revelou uma missão pessoal: caçar Moby Dick, a grande baleia branca que o havia ferido, e que agora simbolizava sua obsessão.\n\nPelo mundo, a tripulação enfrentou tempestades e mares gelados, avistando baleias e ouvindo presságios. Starbuck, o imediato, temia que a fúria de Ahab colocasse todos em risco. Ainda assim, o capitão seguia firme, cada encontro com o oceano alimentando seu desejo de vingança.\n\nAo finalmente encontrarem Moby Dick, travou-se uma batalha feroz. A baleia destruiu o navio e afundou o Pequod. Apenas Ishmael sobreviveu, agarrado a um caixote-boia, para contar a história. A aventura mostra como a obsessão pode engolir tudo ao redor e como a humildade diante da natureza é essencial.",
   },
 
   403: {
@@ -462,7 +462,7 @@ const STORY_CONTENT: Record<
     duration: "20 min",
     xp: 200,
     text:
-      "Início — Em meio às guerras napoleônicas, famílias russas como os Bolkonsky e os Rostov viviam entre bailes, estudos e sonhos. Pierre, Andrei e Natasha buscavam sentido para a vida, enquanto o país se preparava para tempos difíceis.\n\nMeio — A guerra trouxe perdas, coragem e escolhas. Andrei enfrentou o campo de batalha; Pierre questionou quem desejava ser; Natasha amadureceu entre erros e perdões. Em cada mudança, amizade e compaixão mantiveram acesa a esperança.\n\nFim — Com a paz, veio também a reconstrução. Os personagens encontraram novos caminhos, percebendo que o valor da vida está nas pessoas que amamos, na responsabilidade com a comunidade e na capacidade de recomeçar com humildade e esperança.",
+      "Em meio às guerras napoleônicas, famílias russas como os Bolkonsky e os Rostov viviam entre bailes, estudos e sonhos. Pierre, Andrei e Natasha buscavam sentido para a vida, enquanto o país se preparava para tempos difíceis.\n\nA guerra trouxe perdas, coragem e escolhas. Andrei enfrentou o campo de batalha; Pierre questionou quem desejava ser; Natasha amadureceu entre erros e perdões. Em cada mudança, amizade e compaixão mantiveram acesa a esperança.\n\nCom a paz, veio também a reconstrução. Os personagens encontraram novos caminhos, percebendo que o valor da vida está nas pessoas que amamos, na responsabilidade com a comunidade e na capacidade de recomeçar com humildade e esperança.",
   },
 
   404: {
@@ -472,7 +472,7 @@ const STORY_CONTENT: Record<
     duration: "20 min",
     xp: 200,
     text:
-      "Início — Em uma família cheia de conflitos, o pai, Fiódor Karamázov, vivia em desordem, e seus filhos — Dmitri, Ivan e Aliócha — seguiam caminhos diferentes: paixão e impulsos, razão e dúvidas, fé e bondade.\n\nMeio — Desentendimentos e ressentimentos cresceram até um crime abalar a cidade. Enquanto suspeitas surgiam e perguntas sobre culpa, justiça e perdão apareciam, Aliócha procurava agir com gentileza, guiado por valores de empatia e cuidado.\n\nFim — A busca pela verdade levou a julgamentos e escolhas difíceis. Mesmo em meio à dor, Aliócha continuou a ajudar os que sofriam, especialmente os jovens, mostrando que responsabilidade, compaixão e amizade podem iluminar tempos sombrios.",
+      "Em uma família cheia de conflitos, o pai, Fiódor Karamázov, vivia em desordem, e seus filhos — Dmitri, Ivan e Aliócha — seguiam caminhos diferentes: paixão e impulsos, razão e dúvidas, fé e bondade.\n\nDesentendimentos e ressentimentos cresceram até um crime abalar a cidade. Enquanto suspeitas surgiam e perguntas sobre culpa, justiça e perdão apareciam, Aliócha procurava agir com gentileza, guiado por valores de empatia e cuidado.\n\nA busca pela verdade levou a julgamentos e escolhas difíceis. Mesmo em meio à dor, Aliócha continuou a ajudar os que sofriam, especialmente os jovens, mostrando que responsabilidade, compaixão e amizade podem iluminar tempos sombrios.",
   },
 
   405: {
@@ -482,7 +482,7 @@ const STORY_CONTENT: Record<
     duration: "18 min",
     xp: 180,
     text:
-      "Início — Em São Petersburgo, Raskólnikov, um estudante pobre e angustiado, acreditou que algumas pessoas teriam o direito de ultrapassar regras em nome de um bem maior. Em crise, decidiu cometer um crime terrível.\n\nMeio — Após o ato, o remorso e o medo tomaram conta dele. Doente e dividido por dentro, Raskólnikov conheceu Sônia, uma jovem de coração generoso, que o escutou e o incentivou a buscar a verdade e a assumir a responsabilidade por seus atos.\n\nFim — Raskólnikov confessou e foi condenado à Sibéria. Com o tempo e com o apoio de Sônia, começou uma lenta transformação interior, encontrando no reconhecimento da culpa o primeiro passo para a renovação e para uma vida mais honesta.",
+      "Em São Petersburgo, Raskólnikov, um estudante pobre e angustiado, acreditou que algumas pessoas teriam o direito de ultrapassar regras em nome de um bem maior. Em crise, decidiu cometer um crime terrível.\n\nApós o ato, o remorso e o medo tomaram conta dele. Doente e dividido por dentro, Raskólnikov conheceu Sônia, uma jovem de coração generoso, que o escutou e o incentivou a buscar a verdade e a assumir a responsabilidade por seus atos.\n\nRaskólnikov confessou e foi condenado à Sibéria. Com o tempo e com o apoio de Sônia, começou uma lenta transformação interior, encontrando no reconhecimento da culpa o primeiro passo para a renovação e para uma vida mais honesta.",
   },
 };
 
