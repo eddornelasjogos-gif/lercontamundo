@@ -18,6 +18,7 @@ const difficultySettings = {
 
 const WORLD_SIZE = 3000;
 const PELLET_COUNT = 300;
+const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5; // 5 seconds at 60fps
@@ -215,7 +216,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   const joystickDirection = useRef({ x: 0, y: 0 });
 
   const gameInstance = useRef({
-    playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3')],
+    playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)],
     bots: [] as Bot[],
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
@@ -391,7 +392,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     canvas.height = window.innerHeight;
 
     const settings = difficultySettings[difficulty];
-    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3')];
+    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)];
     gameInstance.bots = Array.from({ length: settings.botCount }, () => new Bot(
         Math.random() * WORLD_SIZE,
         Math.random() * WORLD_SIZE,
