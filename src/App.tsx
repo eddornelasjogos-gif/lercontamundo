@@ -10,7 +10,6 @@ import Math from "./pages/Math";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Story from "./pages/Story";
-import Deploy from "./pages/Deploy";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +26,6 @@ const App = () => (
             <Route path="/reading/:id" element={<Story />} />
             <Route path="/math" element={<Math />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/deploy" element={<Deploy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

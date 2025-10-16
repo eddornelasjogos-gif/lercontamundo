@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
-import Narrator from "@/components/Narrator";
 
 const STORY_CONTENT: Record<
   number,
@@ -390,7 +389,6 @@ const Story = () => {
   }
 
   const isCompleted = progress.completedStories.includes(storyId);
-  const isEasyFable = [101, 102, 103, 104, 105].includes(storyId);
 
   const handleComplete = () => {
     if (!isCompleted) {
@@ -420,12 +418,6 @@ const Story = () => {
               </div>
             </div>
           </Card>
-
-          {isEasyFable && (
-            <Card className="p-6 shadow-card border-2 border-secondary/20">
-              <Narrator text={story.text} title={`Narração: ${story.title}`} />
-            </Card>
-          )}
 
           <Card className="p-6 shadow-soft">
             <article className="prose max-w-none text-foreground">
