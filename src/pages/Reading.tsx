@@ -13,14 +13,45 @@ import ColorHeader from "@/components/ColorHeader";
 const Reading = () => {
   const { progress, completeStory } = useProgress();
 
-  const stories = [
-    { id: 1, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 50, stars: 3, completed: false },
-    { id: 2, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 75, stars: 3, completed: false },
-    { id: 3, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3, completed: false },
-    { id: 4, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 40, stars: 3, completed: false },
-  ];
+  // Read the user's selected difficulty from localStorage (defaults to 'easy')
+  const userDifficulty = (localStorage.getItem("userDifficulty") as
+    | "easy"
+    | "medium"
+    | "hard"
+    | "very-hard") || "easy";
 
-  const categories = ["Fábulas", "Contos Clássicos", "Contos"];
+  // Predefined lists with popular/known story titles for each difficulty level
+  const storiesByDifficulty = {
+    easy: [
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 50, stars: 3 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 40, stars: 3 },
+      { id: 103, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      { id: 104, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 55, stars: 3 },
+    ],
+    medium: [
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 75, stars: 3 },
+      { id: 202, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
+      { id: 203, title: "Pedro e o Lobo", category: "Música & Contos", duration: "6 min", xp: 50, stars: 3 },
+      { id: 204, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+    ],
+    hard: [
+      { id: 301, title: "Pinóquio", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
+      { id: 302, title: "Alice no País das Maravilhas", category: "Fantasia", duration: "14 min", xp: 130, stars: 4 },
+      { id: 303, title: "A Ilha do Tesouro", category: "Aventura", duration: "15 min", xp: 140, stars: 4 },
+      { id: 304, title: "As Aventuras de Robinson Crusoé", category: "Aventura", duration: "16 min", xp: 150, stars: 4 },
+    ],
+    "very-hard": [
+      { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 402, title: "As Viagens de Gulliver (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
+      { id: 403, title: "Moby Dick (trechos)", category: "Aventura", duration: "20 min", xp: 200, stars: 5 },
+      { id: 404, title: "Sherlock Holmes (contos)", category: "Mistério", duration: "18 min", xp: 190, stars: 5 },
+    ],
+  } as const;
+
+  const stories = storiesByDifficulty[userDifficulty];
+
+  // Derive categories from the selected difficulty's stories
+  const categories = Array.from(new Set(stories.map((s) => s.category)));
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0]);
 
   const handleCompleteStory = (storyId: number, xpReward: number) => {
@@ -45,7 +76,7 @@ const Reading = () => {
               <img src={readingImage} alt="Leitura" className="w-20 h-20" />
               <ColorHeader
                 title="Área de Leitura"
-                subtitle="Explore histórias mágicas e aprenda se divertindo!"
+                subtitle={`Nível selecionado: ${userDifficulty === "easy" ? "Fácil" : userDifficulty === "medium" ? "Médio" : userDifficulty === "hard" ? "Difícil" : "Muito Difícil"}`}
                 gradientFrom="#93c5fd"
                 gradientTo="#c4b5fd"
               />
