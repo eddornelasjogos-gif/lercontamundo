@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from "sonner";
 
 export interface UserProgress {
   xp: number;
@@ -8,6 +9,7 @@ export interface UserProgress {
   achievements: string[];
   completedStories: number[];
   completedExercises: number[];
+  lastLoginDate: string | null;
 }
 
 const DEFAULT_PROGRESS: UserProgress = {
@@ -18,9 +20,11 @@ const DEFAULT_PROGRESS: UserProgress = {
   achievements: [],
   completedStories: [],
   completedExercises: [],
+  lastLoginDate: null,
 };
 
 const STORAGE_KEY = 'ler-conta-mundo-progress';
+const DAILY_REWARD_XP = 25;
 
 export const useUserProgress = () => {
   const [progress, setProgress] = useState<UserProgress>(() => {
@@ -31,6 +35,25 @@ export const useUserProgress = () => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   }, [progress]);
+
+  // Efeito para verificar e conceder a recompensa diária
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    if (progress.lastLoginDate !== today) {
+      setProgress((prev) => {
+        const newXP = prev.xp + DAILY_REWARD_XP;
+        const newLevel = Math.floor(newXP / 500) + 1;
+        return {
+          ...prev,
+          xp: newXP,
+          level: newLevel,
+          lastLoginDate: today,
+        };
+      });
+      toast.success(`🎁 Recompensa diária! Você ganhou ${DAILY_REWARD_XP} XP por voltar!`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Executa apenas uma vez quando o app é carregado
 
   const addXP = (amount: number) => {
     setProgress((prev) => {
