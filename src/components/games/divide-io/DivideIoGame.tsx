@@ -58,8 +58,6 @@ class Vector {
   }
 }
 
-// This is a bit of a hack, but it allows the Cell class to know about the joystick direction
-// without having to pass it down through every method call.
 const joystickDirectionRef: { current: { x: number; y: number } } = { current: { x: 0, y: 0 } };
 
 class Cell {
@@ -102,7 +100,7 @@ class Cell {
     ctx.closePath();
   }
   
-  split() {
+  split(directionVector: Vector) {
     if (this.mass >= MIN_SPLIT_MASS) {
         const splitMass = this.mass / 2;
         this.mass = splitMass;
@@ -111,11 +109,10 @@ class Cell {
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
         
-        const joystickVec = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
-        const direction = this.velocity.magnitude() > 0.1 
-            ? this.velocity.normalize() 
-            : joystickVec.magnitude() > 0.1
-                ? joystickVec.normalize()
+        const direction = directionVector.magnitude() > 0.1
+            ? directionVector.normalize()
+            : this.velocity.magnitude() > 0.1 
+                ? this.velocity.normalize() 
                 : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
 
         const ejectionImpulse = 30;
@@ -127,37 +124,27 @@ class Cell {
   }
 }
 
-class Player extends Cell {}
+class Player extends Cell {
+    split() {
+        const joystickVec = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
+        return super.split(joystickVec);
+    }
+}
 
 class Bot extends Cell {
   private target: Vector | null = null;
   private threat: Vector | null = null;
   private decisionTimer = 0;
 
-  // Override split for bots so it doesn't depend on the joystick
-  split() {
-    if (this.mass >= MIN_SPLIT_MASS) {
-        const splitMass = this.mass / 2;
-        this.mass = splitMass;
-        this.radius = this.calculateRadius();
-        this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        
-        const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
-        
-        const direction = this.velocity.magnitude() > 0.1 
-            ? this.velocity.normalize() 
-            : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
-
-        const ejectionImpulse = 30;
-        newCell.velocity = this.velocity.add(direction.multiply(ejectionImpulse));
-        newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        return newCell;
-    }
-    return null;
+  // Bot split logic uses its current velocity as direction
+  botSplit() {
+    return super.split(this.velocity);
   }
 
-  updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number) {
+  updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number): Bot | null {
     this.decisionTimer--;
+    let newBot: Bot | null = null;
+
     if (this.decisionTimer <= 0) {
       this.findBestTarget(pellets, otherCells, aggression);
       this.decisionTimer = 30;
@@ -171,16 +158,16 @@ class Bot extends Cell {
       if (this.mass > MIN_SPLIT_MASS && Math.random() < splitChance) {
         const targetDist = this.target.subtract(this.position).magnitude();
         if (targetDist < this.radius * 5) {
-            const newBot = this.split();
-            if (newBot) otherCells.push(newBot);
+            newBot = this.botSplit() as Bot;
         }
       }
     }
 
-    // Bots directly set their velocity, no inertia needed for them
     const speed = 50 / this.radius;
     this.velocity = direction.multiply(speed);
     super.update();
+    
+    return newBot;
   }
 
   findBestTarget(pellets: Pellet[], otherCells: Cell[], aggression: number) {
@@ -303,14 +290,20 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         }
     });
 
-    // Update all cells
+    // Update all cells and handle bot splitting
+    const newBots: Bot[] = [];
     allCells.forEach(cell => {
         if (cell instanceof Bot) {
-            cell.updateLogic(pellets, allCells, settings.botAggression, settings.botSplitChance);
+            const newBot = cell.updateLogic(pellets, allCells, settings.botAggression, settings.botSplitChance);
+            if (newBot) {
+                newBots.push(newBot);
+            }
         } else {
             cell.update();
         }
     });
+    bots.push(...newBots);
+
 
     // Player cell merging
     for (let i = playerCells.length - 1; i >= 0; i--) {
