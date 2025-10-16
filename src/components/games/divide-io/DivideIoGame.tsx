@@ -106,12 +106,13 @@ class Cell {
         this.mass = splitMass;
         this.radius = this.calculateRadius();
         this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        this.ejectionTimer = 20; // Original cell also ignores joystick briefly
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
         const direction = this.velocity.magnitude() > 0 ? this.velocity.normalize() : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
-        newCell.velocity = direction.multiply(25); // Increased ejection speed
+        newCell.velocity = direction.multiply(25);
         newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        newCell.ejectionTimer = 20; // Ignore joystick for 20 frames
+        newCell.ejectionTimer = 20;
         return newCell;
     }
     return null;
