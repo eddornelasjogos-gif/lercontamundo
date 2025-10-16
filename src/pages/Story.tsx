@@ -29,6 +29,7 @@ import pequenoPolegarAudio from "@/assets/audio/pequeno-polegar.m4a";
 import tresPorquinhosAudio from "@/assets/audio/tres-porquinhos.m4a";
 import pedroLoboAudio from "@/assets/audio/pedro-lobo.m4a";
 import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a";
+import aliBabaAudio from "@/assets/audio/ali-baba-ladroes.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -803,6 +804,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={simbadMarinheiroAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 214 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={aliBabaAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
