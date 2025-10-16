@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface VirtualJoystickProps {
@@ -11,36 +11,13 @@ const KNOB_SIZE = 60;
 const DEAD_ZONE = 0.1;
 
 const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) => {
-  const baseRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [basePosition, setBasePosition] = useState({ x: 0, y: 0 });
   const [knobPosition, setKnobPosition] = useState({ x: 0, y: 0 });
 
-  const handleInteractionStart = (e: React.MouseEvent | React.TouchEvent) => {
-    setIsDragging(true);
-    updateKnobPosition(e);
-  };
-
-  const handleInteractionEnd = () => {
-    setIsDragging(false);
-    setKnobPosition({ x: 0, y: 0 });
-    onMove({ x: 0, y: 0 });
-  };
-
-  const handleInteractionMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isDragging) {
-      updateKnobPosition(e);
-    }
-  };
-
-  const updateKnobPosition = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!baseRef.current) return;
-
-    const rect = baseRef.current.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-
-    const dx = clientX - (rect.left + rect.width / 2);
-    const dy = clientY - (rect.top + rect.height / 2);
+  const updateKnobPosition = useCallback((clientX: number, clientY: number, currentBasePos: { x: number, y: number }) => {
+    const dx = clientX - currentBasePos.x;
+    const dy = clientY - currentBasePos.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     const maxDistance = (JOYSTICK_SIZE - KNOB_SIZE) / 2;
 
@@ -66,9 +43,38 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
     }
   }, [onMove]);
 
+  const handleInteractionStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    const newBasePos = { x: clientX, y: clientY };
+    setBasePosition(newBasePos);
+    setIsDragging(true);
+    updateKnobPosition(clientX, clientY, newBasePos);
+  };
+
+  const handleInteractionEnd = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    if (isDragging) {
+      setIsDragging(false);
+      setKnobPosition({ x: 0, y: 0 });
+      onMove({ x: 0, y: 0 });
+    }
+  };
+
+  const handleInteractionMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isDragging) {
+      e.preventDefault();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      updateKnobPosition(clientX, clientY, basePosition);
+    }
+  };
+
   return (
     <div
-      className={cn("fixed bottom-10 left-10 z-50", className)}
+      className={cn("fixed top-0 left-0 w-full h-full z-50", className)}
       onMouseDown={handleInteractionStart}
       onMouseUp={handleInteractionEnd}
       onMouseLeave={handleInteractionEnd}
@@ -77,23 +83,29 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
       onTouchEnd={handleInteractionEnd}
       onTouchMove={handleInteractionMove}
     >
-      <div
-        ref={baseRef}
-        className="relative rounded-full bg-gray-400/50 backdrop-blur-sm"
-        style={{ width: JOYSTICK_SIZE, height: JOYSTICK_SIZE }}
-      >
+      {isDragging && (
         <div
-          className="absolute rounded-full bg-gray-600/70"
+          className="absolute rounded-full bg-gray-400/50 backdrop-blur-sm pointer-events-none"
           style={{
-            width: KNOB_SIZE,
-            height: KNOB_SIZE,
-            top: '50%',
-            left: '50%',
-            transform: `translate(-50%, -50%) translate(${knobPosition.x}px, ${knobPosition.y}px)`,
-            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+            width: JOYSTICK_SIZE,
+            height: JOYSTICK_SIZE,
+            left: basePosition.x,
+            top: basePosition.y,
+            transform: 'translate(-50%, -50%)',
           }}
-        />
-      </div>
+        >
+          <div
+            className="absolute rounded-full bg-gray-600/70"
+            style={{
+              width: KNOB_SIZE,
+              height: KNOB_SIZE,
+              top: '50%',
+              left: '50%',
+              transform: `translate(-50%, -50%) translate(${knobPosition.x}px, ${knobPosition.y}px)`,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
