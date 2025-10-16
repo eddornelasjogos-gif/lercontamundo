@@ -2,9 +2,8 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Trophy, BookOpen, Calculator, Award, Flame } from "lucide-react";
-import { Mascot } from "@/components/Mascot";
-import ColorHeader from "@/components/ColorHeader";
+import { Star, Trophy as TrophyIcon, BookOpen, Calculator, Award, Flame } from "lucide-react";
+import { Trophy } from "@/components/Trophy";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
@@ -23,7 +22,7 @@ const Profile = () => {
       id: "dedicated-reader",
       title: "Leitor Dedicado",
       description: "Leia 10 histórias completas",
-      icon: Trophy,
+      icon: TrophyIcon,
     },
     {
       id: "number-master",
@@ -149,9 +148,9 @@ const Profile = () => {
           <div className="absolute bottom-0 left-1/4 h-64 w-64 translate-y-1/3 rounded-full bg-[hsl(48,100%,88%)] opacity-70 blur-3xl" />
           <div className="relative z-10 max-w-6xl mx-auto space-y-10">
             <div className="text-center">
-              <h2 className="text-3xl font-display font-bold text-foreground">Suas Conquistas</h2>
+              <h2 className="text-3xl font-display font-bold text-foreground">Suas Estatísticas</h2>
               <p className="text-sm md:text-base text-foreground/80 font-body">
-                Continue jogando e lendo para desbloquear todos os prêmios do mundo mágico!
+                Veja como você está progredindo em sua jornada de aprendizado!
               </p>
             </div>
 
@@ -171,33 +170,16 @@ const Profile = () => {
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-2xl font-display font-bold text-foreground text-center">Coleção de Troféus</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <h3 className="text-2xl font-display font-bold text-foreground text-center">Galeria de Troféus</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {achievementsToDisplay.map((achievement) => (
-                    <Card
+                    <Trophy
                       key={achievement.id}
-                      className={`p-6 transition-smooth border-2 ${
-                        achievement.unlocked ? "border-primary shadow-card hover:shadow-glow" : "border-border opacity-50 grayscale"
-                      }`}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-full ${achievement.unlocked ? "gradient-primary" : "bg-muted"}`}>
-                          <achievement.icon
-                            className={`${achievement.unlocked ? "text-white" : "text-muted-foreground"} w-6 h-6`}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-lg font-display font-bold text-foreground mb-1">{achievement.title}</h4>
-                          <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                          {achievement.unlocked && (
-                            <div className="mt-2 flex items-center gap-1 text-success">
-                              <Trophy className="w-4 h-4" />
-                              <span className="text-xs font-bold">Desbloqueado!</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
+                      icon={achievement.icon}
+                      title={achievement.title}
+                      description={achievement.description}
+                      unlocked={achievement.unlocked}
+                    />
                   ))}
                 </div>
               </div>
