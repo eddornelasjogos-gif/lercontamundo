@@ -231,6 +231,97 @@ const STORY_CONTENT: Record<
     text:
       "Pequeno no tamanho, grande na esperteza: assim era o Pequeno Polegar. Em tempos de fome, ele percebeu que os pais planejavam abandonar os filhos na floresta e tentou marcar o caminho com migalhas, que os pássaros comeram.\n\nPerdidos, os irmãos enfrentaram perigos e a casa de um ogro. Com astúcia, o menino trocou gorros, enganou inimigos e salvou a todos. Ao final, recuperou riquezas do ogro e levou a família à segurança.\n\nA história mostra que coragem e inteligência podem proteger quem amamos mesmo nas maiores dificuldades.",
   },
+  
+  211: {
+    id: 211,
+    title: "Os Três Porquinhos",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Três porquinhos, Cícero, Heitor e Prático, deixaram a casa da mãe para construir suas próprias moradias. Cícero, o mais preguiçoso, fez sua casa de palha. Heitor, um pouco mais cuidadoso, usou madeira. Prático, o mais esperto e trabalhador, construiu a sua com tijolos resistentes.\n\nLogo, o Lobo Mau apareceu. Ele soprou a casa de palha de Cícero e a de madeira de Heitor, que correram apavorados para a casa de Prático. O Lobo tentou soprar a casa de tijolos, mas ela permaneceu firme. Furioso, ele tentou entrar pela chaminé.\n\nPrático, prevendo a astúcia do Lobo, colocou um caldeirão de água fervente na lareira. O Lobo caiu dentro e fugiu, queimado e derrotado. Os três porquinhos viveram seguros, e Cícero e Heitor aprenderam que o trabalho duro e a prudência são a melhor defesa contra o perigo.",
+  },
+  212: {
+    id: 212,
+    title: "Pedro e o Lobo",
+    category: "Contos",
+    duration: "6 min",
+    xp: 55,
+    text:
+      "Pedro, um jovem pastor, vivia perto de uma floresta perigosa. Para se divertir, ele gritava que o lobo estava atacando, fazendo com que os aldeões corressem para ajudá-lo. Depois de ser enganado algumas vezes, os aldeões pararam de acreditar em Pedro.\n\nUm dia, o lobo de verdade apareceu e começou a ameaçar o rebanho. Pedro gritou por socorro, mas ninguém veio. Os aldeões pensaram que era mais uma de suas brincadeiras. O lobo conseguiu levar algumas ovelhas.\n\nTriste e arrependido, Pedro aprendeu uma lição dolorosa: a mentira destrói a confiança. Ele prometeu nunca mais enganar ninguém e, com o tempo e a verdade, reconquistou a confiança dos aldeões, mostrando que a honestidade é mais valiosa que qualquer piada.",
+  },
+  213: {
+    id: 213,
+    title: "Simbad, o Marinheiro (trechos)",
+    category: "Contos",
+    duration: "10 min",
+    xp: 95,
+    text:
+      "Simbad, um mercador de Bagdá, herdou uma fortuna, mas a gastou rapidamente. Decidiu então embarcar em viagens perigosas para recuperar sua riqueza. Em sua primeira viagem, foi abandonado em uma ilha que era, na verdade, uma baleia adormecida.\n\nEm outras jornadas, Simbad enfrentou aves gigantes, serpentes marinhas e ilhas cheias de diamantes guardadas por criaturas terríveis. Ele usou sua inteligência e coragem para escapar de cada perigo, sempre voltando para casa com mais riquezas e histórias incríveis.\n\nSimbad aprendeu que a vida é uma aventura constante, cheia de riscos e recompensas. Ele usou sua experiência para se tornar um homem sábio e generoso, ensinando que a perseverança e a astúcia são essenciais para navegar pelos desafios da vida.",
+  },
+  214: {
+    id: 214,
+    title: "Ali Babá e os Quarenta Ladrões (trechos)",
+    category: "Contos",
+    duration: "10 min",
+    xp: 95,
+    text:
+      "Ali Babá, um pobre lenhador, descobriu por acaso o esconderijo secreto de quarenta ladrões. Ele ouviu a senha mágica, 'Abre-te Sésamo', que abria a porta de uma caverna cheia de tesouros. Ali Babá levou um pouco do ouro para casa, mas manteve o segredo.\n\nSeu irmão, Cássim, ganancioso, forçou Ali Babá a revelar o segredo. Cássim entrou na caverna, mas esqueceu a senha para sair e foi capturado pelos ladrões. Ali Babá, com a ajuda de sua esperta serva Morgiana, conseguiu enganar os ladrões e recuperar o corpo do irmão.\n\nOs ladrões tentaram se vingar, mas Morgiana, com sua inteligência e lealdade, frustrou todos os planos deles, salvando a vida de Ali Babá. A história mostra que a ganância pode levar à ruína, e que a lealdade e a inteligência são tesouros inestimáveis.",
+  },
+  215: {
+    id: 215,
+    title: "O Rouxinol",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "O Imperador da China amava o canto de um rouxinol que vivia na floresta. O pássaro era simples, mas sua música era a mais bela do mundo, capaz de tocar o coração de todos. Um dia, o Imperador recebeu um rouxinol mecânico, cravejado de joias, que cantava sempre a mesma melodia.\n\nO rouxinol de verdade, sentindo-se esquecido, voou para longe. O pássaro mecânico quebrou, e o Imperador adoeceu de tristeza. Quando estava à beira da morte, o rouxinol de verdade voltou e cantou. Sua música trouxe vida e alegria de volta ao Imperador.\n\nO Imperador aprendeu que a beleza e a arte verdadeiras vêm da natureza e do coração, e não de imitações luxuosas. Ele convidou o rouxinol a voltar, e o pássaro aceitou, contanto que pudesse cantar sobre a vida simples do povo, lembrando ao Imperador a importância da humildade.",
+  },
+  216: {
+    id: 216,
+    title: "Barba Azul (resumo)",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Barba Azul era um homem rico e poderoso, mas temido por sua barba azul. Ele se casou com uma jovem, e logo após o casamento, precisou viajar. Deu à esposa as chaves do castelo, permitindo que ela abrisse todos os cômodos, exceto um pequeno quarto secreto, cuja chave era pequena e dourada.\n\nA curiosidade da esposa foi maior que a obediência. Ela abriu o quarto proibido e descobriu os corpos das esposas anteriores de Barba Azul. Horrorizada, deixou cair a chave no sangue, manchando-a permanentemente.\n\nBarba Azul voltou, descobriu a mancha na chave e soube da desobediência. Quando ele estava prestes a matá-la, os irmãos da esposa chegaram e a salvaram. A história é um conto de advertência sobre a curiosidade perigosa e a importância de confiar nos instintos, mas também sobre a tirania e a busca por justiça.",
+  },
+  217: {
+    id: 217,
+    title: "A Fada Voadora",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Em um jardim mágico, vivia uma fada que não conseguia voar. Enquanto as outras fadas dançavam no ar, ela ficava no chão, triste. Um dia, um velho sábio disse que ela só voaria se ajudasse alguém sem esperar nada em troca.\n\nA fada encontrou um pássaro ferido e cuidou dele com carinho e paciência. Ela o alimentou e protegeu até que ele pudesse voar novamente. Quando o pássaro se curou e voou para o céu, a fada sentiu uma leveza no coração.\n\nNesse momento, suas asas brilharam e ela conseguiu voar pela primeira vez. A fada descobriu que a verdadeira magia não estava em suas asas, mas na bondade de seu coração. Ela passou a voar pelo jardim, ajudando todos que precisavam, e sua alegria se espalhou por todo o reino.",
+  },
+  218: {
+    id: 218,
+    title: "O Cavalo e o Homem",
+    category: "Contos",
+    duration: "6 min",
+    xp: 60,
+    text:
+      "Um cavalo selvagem vivia livre e feliz, mas era constantemente ameaçado por um leão. Para se proteger, o cavalo pediu ajuda a um homem, que prometeu afastar o leão em troca de permissão para colocar um freio e uma sela no cavalo.\n\nO cavalo concordou. O homem montou nele, perseguiu o leão e o afugentou. Quando o perigo passou, o cavalo pediu ao homem para remover o freio e a sela, mas o homem se recusou. Ele havia gostado de ter o controle.\n\nO cavalo percebeu que, ao buscar proteção, havia perdido sua liberdade. A fábula ensina que, ao aceitar ajuda, devemos ser cautelosos para não trocar um perigo por outro, e que a liberdade é um bem que deve ser protegido a todo custo.",
+  },
+  219: {
+    id: 219,
+    title: "A Lenda da Lua",
+    category: "Contos",
+    duration: "7 min",
+    xp: 65,
+    text:
+      "Há muito tempo, o Sol e a Lua eram amantes. O Sol era quente e brilhante, e a Lua, fria e misteriosa. Eles se amavam profundamente, mas não podiam ficar juntos, pois se o fizessem, o mundo seria destruído pelo calor e pela escuridão.\n\nOs deuses, com pena, permitiram que eles se vissem apenas por um breve momento no horizonte, durante o nascer e o pôr do sol. Mas isso não era suficiente. A Lua, triste, começou a chorar, e suas lágrimas caíram na Terra, formando os rios e os oceanos.\n\nPara confortá-la, os deuses criaram as estrelas, para que a Lua nunca se sentisse sozinha. E assim, a Lua brilha à noite, refletindo a luz do Sol, lembrando a todos que o amor verdadeiro pode existir mesmo na distância, e que a saudade pode criar beleza no mundo.",
+  },
+  220: {
+    id: 220,
+    title: "O Pescador e o Gênio",
+    category: "Contos",
+    duration: "8 min",
+    xp: 70,
+    text:
+      "Um pobre pescador lançou sua rede e, em vez de peixes, pescou um jarro de cobre selado. Ao abri-lo, um Gênio enorme e furioso saiu, prometendo matar o pescador por tê-lo libertado após séculos de prisão. O pescador, esperto, não se desesperou.\n\nEle duvidou que o Gênio fosse tão grande a ponto de caber de volta no jarro. O Gênio, ofendido, demonstrou seu poder voltando para o jarro. O pescador selou o jarro rapidamente, prendendo o Gênio novamente.\n\nO Gênio implorou para ser libertado, prometendo riquezas. O pescador, após negociar, libertou-o, mas exigiu que o Gênio o ajudasse a pescar. O Gênio, humilhado, cumpriu a promessa. O pescador aprendeu que a inteligência e a calma são mais poderosas que a força bruta, e que a astúcia pode transformar a ameaça em oportunidade.",
+  },
 
   /* Nível difícil (301–310) - textos completos */
   301: {
@@ -678,6 +769,8 @@ const Story = () => {
               </div>
             </Card>
           )}
+          
+          {/* Não há áudio para 211-220 */}
 
           <Card className="p-6 shadow-soft">
             <article className="prose max-w-none text-foreground">
