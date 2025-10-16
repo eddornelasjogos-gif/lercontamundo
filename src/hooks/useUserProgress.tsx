@@ -94,6 +94,10 @@ export const useUserProgress = () => {
                   description: ach.title,
                   duration: 5000,
                   onClick: () => navigate('/profile'),
+                  action: {
+                    label: 'Ver Perfil',
+                    onClick: () => navigate('/profile'),
+                  },
                 });
             }
         });
@@ -146,6 +150,10 @@ export const useUserProgress = () => {
             description: ach.title,
             duration: 5000,
             onClick: () => navigate('/profile'),
+            action: {
+              label: 'Ver Perfil',
+              onClick: () => navigate('/profile'),
+            },
           });
         }
       });
@@ -178,6 +186,10 @@ export const useUserProgress = () => {
             description: ach.title,
             duration: 5000,
             onClick: () => navigate('/profile'),
+            action: {
+              label: 'Ver Perfil',
+              onClick: () => navigate('/profile'),
+            },
           });
         }
       });
