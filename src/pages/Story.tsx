@@ -56,35 +56,17 @@ interface StoryMetadata {
 // Metadados das histórias para determinar a ordem e a categoria
 const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
     easy: [
-      // Fábulas (101-105)
-      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
-      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
-      { id: 103, title: "O Leão e o Rato", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      // Fábulas
       { id: 104, title: "A Raposa e as Uvas", category: "Fábulas", duration: "3 min", xp: 25, stars: 2 },
       { id: 105, title: "A Galinha dos Ovos de Ouro", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
-
-      // Contos (111-115)
-      { id: 111, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
-      { id: 112, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 50, stars: 3 },
-      { id: 113, title: "Cinderela", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
-      { id: 114, title: "Branca de Neve", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
-      { id: 115, title: "O Flautista de Hamelin", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
-    ],
-
-    medium: [
-      // Contos Clássicos (201-210)
-      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 75, stars: 3 },
-      { id: 203, title: "Rapunzel", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
-      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+      // Contos Clássicos
       { id: 205, title: "O Príncipe Sapo", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
       { id: 206, title: "Rumpelstiltskin", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
       { id: 207, title: "A Rainha da Neve (trechos)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
       { id: 208, title: "A Gata Borralheira (versão clássica)", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
       { id: 209, title: "O Mágico de Oz (trechos)", category: "Contos Clássicos", duration: "10 min", xp: 90, stars: 4 },
       { id: 210, title: "O Pequeno Polegar", category: "Contos Clássicos", duration: "7 min", xp: 65, stars: 3 },
-
-      // Contos (211-220)
+      // Contos
       { id: 211, title: "Os Três Porquinhos", category: "Contos", duration: "6 min", xp: 60, stars: 3 },
       { id: 212, title: "Pedro e o Lobo", category: "Contos", duration: "6 min", xp: 55, stars: 3 },
       { id: 213, title: "Simbad, o Marinheiro (trechos)", category: "Contos", duration: "10 min", xp: 95, stars: 4 },
@@ -96,7 +78,23 @@ const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
       { id: 219, title: "A Lenda da Lua", category: "Contos", duration: "7 min", xp: 65, stars: 3 },
       { id: 220, title: "O Pescador e o Gênio", category: "Contos", duration: "8 min", xp: 70, stars: 3 },
     ],
-
+    medium: [
+      // Fábulas
+      { id: 101, title: "A Cigarra e a Formiga", category: "Fábulas", duration: "5 min", xp: 35, stars: 2 },
+      { id: 102, title: "A Lebre e a Tartaruga", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      { id: 103, title: "O Leão e o Rato", category: "Fábulas", duration: "4 min", xp: 30, stars: 2 },
+      // Contos
+      { id: 111, title: "O Patinho Feio", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      { id: 112, title: "João e o Pé de Feijão", category: "Contos", duration: "7 min", xp: 50, stars: 3 },
+      { id: 113, title: "Cinderela", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 114, title: "Branca de Neve", category: "Contos", duration: "8 min", xp: 55, stars: 3 },
+      { id: 115, title: "O Flautista de Hamelin", category: "Contos", duration: "6 min", xp: 45, stars: 3 },
+      // Contos Clássicos
+      { id: 201, title: "Chapeuzinho Vermelho", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 202, title: "A Bela Adormecida", category: "Contos Clássicos", duration: "9 min", xp: 75, stars: 3 },
+      { id: 203, title: "Rapunzel", category: "Contos Clássicos", duration: "8 min", xp: 70, stars: 3 },
+      { id: 204, title: "A Pequena Sereia (versão resumida)", category: "Contos Clássicos", duration: "9 min", xp: 80, stars: 3 },
+    ],
     hard: [
       // Clássicos (301-310)
       { id: 301, title: "Pinóquio", category: "Clássicos", duration: "12 min", xp: 120, stars: 4 },
@@ -110,7 +108,6 @@ const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
       { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", duration: "15 min", xp: 140, stars: 4 },
       { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", duration: "13 min", xp: 125, stars: 4 },
     ],
-
     "very-hard": [
       // Clássicos (trechos) (401-405)
       { id: 401, title: "Dom Quixote (trechos)", category: "Clássicos", duration: "18 min", xp: 180, stars: 5 },
