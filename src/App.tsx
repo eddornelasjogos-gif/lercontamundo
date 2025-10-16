@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Story from "./pages/Story";
 import ScrollToTop from "./components/ScrollToTop";
+import Games from "./pages/Games";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/games" element={<Games />} />
             <Route path="/reading" element={<Reading />} />
             <Route path="/reading/:id" element={<Story />} />
             <Route path="/math" element={<Math />} />
