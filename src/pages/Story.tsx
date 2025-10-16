@@ -37,7 +37,8 @@ import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
 import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
 import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
-import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a"; // NOVO ÁUDIO IMPORTADO
+import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a";
+import robinsonCrusoeAudio from "@/assets/audio/robinson-crusoe.m4a"; // NOVO ÁUDIO IMPORTADO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -1041,6 +1042,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={aliceAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 303 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={robinsonCrusoeAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
