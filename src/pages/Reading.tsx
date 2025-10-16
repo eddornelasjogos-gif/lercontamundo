@@ -29,7 +29,7 @@ const Reading = () => {
   }, [userDifficulty]);
 
   // Predefined lists with popular/known story titles for each difficulty level.
-  // The 'easy' difficulty contains exactly 5 Fábulas (101-105) and 5 Contos (111-115).
+  // The 'easy' difficulty contains exactly 5 Fábulas (101-105) e 5 Contos (111-115).
   const storiesByDifficulty = {
     easy: [
       // Fábulas (101-105)
@@ -217,8 +217,7 @@ const Reading = () => {
                         <Button
                           variant={isCompleted ? "outline" : "gradient"}
                           className="w-full"
-                          onClick={() => !isCompleted && navigate(`/reading/${story.id}`)}
-                          disabled={isCompleted}
+                          onClick={() => navigate(`/reading/${story.id}`)}
                         >
                           {isCompleted ? "✓ Completado" : "Começar Leitura"}
                         </Button>
