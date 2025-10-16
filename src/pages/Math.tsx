@@ -9,6 +9,7 @@ import mathImage from "@/assets/math-numbers.png";
 import ColorHeader from "../components/ColorHeader.tsx";
 import LevelSelector from "@/components/LevelSelector";
 import { useState, useEffect } from "react";
+import mascotBackground from "@/assets/mascot-owl.png"; // Importando a imagem do mascote
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -97,6 +98,16 @@ const Math = () => {
         </div>
 
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(210,95%,82%)] via-[hsl(286,90%,80%)] to-[hsl(145,90%,78%)] px-6 py-12 shadow-glow md:px-12 md:py-16">
+          {/* Mascote de fundo */}
+          <div
+            className="absolute inset-0 opacity-20 z-0"
+            style={{
+              backgroundImage: `url(${mascotBackground})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+          
           <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-[hsl(286,100%,85%)] opacity-70 blur-3xl" />
           <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 -translate-x-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 left-12 h-48 w-48 -translate-y-1/2 rounded-full bg-[hsl(52,100%,88%)] opacity-80 blur-3xl" />

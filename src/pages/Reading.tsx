@@ -9,6 +9,7 @@ import { useProgress } from "@/contexts/ProgressContext";
 import readingImage from "@/assets/reading-books.png";
 import ColorHeader from "@/components/ColorHeader";
 import LevelSelector from "@/components/LevelSelector";
+import mascotBackground from "@/assets/mascot-owl.png"; // Importando a imagem do mascote
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 
@@ -145,6 +146,16 @@ const Reading = () => {
 
         {/* Stories Section */}
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(198,95%,80%)] via-[hsl(315,93%,82%)] to-[hsl(45,98%,75%)] px-6 py-10 shadow-glow md:px-12 md:py-14">
+          {/* Mascote de fundo */}
+          <div
+            className="absolute inset-0 opacity-20 z-0"
+            style={{
+              backgroundImage: `url(${mascotBackground})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+          
           <div className="absolute -top-24 -left-14 h-60 w-60 rounded-full bg-[hsl(200,100%,82%)] opacity-70 blur-3xl" />
           <div className="absolute bottom-0 right-0 h-72 w-72 translate-y-1/3 rounded-full bg-[hsl(315,93%,78%)] opacity-70 blur-3xl" />
           <div className="absolute top-1/2 left-12 h-48 w-48 -translate-y-1/2 rounded-full bg-[hsl(45,100%,88%)] opacity-80 blur-3xl" />
