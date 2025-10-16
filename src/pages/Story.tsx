@@ -20,6 +20,7 @@ import chapeuzinhoAudio from "@/assets/audio/chapeuzinho-vermelho.m4a";
 import belaAdormecidaAudio from "@/assets/audio/bela-adormecida.m4a";
 import rapunzelAudio from "@/assets/audio/rapunzel.m4a";
 import pequenaSereiaAudio from "@/assets/audio/pequena-sereia.m4a";
+import principeSapoAudio from "@/assets/audio/principe-sapo.m4a";
 
 const STORY_CONTENT: Record<
   number,
@@ -595,6 +596,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={pequenaSereiaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 205 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={principeSapoAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
