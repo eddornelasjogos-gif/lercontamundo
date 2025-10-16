@@ -17,7 +17,7 @@ const difficultySettings = {
 };
 
 const WORLD_SIZE = 3000;
-const PELLET_COUNT = 300;
+const PELLET_COUNT = 900;
 const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
