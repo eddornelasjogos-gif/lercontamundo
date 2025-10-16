@@ -261,8 +261,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
 
     // Collision detection
     for (let i = allCells.length - 1; i >= 0; i--) {
-        for (let j = allCells.length - 1; j >= 0; j--) {
-            if (i === j) continue;
+        for (let j = i - 1; j >= 0; j--) {
             const cellA = allCells[i];
             const cellB = allCells[j];
             if (!cellA || !cellB) continue;
@@ -271,16 +270,37 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
             const distance = distVec.magnitude();
 
             if (distance < cellA.radius + cellB.radius) {
+                let predator, prey;
                 if (cellA.mass > cellB.mass * 1.1) {
-                    cellA.mass += cellB.mass;
-                    cellA.radius = cellA.calculateRadius();
-                    if (cellB === player) {
+                    predator = cellA;
+                    prey = cellB;
+                } else if (cellB.mass > cellA.mass * 1.1) {
+                    predator = cellB;
+                    prey = cellA;
+                } else {
+                    continue;
+                }
+
+                const deathDistance = predator.radius + prey.radius * 0.4;
+
+                if (distance < deathDistance) {
+                    predator.mass += prey.mass;
+                    predator.radius = predator.calculateRadius();
+                    
+                    if (prey === player) {
                         onGameOver(gameInstance.score);
                         return;
                     }
-                    allCells.splice(j, 1);
-                    bots.splice(bots.indexOf(cellB as Bot), 1);
-                    if (i > j) i--;
+                    
+                    const preyIndex = allCells.indexOf(prey);
+                    if (preyIndex > -1) {
+                        allCells.splice(preyIndex, 1);
+                        const botIndex = bots.indexOf(prey as Bot);
+                        if (botIndex > -1) bots.splice(botIndex, 1);
+                        
+                        if (preyIndex < i) i--;
+                        if (preyIndex < j) j--;
+                    }
                 }
             }
         }
