@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
+import VirtualJoystick from './VirtualJoystick';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -221,7 +222,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { highScore } = useDivideIoProgress();
   const animationFrameId = useRef<number>();
-  const mousePos = useRef({ x: 0, y: 0 });
+  const joystickDirection = useRef({ x: 0, y: 0 });
 
   const gameInstance = useRef({
     player: new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3'),
@@ -231,19 +232,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     score: 0,
   }).current;
 
-  const handleMouseMove = (event: MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    mousePos.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  };
-
-  const handleTouchMove = (event: TouchEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas || event.touches.length === 0) return;
-    const rect = canvas.getBoundingClientRect();
-    mousePos.current = { x: event.touches[0].clientX - rect.left, y: event.touches[0].clientY - rect.top };
-  };
+  const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
+    joystickDirection.current = direction;
+  }, []);
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
@@ -254,10 +245,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     const allCells = [player, ...bots];
     const settings = difficultySettings[difficulty];
 
-    // Update player velocity
-    const screenCenter = new Vector(canvas.width / 2, canvas.height / 2);
-    const mouseVector = new Vector(mousePos.current.x, mousePos.current.y);
-    const direction = mouseVector.subtract(screenCenter).normalize();
+    // Update player velocity based on joystick
+    const direction = new Vector(joystickDirection.current.x, joystickDirection.current.y);
     const speed = 50 / player.radius;
     player.velocity = direction.multiply(speed);
 
@@ -377,21 +366,21 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     gameInstance.pellets = Array.from({ length: PELLET_COUNT }, () => new Pellet(getRandomColor()));
     gameInstance.score = 0;
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchmove', handleTouchMove);
-
     animationFrameId.current = requestAnimationFrame(gameLoop);
 
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, [gameLoop, difficulty, gameInstance]);
 
-  return <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />;
+  return (
+    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
+      <VirtualJoystick onMove={handleJoystickMove} />
+    </div>
+  );
 };
 
 export default DivideIoGame;
