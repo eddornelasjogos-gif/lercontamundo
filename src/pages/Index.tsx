@@ -3,12 +3,13 @@ import { DifficultyCard } from "@/components/DifficultyCard";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import mascotBackground from "@/assets/mascot-owl.png";
 
 const Index = () => {
   const navigate = useNavigate();
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const buttonsSectionRef = useRef<HTMLDivElement>(null);
 
   const difficulties = [
     {
@@ -53,6 +54,15 @@ const Index = () => {
     setSelectedDifficulty(difficultyId);
     localStorage.setItem("userDifficulty", difficultyId);
   };
+
+  useEffect(() => {
+    if (selectedDifficulty && buttonsSectionRef.current) {
+      buttonsSectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [selectedDifficulty]);
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
@@ -108,7 +118,10 @@ const Index = () => {
               </div>
 
               {selectedDifficulty && (
-                <div className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in">
+                <div
+                  ref={buttonsSectionRef}
+                  className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in"
+                >
                   <Button
                     variant="gradient"
                     size="lg"
