@@ -58,13 +58,16 @@ class Vector {
   }
 }
 
+// This is a bit of a hack, but it allows the Cell class to know about the joystick direction
+// without having to pass it down through every method call.
+const joystickDirectionRef: { current: { x: number; y: number } } = { current: { x: 0, y: 0 } };
+
 class Cell {
   public position: Vector;
   public mass: number;
   public radius: number;
   public velocity: Vector;
   public mergeCooldown = 0;
-  public ejectionTimer = 0;
 
   constructor(x: number, y: number, public color: string, initialMass: number) {
     this.position = new Vector(x, y);
@@ -81,9 +84,8 @@ class Cell {
     if (this.mergeCooldown > 0) {
       this.mergeCooldown--;
     }
-    if (this.ejectionTimer > 0) {
-        this.ejectionTimer--;
-    }
+    // Apply friction to slow down over time
+    this.velocity = this.velocity.multiply(0.95);
     this.position = this.position.add(this.velocity);
     this.position.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.x));
     this.position.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.y));
@@ -106,13 +108,19 @@ class Cell {
         this.mass = splitMass;
         this.radius = this.calculateRadius();
         this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        this.ejectionTimer = 20; // Original cell also ignores joystick briefly
         
         const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
-        const direction = this.velocity.magnitude() > 0 ? this.velocity.normalize() : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
-        newCell.velocity = direction.multiply(25);
+        
+        const joystickVec = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
+        const direction = this.velocity.magnitude() > 0.1 
+            ? this.velocity.normalize() 
+            : joystickVec.magnitude() > 0.1
+                ? joystickVec.normalize()
+                : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+
+        const ejectionImpulse = 30;
+        newCell.velocity = this.velocity.add(direction.multiply(ejectionImpulse));
         newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        newCell.ejectionTimer = 20;
         return newCell;
     }
     return null;
@@ -125,6 +133,28 @@ class Bot extends Cell {
   private target: Vector | null = null;
   private threat: Vector | null = null;
   private decisionTimer = 0;
+
+  // Override split for bots so it doesn't depend on the joystick
+  split() {
+    if (this.mass >= MIN_SPLIT_MASS) {
+        const splitMass = this.mass / 2;
+        this.mass = splitMass;
+        this.radius = this.calculateRadius();
+        this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        
+        const newCell = new (this.constructor as any)(this.position.x, this.position.y, this.color, splitMass);
+        
+        const direction = this.velocity.magnitude() > 0.1 
+            ? this.velocity.normalize() 
+            : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+
+        const ejectionImpulse = 30;
+        newCell.velocity = this.velocity.add(direction.multiply(ejectionImpulse));
+        newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        return newCell;
+    }
+    return null;
+  }
 
   updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number) {
     this.decisionTimer--;
@@ -147,6 +177,7 @@ class Bot extends Cell {
       }
     }
 
+    // Bots directly set their velocity, no inertia needed for them
     const speed = 50 / this.radius;
     this.velocity = direction.multiply(speed);
     super.update();
@@ -219,7 +250,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { highScore } = useDivideIoProgress();
   const animationFrameId = useRef<number>();
-  const joystickDirection = useRef({ x: 0, y: 0 });
 
   const gameInstance = useRef({
     playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)],
@@ -230,7 +260,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   }).current;
 
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
-    joystickDirection.current = direction;
+    joystickDirectionRef.current = direction;
   }, []);
 
   const handleSplit = useCallback(() => {
@@ -259,14 +289,21 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     const allCells: Cell[] = [...playerCells, ...bots];
     const settings = difficultySettings[difficulty];
 
-    const direction = new Vector(joystickDirection.current.x, joystickDirection.current.y);
+    // Apply force to player cells based on joystick
+    const direction = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
     playerCells.forEach(playerCell => {
-      if (playerCell.ejectionTimer <= 0) {
-        const speed = 50 / playerCell.radius;
-        playerCell.velocity = direction.multiply(speed);
-      }
+        const acceleration = 1;
+        const force = direction.multiply(acceleration);
+        playerCell.velocity = playerCell.velocity.add(force);
+
+        // Clamp velocity to a max speed
+        const maxSpeed = 50 / playerCell.radius;
+        if (playerCell.velocity.magnitude() > maxSpeed) {
+            playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
+        }
     });
 
+    // Update all cells
     allCells.forEach(cell => {
         if (cell instanceof Bot) {
             cell.updateLogic(pellets, allCells, settings.botAggression, settings.botSplitChance);
@@ -282,17 +319,24 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         const cellB = playerCells[j];
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < cellA.radius + cellB.radius) {
-            cellA.mass += cellB.mass;
-            cellA.radius = cellA.calculateRadius();
-            playerCells.splice(j, 1);
-            i--;
+          if (dist < (cellA.radius + cellB.radius) * 0.8) { // Require more overlap to merge
+            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+            bigger.mass += smaller.mass;
+            bigger.radius = bigger.calculateRadius();
+            
+            const smallerIndex = playerCells.indexOf(smaller);
+            if (smallerIndex > -1) {
+                playerCells.splice(smallerIndex, 1);
+                if (smallerIndex <= i) i--;
+                if (smallerIndex <= j) j--;
+            }
           }
         }
       }
     }
 
-    // Collision detection
+    // Collision detection (eating)
     for (let i = allCells.length - 1; i >= 0; i--) {
         for (let j = i - 1; j >= 0; j--) {
             const cellA = allCells[i];
@@ -302,12 +346,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
             const distVec = cellA.position.subtract(cellB.position);
             const distance = distVec.magnitude();
 
-            if (distance < cellA.radius + cellB.radius) {
+            if (distance < Math.max(cellA.radius, cellB.radius)) {
                 let predator, prey;
-                if (cellA.mass > cellB.mass * 1.1) {
+                if (cellA.mass > cellB.mass * 1.15) { // Need to be 15% bigger
                     predator = cellA;
                     prey = cellB;
-                } else if (cellB.mass > cellA.mass * 1.1) {
+                } else if (cellB.mass > cellA.mass * 1.15) {
                     predator = cellB;
                     prey = cellA;
                 } else {
@@ -339,31 +383,34 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     // Eating pellets
     for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
-        allCells.forEach(cell => {
-            if (!pellet) return;
+        for (const cell of allCells) {
+            if (!pellet) continue;
             const dist = cell.position.subtract(pellet.position).magnitude();
             if (dist < cell.radius) {
                 cell.mass += 10;
                 cell.radius = cell.calculateRadius();
                 pellets.splice(i, 1);
+                break; 
             }
-        });
+        }
     }
     if (pellets.length < PELLET_COUNT) {
       pellets.push(new Pellet(getRandomColor()));
     }
 
-    gameInstance.score = Math.floor(playerCells.reduce((sum, cell) => sum + cell.mass, 0) - MIN_CELL_MASS);
+    gameInstance.score = Math.floor(playerCells.reduce((sum, cell) => sum + cell.mass, 0) - MIN_CELL_MASS * playerCells.length);
 
     // Update camera to follow center of mass
-    const totalMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    const centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalMass;
-    const centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalMass;
-    const avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
-    
-    camera.x += (centerX - camera.x) * 0.1;
-    camera.y += (centerY - camera.y) * 0.1;
-    camera.zoom = 50 / avgRadius + 0.5;
+    if (playerCells.length > 0) {
+        const totalMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+        const centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalMass;
+        const centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalMass;
+        const avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+        
+        camera.x += (centerX - camera.x) * 0.1;
+        camera.y += (centerY - camera.y) * 0.1;
+        camera.zoom = 50 / avgRadius + 0.5;
+    }
 
     // Drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
