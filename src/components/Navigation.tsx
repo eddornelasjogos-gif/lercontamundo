@@ -24,7 +24,7 @@ export const Navigation = () => {
                   "flex flex-col md:flex-row items-center gap-1 md:gap-2 px-4 py-2 rounded-full transition-smooth",
                   isActive
                     ? "gradient-primary text-white shadow-soft"
-                    - : "text-muted-foreground hover:text-primary hover:bg-primary/15"
+                    : "text-muted-foreground hover:text-primary hover:bg-primary/15"
                 )}
               >
                 <Icon className="w-5 h-5" />
