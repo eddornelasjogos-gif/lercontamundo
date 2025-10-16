@@ -1,7 +1,6 @@
 import { Home, BookOpen, Calculator, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { DailyRewardButton } from "./DailyRewardButton";
 
 export const Navigation = () => {
   const location = useLocation();
@@ -37,7 +36,6 @@ export const Navigation = () => {
               </Link>
             );
           })}
-          <DailyRewardButton />
         </div>
       </div>
     </nav>
