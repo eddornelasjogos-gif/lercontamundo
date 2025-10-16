@@ -2,7 +2,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Trophy, BookOpen, Calculator, Award } from "lucide-react";
+import { Star, Trophy, BookOpen, Calculator, Award, Flame } from "lucide-react";
 import { Mascot } from "@/components/Mascot";
 import ColorHeader from "@/components/ColorHeader";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -19,15 +19,6 @@ const Profile = () => {
       description: "Complete sua primeira leitura",
       icon: BookOpen,
       unlocked: progress.achievements.includes("first-read"),
-      color: "text-success",
-    },
-    {
-      id: "number-master",
-      title: "Mestre dos Números",
-      description: "Resolva 50 exercícios de matemática",
-      icon: Calculator,
-      unlocked: progress.achievements.includes("number-master"),
-      color: "text-secondary",
     },
     {
       id: "dedicated-reader",
@@ -35,7 +26,13 @@ const Profile = () => {
       description: "Leia 10 histórias completas",
       icon: Trophy,
       unlocked: progress.achievements.includes("dedicated-reader"),
-      color: "text-accent",
+    },
+    {
+      id: "number-master",
+      title: "Mestre dos Números",
+      description: "Resolva 50 exercícios de matemática",
+      icon: Calculator,
+      unlocked: progress.achievements.includes("number-master"),
     },
     {
       id: "star-bright",
@@ -43,7 +40,27 @@ const Profile = () => {
       description: "Alcance o nível 5",
       icon: Star,
       unlocked: progress.level >= 5,
-      color: "text-primary",
+    },
+    {
+      id: "streak-3",
+      title: "Consistente",
+      description: "Acesse por 3 dias seguidos",
+      icon: Flame,
+      unlocked: progress.achievements.includes("streak-3"),
+    },
+    {
+      id: "streak-7",
+      title: "Determinado",
+      description: "Acesse por 7 dias seguidos",
+      icon: Flame,
+      unlocked: progress.achievements.includes("streak-7"),
+    },
+    {
+      id: "streak-15",
+      title: "Imparável",
+      description: "Acesse por 15 dias seguidos",
+      icon: Flame,
+      unlocked: progress.achievements.includes("streak-15"),
     },
   ];
 
@@ -61,14 +78,14 @@ const Profile = () => {
       color: "gradient-secondary",
     },
     {
-      label: "XP Total",
-      value: progress.xp.toString(),
-      icon: Star,
+      label: "Dias Consecutivos",
+      value: progress.consecutiveDays.toString(),
+      icon: Flame,
       color: "gradient-success",
     },
     {
       label: "Conquistas",
-      value: `${progress.achievements.length}/4`,
+      value: `${progress.achievements.length}/${achievements.length}`,
       icon: Award,
       color: "gradient-primary",
     },

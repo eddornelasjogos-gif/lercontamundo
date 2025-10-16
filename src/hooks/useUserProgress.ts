@@ -10,6 +10,7 @@ export interface UserProgress {
   completedStories: number[];
   completedExercises: number[];
   lastLoginDate: string | null;
+  consecutiveDays: number;
 }
 
 const DEFAULT_PROGRESS: UserProgress = {
@@ -21,6 +22,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   completedStories: [],
   completedExercises: [],
   lastLoginDate: null,
+  consecutiveDays: 0,
 };
 
 const STORAGE_KEY = 'ler-conta-mundo-progress';
@@ -36,24 +38,66 @@ export const useUserProgress = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   }, [progress]);
 
-  // Efeito para verificar e conceder a recompensa diária
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    if (progress.lastLoginDate !== today) {
-      setProgress((prev) => {
-        const newXP = prev.xp + DAILY_REWARD_XP;
-        const newLevel = Math.floor(newXP / 500) + 1;
-        return {
-          ...prev,
-          xp: newXP,
-          level: newLevel,
-          lastLoginDate: today,
-        };
-      });
-      toast.success(`🎁 Recompensa diária! Você ganhou ${DAILY_REWARD_XP} XP por voltar!`);
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    if (progress.lastLoginDate === todayStr) {
+      return; // Já logou hoje, não faz nada
     }
+
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    setProgress((prev) => {
+      let newConsecutiveDays = prev.consecutiveDays;
+      let bonusXP = 0;
+      const newAchievements = [...prev.achievements];
+
+      if (prev.lastLoginDate === yesterdayStr) {
+        // Continua a sequência
+        newConsecutiveDays++;
+        bonusXP = newConsecutiveDays * 5; // Bônus de 5 XP por dia de sequência
+        toast.success(`🔥 Sequência de ${newConsecutiveDays} dias! +${bonusXP} XP bônus!`);
+
+        // Checar conquistas de sequência
+        if (newConsecutiveDays >= 3 && !newAchievements.includes('streak-3')) {
+          newAchievements.push('streak-3');
+          toast.info("🏆 Nova Conquista: Sequência de 3 dias!");
+        }
+        if (newConsecutiveDays >= 7 && !newAchievements.includes('streak-7')) {
+          newAchievements.push('streak-7');
+          toast.info("🏆 Nova Conquista: Sequência de 7 dias!");
+        }
+        if (newConsecutiveDays >= 15 && !newAchievements.includes('streak-15')) {
+          newAchievements.push('streak-15');
+          toast.info("🏆 Nova Conquista: Sequência de 15 dias!");
+        }
+
+      } else {
+        // Quebrou a sequência ou é o primeiro login
+        newConsecutiveDays = 1;
+      }
+
+      const newXP = prev.xp + DAILY_REWARD_XP + bonusXP;
+      const newLevel = Math.floor(newXP / 500) + 1;
+      
+      if (prev.lastLoginDate !== yesterdayStr) {
+        toast.success(`🎁 Recompensa diária! Você ganhou ${DAILY_REWARD_XP} XP por voltar!`);
+      }
+
+      return {
+        ...prev,
+        xp: newXP,
+        level: newLevel,
+        lastLoginDate: todayStr,
+        consecutiveDays: newConsecutiveDays,
+        achievements: newAchievements,
+      };
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Executa apenas uma vez quando o app é carregado
+  }, []);
 
   const addXP = (amount: number) => {
     setProgress((prev) => {
