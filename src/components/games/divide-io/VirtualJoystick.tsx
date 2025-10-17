@@ -44,6 +44,7 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
   }, [onMove]);
 
   const handleInteractionStart = (e: React.MouseEvent | React.TouchEvent) => {
+    // Previne o comportamento padrão de toque (como rolagem) no início da interação
     e.preventDefault();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -55,7 +56,7 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
   };
 
   const handleInteractionEnd = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+    // Não precisa de preventDefault aqui, mas garante que o dragging pare
     if (isDragging) {
       setIsDragging(false);
       setKnobPosition({ x: 0, y: 0 });
@@ -65,7 +66,10 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
 
   const handleInteractionMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (isDragging) {
-      e.preventDefault();
+      // CRUCIAL: Previne a rolagem da tela durante o movimento de toque
+      if ('touches' in e) {
+        e.preventDefault();
+      }
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
       updateKnobPosition(clientX, clientY, basePosition);
@@ -74,7 +78,8 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
 
   return (
     <div
-      className={cn("fixed top-0 left-0 w-full h-full z-50", className)}
+      // Adiciona touch-action: none para otimizar a prevenção de rolagem
+      className={cn("fixed top-0 left-0 w-full h-full z-50 touch-none", className)}
       onMouseDown={handleInteractionStart}
       onMouseUp={handleInteractionEnd}
       onMouseLeave={handleInteractionEnd}

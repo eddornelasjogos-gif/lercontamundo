@@ -475,7 +475,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   }, [gameLoop, difficulty, gameInstance]);
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
       <SplitButton onSplit={handleSplit} />
