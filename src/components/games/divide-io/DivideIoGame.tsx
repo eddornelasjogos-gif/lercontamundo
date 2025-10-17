@@ -283,6 +283,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
     score: 0,
+    lastValidScore: 0, // Adicionado para rastrear o último score válido
   }).current;
 
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
@@ -307,8 +308,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (!canvas || !ctx) return;
 
     const { playerCells, bots, pellets, camera } = gameInstance;
+    
+    // 1. Check for Game Over BEFORE updating cells, as collision detection might remove the last cell
     if (playerCells.length === 0) {
-      onGameOver(gameInstance.score);
+      // Usa o último score válido antes da morte
+      onGameOver(gameInstance.lastValidScore);
       return;
     }
 
@@ -432,7 +436,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // Calculate player stats for score and minimap
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    gameInstance.score = Math.floor(totalPlayerMass - MIN_CELL_MASS * playerCells.length);
+    const currentScore = Math.floor(totalPlayerMass - MIN_CELL_MASS * playerCells.length);
+    
+    // Atualiza o score e o último score válido
+    gameInstance.score = currentScore;
+    if (currentScore > 0) {
+        gameInstance.lastValidScore = currentScore;
+    }
+
 
     let centerX = WORLD_SIZE / 2;
     let centerY = WORLD_SIZE / 2;
@@ -636,6 +647,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     gameInstance.pellets = Array.from({ length: PELLET_COUNT }, () => new Pellet(getRandomColor()));
     gameInstance.score = 0;
+    gameInstance.lastValidScore = 0; // Resetar o score válido no início
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
 
