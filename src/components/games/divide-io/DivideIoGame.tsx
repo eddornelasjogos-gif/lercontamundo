@@ -15,7 +15,7 @@ interface DivideIoGameProps {
 }
 
 const difficultySettings = {
-  easy: { botCount: 15, botAggression: 0.2, botSplitChance: 0.001 },
+  easy: { botCount: 30, botAggression: 0.2, botSplitChance: 0.001 },
   medium: { botCount: 25, botAggression: 0.5, botSplitChance: 0.002 },
   hard: { botCount: 40, botAggression: 0.8, botSplitChance: 0.005 },
 };
@@ -359,7 +359,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         // Decisão de movimento (a cada 30 frames)
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
-            botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
+            // Filtra todas as células que não pertencem a este bot
+            const otherCells = allCells.filter(c => c.name !== botName);
+            botLogic.findBestTarget(cells, pellets, otherCells, settings.botAggression, botName);
             decisionTimer = 30;
         }
         botLogic.decisionTimer.set(botName, decisionTimer - 1);
@@ -390,6 +392,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             
             // 2c. Lógica de Divisão (se o bot for grande e estiver caçando)
             if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
+                // Usa a direção do movimento alvo para a divisão
                 const newCell = cell.split(targetDirection, getNextCellId());
                 if (newCell) {
                     newBotCells.push(newCell);
@@ -400,41 +403,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         });
         
         // 2d. Fusão de Células de Bot (dentro do grupo)
-        for (let i = cells.length - 1; i >= 0; i--) {
-            for (let j = i - 1; j >= 0; j--) {
-                const cellA = cells[i];
-                const cellB = cells[j];
-                
-                if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-                    const dist = cellA.position.subtract(cellB.position).magnitude();
-                    if (dist < (cellA.radius + cellB.radius) * 0.8) { 
-                        const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-                        const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-                        
-                        bigger.mass += smaller.mass;
-                        bigger.radius = bigger.calculateRadius();
-                        
-                        // Remove a célula menor do array principal (botCells)
-                        const smallerIndex = botCells.indexOf(smaller);
-                        if (smallerIndex > -1) {
-                            botCells.splice(smallerIndex, 1);
-                            // Remove também do array temporário 'cells' para evitar erros de índice
-                            cells.splice(cells.indexOf(smaller), 1);
-                            if (smallerIndex <= i) i--;
-                            if (smallerIndex <= j) j--;
-                        }
-                    }
-                }
-            }
-        }
+        // Esta lógica foi movida para fora do loop botGroups para evitar problemas de iteração,
+        // mas a lógica de fusão de bots é aplicada abaixo (Passo 3b).
     });
     
     gameInstance.botCells.push(...newBotCells);
     
-    // --- 3. Atualização e Fusão do Jogador ---
-    playerCells.forEach(cell => cell.update());
-
-    // Player cell merging
+    // --- 3. Atualização e Fusão ---
+    
+    // 3a. Player cell merging
     for (let i = playerCells.length - 1; i >= 0; i--) {
       for (let j = i - 1; j >= 0; j--) {
         const cellA = playerCells[i];
@@ -457,6 +434,38 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
       }
     }
+    
+    // 3b. Bot cell merging
+    for (let i = botCells.length - 1; i >= 0; i--) {
+      for (let j = i - 1; j >= 0; j--) {
+        const cellA = botCells[i];
+        const cellB = botCells[j];
+        
+        // Verifica se são do mesmo bot (mesmo nome) e se o cooldown terminou
+        if (cellA.name === cellB.name && cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+          const dist = cellA.position.subtract(cellB.position).magnitude();
+          
+          // Se as células estiverem próximas o suficiente (80% de sobreposição)
+          if (dist < (cellA.radius + cellB.radius) * 0.8) { 
+            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+            
+            // A célula maior absorve a massa da menor
+            bigger.mass += smaller.mass;
+            bigger.radius = bigger.calculateRadius();
+            
+            // Remove a célula menor
+            const smallerIndex = botCells.indexOf(smaller);
+            if (smallerIndex > -1) {
+                botCells.splice(smallerIndex, 1);
+                if (smallerIndex <= i) i--;
+                if (smallerIndex <= j) j--;
+            }
+          }
+        }
+      }
+    }
+
 
     // --- 4. Detecção de Colisão (Comer) ---
     
