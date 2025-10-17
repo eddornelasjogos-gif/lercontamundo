@@ -352,6 +352,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     gameInstance.playerCells.push(...(newCells as Player[]));
   }, [gameInstance, playSplit]);
 
+  // Efeito para escutar a tecla Espaço (apenas para PC)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Verifica se o jogo está ativo e se a tecla pressionada é a barra de espaço
+      if (isPlaying && event.code === 'Space') {
+        event.preventDefault(); // Previne a rolagem da página
+        handleSplit();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isPlaying, handleSplit]);
+
+
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -803,6 +820,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
+      {/* O SplitButton é mantido para dispositivos móveis, mas a divisão também é acionada pelo teclado no PC */}
       <SplitButton onSplit={handleSplit} />
       <Minimap {...minimapData} />
     </div>
