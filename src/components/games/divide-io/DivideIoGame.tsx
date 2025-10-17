@@ -307,7 +307,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
     score: 0,
-    lastValidScore: 0,
+    maxScore: 0, // Novo campo para rastrear a pontuação máxima da sessão
   }).current;
 
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
@@ -336,7 +336,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     if (playerCells.length === 0) {
       setIsPlaying(false);
-      onGameOver(gameInstance.lastValidScore);
+      onGameOver(gameInstance.maxScore); // Reporta a pontuação máxima alcançada
       return;
     }
 
@@ -472,10 +472,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
     const currentScore = Math.floor(totalPlayerMass - MIN_CELL_MASS * playerCells.length);
     
-    // Atualiza o score e o último score válido
+    // Atualiza o score
     gameInstance.score = currentScore;
-    if (currentScore > 0) {
-        gameInstance.lastValidScore = currentScore;
+    
+    // Rastreia a pontuação máxima alcançada
+    if (currentScore > gameInstance.maxScore) {
+        gameInstance.maxScore = currentScore;
     }
 
 
@@ -673,7 +675,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     gameInstance.pellets = Array.from({ length: PELLET_COUNT }, () => new Pellet(getRandomColor()));
     gameInstance.score = 0;
-    gameInstance.lastValidScore = 0; // Resetar o score válido no início
+    gameInstance.maxScore = 0; // Resetar o score máximo no início
     setIsPlaying(true); // Garante que o áudio de fundo comece
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
