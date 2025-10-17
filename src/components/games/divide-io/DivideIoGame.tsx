@@ -215,7 +215,7 @@ class Bot extends Cell {
 
         // Ajuste da velocidade: menos punitiva para massas maiores
         // Fórmula original: 50 / playerCell.radius
-        // Nova fórmula: 50 / (playerCell.radius * 0.5 + 10) -> Mantém a velocidade mais alta
+        // Nova fórmula: 50 / (this.radius * 0.5 + 10) -> Mantém a velocidade mais alta
         const speed = 50 / (this.radius * 0.5 + 10); 
         this.velocity = direction.multiply(speed);
         super.update();
@@ -377,14 +377,19 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       for (let j = i - 1; j >= 0; j--) {
         const cellA = playerCells[i];
         const cellB = playerCells[j];
+        // Verifica se o cooldown de fusão terminou para AMBAS as células
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < (cellA.radius + cellB.radius) * 0.8) { // Require more overlap to merge
+          // Se as células estiverem próximas o suficiente (80% de sobreposição)
+          if (dist < (cellA.radius + cellB.radius) * 0.8) { 
             const bigger = cellA.mass > cellB.mass ? cellA : cellB;
             const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+            
+            // A célula maior absorve a massa da menor
             bigger.mass += smaller.mass;
             bigger.radius = bigger.calculateRadius();
             
+            // Remove a célula menor
             const smallerIndex = playerCells.indexOf(smaller);
             if (smallerIndex > -1) {
                 playerCells.splice(smallerIndex, 1);
@@ -470,7 +475,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // Calculate player stats for score and minimap
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    const currentScore = Math.floor(totalPlayerMass - MIN_CELL_MASS * playerCells.length);
+    
+    // NOVO CÁLCULO DE SCORE: Apenas a massa total (para que o score só suba ao comer)
+    // Subtraímos a massa inicial para que o score comece em 0
+    const initialMass = MIN_CELL_MASS;
+    const currentScore = Math.floor(totalPlayerMass - initialMass);
     
     // Atualiza o score
     gameInstance.score = currentScore;
@@ -497,7 +506,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     }
 
     // Prepare minimap data: Inclui TODOS os bots ativos
-    const playerMassForMinimap = totalPlayerMass;
     const visibleBots = bots
         .map(bot => ({
             x: bot.position.x,
@@ -512,14 +520,26 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         visibleBots: visibleBots,
     });
     
-    // --- Leaderboard Logic (Lista as 5 maiores CÉLULAS) ---
-    const leaderboardData = allCells
-        .map(cell => ({
-            name: cell.name,
-            mass: cell.mass,
-            isPlayer: cell instanceof Player,
-            id: cell.id,
-        }))
+    // --- Leaderboard Logic (Lista as 5 maiores CÉLULAS/JOGADORES) ---
+    
+    // 1. Coleta todas as células de bots
+    const botEntries = bots.map(cell => ({
+        name: cell.name,
+        mass: cell.mass,
+        isPlayer: false,
+        id: cell.id,
+    }));
+    
+    // 2. Cria uma entrada UNIFICADA para o jogador
+    const playerEntry = {
+        name: playerName,
+        mass: totalPlayerMass,
+        isPlayer: true,
+        id: 0, // ID fixo para o jogador unificado
+    };
+    
+    // 3. Combina e ordena
+    const leaderboardData = [...botEntries, playerEntry]
         .sort((a, b) => b.mass - a.mass)
         .slice(0, 5); // Limita ao Top 5
 
