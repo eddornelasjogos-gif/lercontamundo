@@ -574,22 +574,56 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // Initialize Bots with UNIQUE Names
     const botCount = settings.botCount;
     const baseNames = [...BOT_NAMES];
-    const uniqueBotNames: string[] = [];
+    
+    // Função para embaralhar a lista de nomes
+    const shuffleArray = (array: string[]) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    };
 
+    // Embaralha a lista base
+    shuffleArray(baseNames);
+
+    const uniqueBotNames: string[] = [];
+    
+    // Se o número de bots for maior que a lista de nomes, reutilizamos os nomes
+    // mas garantimos que cada bot inicial receba um nome único.
     for (let i = 0; i < botCount; i++) {
         const baseName = baseNames[i % baseNames.length];
-        const suffix = Math.floor(i / baseNames.length) > 0 ? ` ${Math.floor(i / baseNames.length) + 1}` : '';
-        uniqueBotNames.push(baseName + suffix);
+        
+        // Se o índice for maior que o tamanho da lista base, criamos um nome composto
+        if (i >= baseNames.length) {
+            // Usamos um índice secundário para pegar um segundo nome para combinação
+            const secondaryIndex = Math.floor(i / baseNames.length) - 1;
+            const secondaryName = baseNames[secondaryIndex % baseNames.length];
+            
+            // Combinações criativas (ex: Corujinha Mestre, Leitora Veloz)
+            // Usamos o índice 'i' para garantir que a combinação seja única
+            const combinationIndex = i % baseNames.length;
+            const combinedName = `${baseNames[combinationIndex]} ${secondaryName}`;
+            
+            // Se a combinação já existir (improvável, mas possível), usamos um sufixo de letra
+            let finalName = combinedName;
+            let suffix = 0;
+            while (uniqueBotNames.includes(finalName)) {
+                suffix++;
+                finalName = `${combinedName} ${String.fromCharCode(65 + suffix)}`; // A, B, C...
+            }
+            uniqueBotNames.push(finalName);
+        } else {
+            // Se o nome for único na primeira rodada, usamos ele diretamente
+            uniqueBotNames.push(baseName);
+        }
     }
     
-    // Shuffle the unique names to randomize which bot gets which name
-    for (let i = uniqueBotNames.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [uniqueBotNames[i], uniqueBotNames[j]] = [uniqueBotNames[j], uniqueBotNames[i]];
-    }
+    // Se a lista de nomes únicos gerada for maior que a contagem de bots, cortamos.
+    // Se for menor (o que não deve acontecer com a lógica acima), usamos o que temos.
+    const finalBotNames = uniqueBotNames.slice(0, botCount);
 
     gameInstance.bots = Array.from({ length: botCount }, (_, i) => {
-        const name = uniqueBotNames[i];
+        const name = finalBotNames[i];
         
         return new Bot(
             Math.random() * WORLD_SIZE,
