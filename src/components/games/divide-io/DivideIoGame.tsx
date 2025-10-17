@@ -572,7 +572,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             Math.random() * WORLD_SIZE,
             Math.random() * WORLD_SIZE,
             getRandomColor(),
-            MIN_CELL_MASS + 100, // Massa inicial pequena (100 de massa = 0 de score, 200 de massa = 100 de score)
+            MIN_CELL_MASS + 10, // Massa inicial pequena (10 de score)
             newBotName,
             getNextCellId(),
             true
@@ -700,10 +700,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.restore();
 
     // Draw UI elements (Score and Leaderboard)
+    // Ajustando a posição da pontuação para o topo esquerdo, acima do minimapa
     ctx.fillStyle = '#333';
     ctx.font = 'bold 20px Quicksand';
     ctx.textAlign = 'left';
     ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
+    
+    // Ajustando a posição do Recorde para o topo direito
     ctx.textAlign = 'right';
     ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
     
@@ -711,21 +714,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const leaderboardWidth = 180; 
     const leaderboardX = canvas.width - leaderboardWidth - 20;
     const lineHeight = 20; 
+    // Ajustando a posição Y inicial do leaderboard para ficar abaixo do Recorde
+    const leaderboardY = 50; 
     const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillRect(leaderboardX, 50, leaderboardWidth, leaderboardHeight);
+    ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
     ctx.strokeStyle = '#ccc';
-    ctx.strokeRect(leaderboardX, 50, leaderboardWidth, leaderboardHeight);
+    ctx.strokeRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
 
     ctx.fillStyle = '#333';
     ctx.font = 'bold 16px Quicksand';
     ctx.textAlign = 'left';
-    ctx.fillText('Top 5', leaderboardX + 10, 70);
+    ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
     
     ctx.font = '14px Quicksand';
     leaderboardData.forEach((entry, index) => {
-        const y = 90 + index * lineHeight; 
+        const y = leaderboardY + 40 + index * lineHeight; 
         ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
         
         // Nome (alinhado à esquerda)

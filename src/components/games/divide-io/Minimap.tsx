@@ -23,8 +23,8 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
   return (
     <div
       className={cn(
-        // Movido para bottom-4 para ficar bem na parte de baixo
-        "fixed bottom-4 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
+        // Alterado de bottom-4 para top-4
+        "fixed top-4 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
         className
       )}
       style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
