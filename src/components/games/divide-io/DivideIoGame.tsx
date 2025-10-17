@@ -75,15 +75,17 @@ class Cell {
   public velocity: Vector;
   public mergeCooldown = 0;
   public name: string;
-  public id: number; // Adicionado ID único para rastreamento no ranking
+  public id: number; 
+  public isBot: boolean; // Adicionado para distinguir no loop
 
-  constructor(x: number, y: number, public color: string, initialMass: number, name: string = 'Cell', id: number) {
+  constructor(x: number, y: number, public color: string, initialMass: number, name: string = 'Cell', id: number, isBot: boolean = false) {
     this.position = new Vector(x, y);
     this.mass = initialMass;
     this.radius = this.calculateRadius();
     this.velocity = new Vector(0, 0);
     this.name = name;
     this.id = id;
+    this.isBot = isBot;
   }
 
   calculateRadius() {
@@ -141,13 +143,14 @@ class Cell {
         const offsetDistance = this.radius + EJECTION_OFFSET; 
         const offset = direction.multiply(offsetDistance);
 
-        const newCell = new (this.constructor as any)(
+        const newCell = new Cell(
             this.position.x + offset.x, 
             this.position.y + offset.y, 
             this.color, 
             splitMass,
             this.name,
-            nextCellId // Novo ID para a nova célula
+            nextCellId,
+            this.isBot // Mantém o status de bot
         );
         
         // Apply a strong impulse to the new cell
@@ -168,7 +171,7 @@ const getNextCellId = () => nextCellId++;
 
 class Player extends Cell {
     constructor(x: number, y: number, color: string, initialMass: number, name: string) {
-        super(x, y, color, initialMass, name, getNextCellId());
+        super(x, y, color, initialMass, name, getNextCellId(), false);
     }
     
     split() {
@@ -177,73 +180,36 @@ class Player extends Cell {
     }
 }
 
-class Bot extends Cell {
-    constructor(x: number, y: number, color: string, initialMass: number, name: string) {
-        super(x, y, color, initialMass, name, getNextCellId());
-    }
+// Lógica de Bot movida para uma função auxiliar
+const botLogic = {
+    target: new Map<string, Vector | null>(),
+    threat: new Map<string, Vector | null>(),
+    decisionTimer: new Map<string, number>(),
     
-    private target: Vector | null = null;
-    private threat: Vector | null = null;
-    private decisionTimer = 0;
+    findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
+        // Calcula o centro de massa do bot
+        const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
+        const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
 
-    // Bot split logic uses its current velocity as direction
-    botSplit() {
-        return super.split(this.velocity, getNextCellId());
-    }
-
-    updateLogic(pellets: Pellet[], otherCells: Cell[], aggression: number, splitChance: number): Bot | null {
-        this.decisionTimer--;
-        let newBot: Bot | null = null;
-
-        if (this.decisionTimer <= 0) {
-            this.findBestTarget(pellets, otherCells, aggression);
-            this.decisionTimer = 30;
-        }
-
-        let direction = new Vector(0, 0);
-        if (this.threat) {
-            direction = this.position.subtract(this.threat).normalize();
-        } else if (this.target) {
-            direction = this.target.subtract(this.position).normalize();
-            if (this.mass > MIN_SPLIT_MASS && Math.random() < splitChance) {
-                const targetDist = this.target.subtract(this.position).magnitude();
-                if (targetDist < this.radius * 5) {
-                    newBot = this.botSplit() as Bot;
-                }
-            }
-        }
-
-        // Ajuste da velocidade: menos punitiva para massas maiores
-        // Fórmula original: 50 / playerCell.radius
-        // Nova fórmula: 50 / (this.radius * 0.5 + 10) -> Mantém a velocidade mais alta
-        const speed = 50 / (this.radius * 0.5 + 10); 
-        this.velocity = direction.multiply(speed);
-        super.update();
-        
-        return newBot;
-    }
-
-    findBestTarget(pellets: Pellet[], otherCells: Cell[], aggression: number) {
-        this.target = null;
-        this.threat = null;
         let bestTarget: Pellet | Cell | null = null;
         let minTargetDist = Infinity;
         let closestThreat: Cell | null = null;
         let minThreatDist = Infinity;
 
-        const perceptionRadius = this.radius * 10;
+        const perceptionRadius = avgRadius * 10;
 
         for (const cell of otherCells) {
-            if (cell === this) continue;
-            const dist = this.position.subtract(cell.position).magnitude();
+            if (cell.name === botName) continue; // Não considera as próprias células
+            const dist = center.subtract(cell.position).magnitude();
             if (dist > perceptionRadius) continue;
 
-            if (cell.mass > this.mass * 1.1) {
+            if (cell.mass > totalMass * 1.1) {
                 if (dist < minThreatDist) {
                     minThreatDist = dist;
                     closestThreat = cell;
                 }
-            } else if (this.mass > cell.mass * 1.1) {
+            } else if (totalMass > cell.mass * 1.1) {
                 if (dist < minTargetDist && Math.random() < aggression) {
                     minTargetDist = dist;
                     bestTarget = cell;
@@ -251,24 +217,41 @@ class Bot extends Cell {
             }
         }
 
-        if (closestThreat && minThreatDist < this.radius * 3) {
-            this.threat = closestThreat.position;
-            this.target = null;
+        if (closestThreat && minThreatDist < avgRadius * 3) {
+            this.threat.set(botName, closestThreat.position);
+            this.target.set(botName, null);
             return;
         }
 
         if (!bestTarget) {
             for (const pellet of pellets) {
-                const dist = this.position.subtract(pellet.position).magnitude();
+                const dist = center.subtract(pellet.position).magnitude();
                 if (dist < minTargetDist) {
                     minTargetDist = dist;
                     bestTarget = pellet;
                 }
             }
         }
-        this.target = bestTarget ? bestTarget.position : null;
+        this.threat.set(botName, null);
+        this.target.set(botName, bestTarget ? bestTarget.position : null);
+    },
+    
+    getMovementDirection(botName: string): Vector {
+        const threat = this.threat.get(botName);
+        const target = this.target.get(botName);
+        
+        if (threat) {
+            // Fuga: move-se na direção oposta à ameaça
+            return new Vector(0, 0).subtract(threat).normalize();
+        } else if (target) {
+            // Caça: move-se em direção ao alvo
+            return target.subtract(new Vector(0, 0)).normalize();
+        }
+        // Movimento aleatório suave se não houver alvo
+        return new Vector(Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05);
     }
-}
+};
+
 
 class Pellet {
   public position: Vector;
@@ -303,7 +286,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   const gameInstance = useRef({
     playerCells: [] as Player[],
-    bots: [] as Bot[],
+    botCells: [] as Cell[], // Agora armazena todas as células de bot aqui
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
     score: 0,
@@ -315,16 +298,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   }, []);
 
   const handleSplit = useCallback(() => {
-    const newCells: Player[] = [];
+    const newCells: Cell[] = [];
     const cellsToSplit = [...gameInstance.playerCells];
     cellsToSplit.forEach(cell => {
-      const newCell = cell.split();
+      const newCell = cell.split(new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y), getNextCellId());
       if (newCell) {
-        newCells.push(newCell as Player);
+        newCells.push(newCell);
         playSplit(); // Toca SFX de divisão
       }
     });
-    gameInstance.playerCells.push(...newCells);
+    gameInstance.playerCells.push(...(newCells as Player[]));
   }, [gameInstance, playSplit]);
 
   const gameLoop = useCallback(() => {
@@ -332,7 +315,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const { playerCells, bots, pellets, camera } = gameInstance;
+    const { playerCells, botCells, pellets, camera } = gameInstance;
     
     if (playerCells.length === 0) {
       setIsPlaying(false);
@@ -340,56 +323,130 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       return;
     }
 
-    const allCells: Cell[] = [...playerCells, ...bots];
+    const allCells: Cell[] = [...playerCells, ...botCells];
     const settings = difficultySettings[difficulty];
 
-    // Apply force to player cells based on joystick
-    const direction = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
+    // --- 1. Lógica do Jogador ---
+    const playerDirection = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
     playerCells.forEach(playerCell => {
         const acceleration = 1;
-        const force = direction.multiply(acceleration);
+        const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
-        // Clamp velocity to a max speed
         const maxSpeed = 50 / (playerCell.radius * 0.5 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
         }
     });
 
-    // Update all cells and handle bot splitting
-    const newBots: Bot[] = [];
-    allCells.forEach(cell => {
-        if (cell instanceof Bot) {
-            const newBot = cell.updateLogic(pellets, allCells, settings.botAggression, settings.botSplitChance);
-            if (newBot) {
-                newBots.push(newBot);
+    // --- 2. Lógica dos Bots (Movimento Coordenado e Fusão) ---
+    
+    // Agrupar células de bot por nome
+    const botGroups = new Map<string, Cell[]>();
+    botCells.forEach(cell => {
+        if (!botGroups.has(cell.name)) {
+            botGroups.set(cell.name, []);
+        }
+        botGroups.get(cell.name)!.push(cell);
+    });
+    
+    const newBotCells: Cell[] = [];
+
+    botGroups.forEach((cells, botName) => {
+        const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
+        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+        
+        // Decisão de movimento (a cada 30 frames)
+        let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
+        if (decisionTimer <= 0) {
+            botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
+            decisionTimer = 30;
+        }
+        botLogic.decisionTimer.set(botName, decisionTimer - 1);
+
+        const targetDirection = botLogic.getMovementDirection(botName);
+        
+        cells.forEach(cell => {
+            // 2a. Movimento Coordenado
+            const acceleration = 1;
+            const force = targetDirection.multiply(acceleration);
+            cell.velocity = cell.velocity.add(force);
+            
+            const maxSpeed = 50 / (cell.radius * 0.5 + 10); 
+            if (cell.velocity.magnitude() > maxSpeed) {
+                cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
             }
-        } else {
+            
+            // 2b. Força de Atração (para fusão)
+            if (cells.length > 1 && cell.mergeCooldown <= 0) {
+                // Calcula o centro de massa do grupo
+                const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+                const attractionVector = centerOfMass.subtract(cell.position).normalize();
+                
+                // Aplica uma força de atração suave (ajustada pela massa)
+                const attractionForce = 0.5 * (avgRadius / cell.radius); 
+                cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
+            }
+            
+            // 2c. Lógica de Divisão (se o bot for grande e estiver caçando)
+            if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
+                const newCell = cell.split(targetDirection, getNextCellId());
+                if (newCell) {
+                    newBotCells.push(newCell);
+                }
+            }
+            
             cell.update();
+        });
+        
+        // 2d. Fusão de Células de Bot (dentro do grupo)
+        for (let i = cells.length - 1; i >= 0; i--) {
+            for (let j = i - 1; j >= 0; j--) {
+                const cellA = cells[i];
+                const cellB = cells[j];
+                
+                if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+                    const dist = cellA.position.subtract(cellB.position).magnitude();
+                    if (dist < (cellA.radius + cellB.radius) * 0.8) { 
+                        const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+                        const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+                        
+                        bigger.mass += smaller.mass;
+                        bigger.radius = bigger.calculateRadius();
+                        
+                        // Remove a célula menor do array principal (botCells)
+                        const smallerIndex = botCells.indexOf(smaller);
+                        if (smallerIndex > -1) {
+                            botCells.splice(smallerIndex, 1);
+                            // Remove também do array temporário 'cells' para evitar erros de índice
+                            cells.splice(cells.indexOf(smaller), 1);
+                            if (smallerIndex <= i) i--;
+                            if (smallerIndex <= j) j--;
+                        }
+                    }
+                }
+            }
         }
     });
-    bots.push(...newBots);
-
+    
+    gameInstance.botCells.push(...newBotCells);
+    
+    // --- 3. Atualização e Fusão do Jogador ---
+    playerCells.forEach(cell => cell.update());
 
     // Player cell merging
     for (let i = playerCells.length - 1; i >= 0; i--) {
       for (let j = i - 1; j >= 0; j--) {
         const cellA = playerCells[i];
         const cellB = playerCells[j];
-        // Verifica se o cooldown de fusão terminou para AMBAS as células
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          // Se as células estiverem próximas o suficiente (80% de sobreposição)
-          if (dist < (cellA.radius + cellB.radius) * 0.8) { 
+          if (dist < (cellA.radius + cellB.radius) * 0.8) { // Require more overlap to merge
             const bigger = cellA.mass > cellB.mass ? cellA : cellB;
             const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-            
-            // A célula maior absorve a massa da menor
             bigger.mass += smaller.mass;
             bigger.radius = bigger.calculateRadius();
             
-            // Remove a célula menor
             const smallerIndex = playerCells.indexOf(smaller);
             if (smallerIndex > -1) {
                 playerCells.splice(smallerIndex, 1);
@@ -400,44 +457,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
       }
     }
+
+    // --- 4. Detecção de Colisão (Comer) ---
     
-    // Bot cell merging (NOVA LÓGICA)
-    for (let i = bots.length - 1; i >= 0; i--) {
-      for (let j = i - 1; j >= 0; j--) {
-        const cellA = bots[i];
-        const cellB = bots[j];
-        
-        // Verifica se são do mesmo bot (mesmo nome) e se o cooldown terminou
-        if (cellA.name === cellB.name && cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-          const dist = cellA.position.subtract(cellB.position).magnitude();
-          
-          // Se as células estiverem próximas o suficiente (80% de sobreposição)
-          if (dist < (cellA.radius + cellB.radius) * 0.8) { 
-            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-            
-            // A célula maior absorve a massa da menor
-            bigger.mass += smaller.mass;
-            bigger.radius = bigger.calculateRadius();
-            
-            // Remove a célula menor
-            const smallerIndex = bots.indexOf(smaller);
-            if (smallerIndex > -1) {
-                bots.splice(smallerIndex, 1);
-                if (smallerIndex <= i) i--;
-                if (smallerIndex <= j) j--;
-            }
-          }
-        }
-      }
-    }
+    // Re-cria allCells após fusões
+    const currentAllCells: Cell[] = [...playerCells, ...botCells];
 
-
-    // Collision detection (eating)
-    for (let i = allCells.length - 1; i >= 0; i--) {
+    for (let i = currentAllCells.length - 1; i >= 0; i--) {
         for (let j = i - 1; j >= 0; j--) {
-            const cellA = allCells[i];
-            const cellB = allCells[j];
+            const cellA = currentAllCells[i];
+            const cellB = currentAllCells[j];
             if (!cellA || !cellB) continue;
 
             const distVec = cellA.position.subtract(cellB.position);
@@ -454,29 +483,30 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 } else {
                     continue;
                 }
+                
+                // Não permite que células do mesmo jogador/bot se comam
+                if (predator.name === prey.name) continue;
 
                 const deathDistance = predator.radius - prey.radius * 0.3;
                 if (distance < deathDistance) {
                     predator.mass += prey.mass;
                     predator.radius = predator.calculateRadius();
                     
-                    // Se o predador for o jogador, toca o SFX de coleta
-                    if (predator instanceof Player) {
+                    if (predator instanceof Player || !predator.isBot) {
                         playCollect();
                     }
                     
-                    const preyIndexInAll = allCells.indexOf(prey);
-                    if (preyIndexInAll > -1) {
-                      allCells.splice(preyIndexInAll, 1);
-                      if (preyIndexInAll < i) i--;
-                      if (preyIndexInAll < j) j--;
-                    }
-
+                    // Remove a presa dos arrays específicos
                     const preyIndexInPlayer = playerCells.indexOf(prey as Player);
                     if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
 
-                    const preyIndexInBots = bots.indexOf(prey as Bot);
-                    if (preyIndexInBots > -1) bots.splice(preyIndexInBots, 1);
+                    const preyIndexInBots = botCells.indexOf(prey);
+                    if (preyIndexInBots > -1) botCells.splice(preyIndexInBots, 1);
+                    
+                    // Remove a presa do array temporário currentAllCells
+                    currentAllCells.splice(currentAllCells.indexOf(prey), 1);
+                    if (currentAllCells.indexOf(predator) < i) i--;
+                    if (currentAllCells.indexOf(predator) < j) j--;
                 }
             }
         }
@@ -485,7 +515,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // Eating pellets
     for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
-        for (const cell of allCells) {
+        for (const cell of currentAllCells) {
             if (!pellet) continue;
             const dist = cell.position.subtract(pellet.position).magnitude();
             if (dist < cell.radius) {
@@ -493,8 +523,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 cell.radius = cell.calculateRadius();
                 pellets.splice(i, 1);
                 
-                // Se o jogador comeu a bolinha, toca o SFX de coleta
-                if (cell instanceof Player) {
+                if (cell instanceof Player || !cell.isBot) {
                     playCollect();
                 }
                 break; 
@@ -505,17 +534,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       pellets.push(new Pellet(getRandomColor()));
     }
 
-    // Calculate player stats for score and minimap
+    // --- 5. Atualização de Câmera e Score ---
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    
-    // CÁLCULO DE SCORE: Massa total menos a massa inicial (para começar em 0)
     const initialMass = MIN_CELL_MASS;
     const currentScore = Math.floor(totalPlayerMass - initialMass);
     
-    // Atualiza o score
     gameInstance.score = currentScore;
-    
-    // Rastreia a pontuação máxima alcançada
     if (currentScore > gameInstance.maxScore) {
         gameInstance.maxScore = currentScore;
     }
@@ -532,12 +556,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         camera.x += (centerX - camera.x) * 0.1;
         camera.y += (centerY - camera.y) * 0.1;
-        // Ajuste do zoom: 40 / avgRadius + 0.4
         camera.zoom = 40 / avgRadius + 0.4;
     }
 
-    // Prepare minimap data: Inclui TODOS os bots ativos
-    const visibleBots = bots
+    // Prepare minimap data
+    const visibleBots = botCells
         .map(bot => ({
             x: bot.position.x,
             y: bot.position.y,
@@ -547,15 +570,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     setMinimapData({
         playerCenter: { x: centerX, y: centerY },
-        playerRadius: avgRadius, // Passando o raio médio
+        playerRadius: avgRadius, 
         visibleBots: visibleBots,
     });
     
-    // --- Leaderboard Logic (Lista as 5 maiores CÉLULAS/JOGADORES) ---
+    // --- 6. Leaderboard Logic ---
     
-    // 1. Agrupa a massa total dos bots pelo nome (para bots divididos)
+    // 1. Agrupa a massa total dos bots pelo nome
     const botMassMap = new Map<string, number>();
-    bots.forEach(bot => {
+    botCells.forEach(bot => {
         botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
     });
     
@@ -564,7 +587,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         name: name,
         mass: mass,
         isPlayer: false,
-        id: 0, // ID não é relevante para o rank unificado
+        id: 0, 
     }));
     
     // 3. Cria uma entrada UNIFICADA para o jogador
@@ -578,7 +601,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // 4. Combina e ordena
     const leaderboardData = [...botEntries, playerEntry]
         .sort((a, b) => b.mass - a.mass)
-        .slice(0, 5); // Limita ao Top 5
+        .slice(0, 5); 
 
 
     // Drawing
@@ -596,13 +619,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // Draw World Border
     ctx.strokeStyle = '#333';
-    ctx.lineWidth = 20; // Make the border thick and visible
+    ctx.lineWidth = 20; 
     ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
     pellets.forEach(p => p.draw(ctx));
     
     // Draw cells and names
-    allCells.sort((a, b) => a.mass - b.mass).forEach(c => {
+    currentAllCells.sort((a, b) => a.mass - b.mass).forEach(c => {
         c.draw(ctx, c instanceof Player);
     });
 
@@ -684,56 +707,49 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     const uniqueBotNames: string[] = [];
     
-    // Se o número de bots for maior que a lista de nomes, reutilizamos os nomes
-    // mas garantimos que cada bot inicial receba um nome único.
     for (let i = 0; i < botCount; i++) {
         const baseName = baseNames[i % baseNames.length];
         
-        // Se o índice for maior que o tamanho da lista base, criamos um nome composto
         if (i >= baseNames.length) {
-            // Usamos um índice secundário para pegar um segundo nome para combinação
             const secondaryIndex = Math.floor(i / baseNames.length) - 1;
             const secondaryName = baseNames[secondaryIndex % baseNames.length];
             
-            // Combinações criativas (ex: Corujinha Mestre, Leitora Veloz)
-            // Usamos o índice 'i' para garantir que a combinação seja única
             const combinationIndex = i % baseNames.length;
             const combinedName = `${baseNames[combinationIndex]} ${secondaryName}`;
             
-            // Se a combinação já existir (improvável, mas possível), usamos um sufixo de letra
             let finalName = combinedName;
             let suffix = 0;
             while (uniqueBotNames.includes(finalName)) {
                 suffix++;
-                finalName = `${combinedName} ${String.fromCharCode(65 + suffix)}`; // A, B, C...
+                finalName = `${combinedName} ${String.fromCharCode(65 + suffix)}`; 
             }
             uniqueBotNames.push(finalName);
         } else {
-            // Se o nome for único na primeira rodada, usamos ele diretamente
             uniqueBotNames.push(baseName);
         }
     }
     
-    // Se a lista de nomes únicos gerada for maior que a contagem de bots, cortamos.
-    // Se for menor (o que não deve acontecer com a lógica acima), usamos o que temos.
     const finalBotNames = uniqueBotNames.slice(0, botCount);
 
-    gameInstance.bots = Array.from({ length: botCount }, (_, i) => {
+    // Inicializa as células de bot como células genéricas com isBot=true
+    gameInstance.botCells = Array.from({ length: botCount }, (_, i) => {
         const name = finalBotNames[i];
         
-        return new Bot(
+        return new Cell(
             Math.random() * WORLD_SIZE,
             Math.random() * WORLD_SIZE,
             getRandomColor(),
             Math.random() * 2000 + 500,
-            name
+            name,
+            getNextCellId(),
+            true // É um bot
         );
     });
     
     gameInstance.pellets = Array.from({ length: PELLET_COUNT }, () => new Pellet(getRandomColor()));
     gameInstance.score = 0;
-    gameInstance.maxScore = 0; // Resetar o score máximo no início
-    setIsPlaying(true); // Garante que o áudio de fundo comece
+    gameInstance.maxScore = 0; 
+    setIsPlaying(true); 
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
 
