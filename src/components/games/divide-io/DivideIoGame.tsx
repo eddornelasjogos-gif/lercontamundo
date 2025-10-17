@@ -297,7 +297,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
     playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
-    playerMass: MIN_CELL_MASS,
+    playerRadius: MIN_CELL_RADIUS, // Agora passamos o raio médio
     visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string }>,
   });
 
@@ -506,7 +506,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     setMinimapData({
         playerCenter: { x: centerX, y: centerY },
-        playerMass: playerMassForMinimap,
+        playerRadius: avgRadius, // Passando o raio médio
         visibleBots: visibleBots,
     });
     
