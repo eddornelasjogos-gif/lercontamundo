@@ -85,6 +85,8 @@ class Cell {
     // Apply friction to slow down over time
     this.velocity = this.velocity.multiply(0.95);
     this.position = this.position.add(this.velocity);
+    
+    // Boundary clamping (Clamping the cell position to the world boundaries)
     this.position.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.x));
     this.position.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.y));
   }
@@ -427,10 +429,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
 
+    // Draw World Grid
     ctx.strokeStyle = '#eee';
     ctx.lineWidth = 1;
     for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
     for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
+
+    // Draw World Border
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 20; // Make the border thick and visible
+    ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
     pellets.forEach(p => p.draw(ctx));
     allCells.sort((a, b) => a.mass - b.mass).forEach(c => c.draw(ctx));
