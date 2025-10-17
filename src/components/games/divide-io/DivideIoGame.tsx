@@ -466,12 +466,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         visibleBots: visibleBots,
     });
     
-    // --- Leaderboard Logic ---
-    const leaderboardData = allCells
-        .map(cell => ({
-            name: cell.name,
-            mass: cell.mass,
-            isPlayer: cell instanceof Player,
+    // --- Leaderboard Logic (Consolidating mass by name) ---
+    const massByName = new Map<string, { mass: number, isPlayer: boolean }>();
+
+    allCells.forEach(cell => {
+        const current = massByName.get(cell.name) || { mass: 0, isPlayer: false };
+        current.mass += cell.mass;
+        if (cell instanceof Player) {
+            current.isPlayer = true;
+        }
+        massByName.set(cell.name, current);
+    });
+
+    const leaderboardData = Array.from(massByName.entries())
+        .map(([name, data]) => ({
+            name,
+            mass: data.mass,
+            isPlayer: data.isPlayer,
         }))
         .sort((a, b) => b.mass - a.mass)
         .slice(0, 5); // Limita ao Top 5
@@ -513,9 +524,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
     
     // Draw Leaderboard
-    const leaderboardWidth = 180; // Diminuindo a largura
+    const leaderboardWidth = 180; 
     const leaderboardX = canvas.width - leaderboardWidth - 20;
-    const lineHeight = 20; // Diminuindo a altura da linha
+    const lineHeight = 20; 
     const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
@@ -530,12 +541,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     ctx.font = '14px Quicksand';
     leaderboardData.forEach((entry, index) => {
-        const y = 90 + index * lineHeight; // Ajustando a posição vertical
+        const y = 90 + index * lineHeight; 
         ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
         
         // Nome (alinhado à esquerda)
         ctx.textAlign = 'left';
-        ctx.fillText(`${index + 1}. ${entry.name}`, leaderboardX + 10, y);
+        // Limita o nome para caber no espaço
+        const nameDisplay = entry.name.length > 10 ? entry.name.substring(0, 8) + '...' : entry.name;
+        ctx.fillText(`${index + 1}. ${nameDisplay}`, leaderboardX + 10, y);
         
         // Pontuação (alinhado à direita)
         ctx.textAlign = 'right';
