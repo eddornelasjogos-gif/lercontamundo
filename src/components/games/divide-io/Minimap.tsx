@@ -21,7 +21,8 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerMass, visibleBots
   return (
     <div
       className={cn(
-        "fixed top-20 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
+        // Alterado de top-20 para bottom-20
+        "fixed bottom-20 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
         className
       )}
       style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
