@@ -474,7 +474,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             isPlayer: cell instanceof Player,
         }))
         .sort((a, b) => b.mass - a.mass)
-        .slice(0, 10);
+        .slice(0, 5); // Limita ao Top 5
 
 
     // Drawing
@@ -513,25 +513,33 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
     
     // Draw Leaderboard
+    const leaderboardWidth = 180; // Diminuindo a largura
+    const leaderboardX = canvas.width - leaderboardWidth - 20;
+    const lineHeight = 20; // Diminuindo a altura da linha
+    const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
+
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillRect(canvas.width - 220, 50, 200, 20 + leaderboardData.length * 25);
+    ctx.fillRect(leaderboardX, 50, leaderboardWidth, leaderboardHeight);
     ctx.strokeStyle = '#ccc';
-    ctx.strokeRect(canvas.width - 220, 50, 200, 20 + leaderboardData.length * 25);
+    ctx.strokeRect(leaderboardX, 50, leaderboardWidth, leaderboardHeight);
 
     ctx.fillStyle = '#333';
     ctx.font = 'bold 16px Quicksand';
     ctx.textAlign = 'left';
-    ctx.fillText('Top 10', canvas.width - 210, 70);
+    ctx.fillText('Top 5', leaderboardX + 10, 70);
     
     ctx.font = '14px Quicksand';
     leaderboardData.forEach((entry, index) => {
-        const y = 95 + index * 25;
+        const y = 90 + index * lineHeight; // Ajustando a posição vertical
         ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
-        ctx.fillText(`${index + 1}. ${entry.name}`, canvas.width - 210, y);
         
+        // Nome (alinhado à esquerda)
+        ctx.textAlign = 'left';
+        ctx.fillText(`${index + 1}. ${entry.name}`, leaderboardX + 10, y);
+        
+        // Pontuação (alinhado à direita)
         ctx.textAlign = 'right';
-        ctx.fillText(Math.floor(entry.mass).toString(), canvas.width - 30, y);
-        ctx.textAlign = 'left'; // Reset for next line
+        ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
     });
 
 
