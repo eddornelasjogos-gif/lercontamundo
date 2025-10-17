@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const MINIMAP_SIZE = 150; // Tamanho fixo do minimapa em pixels
+const MINIMAP_SIZE = 120; // Tamanho fixo do minimapa em pixels (reduzido em 20%)
 const WORLD_SIZE = 3000; // Deve ser o mesmo valor de DivideIoGame.tsx
 
 interface MinimapProps {
@@ -16,13 +16,13 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerMass, visibleBots
   const mapToMinimap = (coord: number) => (coord / WORLD_SIZE) * MINIMAP_SIZE;
 
   // Calcula o raio do jogador no minimapa (fixo para visibilidade)
-  const playerRadius = 5; 
+  const playerRadius = 4; // Reduzido ligeiramente para caber no mapa menor
 
   return (
     <div
       className={cn(
-        // Alterado de top-20 para bottom-20
-        "fixed bottom-20 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
+        // Movido para bottom-4 para ficar bem na parte de baixo
+        "fixed bottom-4 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
         className
       )}
       style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
@@ -37,7 +37,7 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerMass, visibleBots
           const minimapY = mapToMinimap(bot.y);
           
           // O tamanho do bot no minimapa é proporcional à sua massa em relação ao jogador, mas limitado
-          const relativeSize = Math.min(10, (bot.mass / playerMass) * 2);
+          const relativeSize = Math.min(8, (bot.mass / playerMass) * 1.5); // Ajuste de limite para o novo tamanho
           
           return (
             <circle
