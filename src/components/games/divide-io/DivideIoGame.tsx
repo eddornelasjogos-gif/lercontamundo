@@ -431,7 +431,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         
         camera.x += (centerX - camera.x) * 0.1;
         camera.y += (centerY - camera.y) * 0.1;
-        camera.zoom = 50 / avgRadius + 0.5;
+        // Ajuste do zoom: 40 / avgRadius + 0.4 (era 50 / avgRadius + 0.5)
+        camera.zoom = 40 / avgRadius + 0.4;
     }
 
     // Prepare minimap data
