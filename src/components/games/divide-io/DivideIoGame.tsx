@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
 import SplitButton from './SplitButton';
+import Minimap from './Minimap'; // Importando o novo componente
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -254,6 +255,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { highScore } = useDivideIoProgress();
   const animationFrameId = useRef<number>();
+  
+  // Estado para o minimapa
+  const [minimapData, setMinimapData] = React.useState({
+    playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
+    playerMass: MIN_CELL_MASS,
+    visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string }>,
+  });
 
   const gameInstance = useRef({
     playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)],
@@ -408,19 +416,41 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
       pellets.push(new Pellet(getRandomColor()));
     }
 
-    gameInstance.score = Math.floor(playerCells.reduce((sum, cell) => sum + cell.mass, 0) - MIN_CELL_MASS * playerCells.length);
+    // Calculate player stats for score and minimap
+    const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+    gameInstance.score = Math.floor(totalPlayerMass - MIN_CELL_MASS * playerCells.length);
 
-    // Update camera to follow center of mass
+    let centerX = WORLD_SIZE / 2;
+    let centerY = WORLD_SIZE / 2;
+    let avgRadius = MIN_CELL_RADIUS;
+
     if (playerCells.length > 0) {
-        const totalMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-        const centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalMass;
-        const centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalMass;
-        const avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+        centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalPlayerMass;
+        centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalPlayerMass;
+        avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
         
         camera.x += (centerX - camera.x) * 0.1;
         camera.y += (centerY - camera.y) * 0.1;
         camera.zoom = 50 / avgRadius + 0.5;
     }
+
+    // Prepare minimap data
+    const playerMassForMinimap = totalPlayerMass;
+    const visibleBots = bots
+        .filter(bot => bot.mass > playerMassForMinimap * 1.15) // Bots 15% maiores que o jogador
+        .map(bot => ({
+            x: bot.position.x,
+            y: bot.position.y,
+            mass: bot.mass,
+            color: bot.color,
+        }));
+
+    setMinimapData({
+        playerCenter: { x: centerX, y: centerY },
+        playerMass: playerMassForMinimap,
+        visibleBots: visibleBots,
+    });
+
 
     // Drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -487,6 +517,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
       <SplitButton onSplit={handleSplit} />
+      <Minimap {...minimapData} />
     </div>
   );
 };
