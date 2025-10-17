@@ -23,7 +23,7 @@ const difficultySettings = {
 const WORLD_SIZE = 3000;
 const PELLET_COUNT = 900;
 const MIN_CELL_RADIUS = 10;
-const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
+const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS; // 100
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5; // 5 seconds at 60fps
 const MASS_TO_RADIUS_RATIO = 4;
@@ -269,6 +269,44 @@ class Pellet {
   }
 }
 
+// Função auxiliar para gerar nomes de bot
+const generateBotNames = (count: number) => {
+    const baseNames = [...BOT_NAMES];
+    const shuffleArray = (array: string[]) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    };
+    shuffleArray(baseNames);
+
+    const uniqueBotNames: string[] = [];
+    
+    for (let i = 0; i < count; i++) {
+        const baseName = baseNames[i % baseNames.length];
+        
+        if (i >= baseNames.length) {
+            const secondaryIndex = Math.floor(i / baseNames.length) - 1;
+            const secondaryName = baseNames[secondaryIndex % baseNames.length];
+            
+            const combinationIndex = i % baseNames.length;
+            const combinedName = `${baseNames[combinationIndex]} ${secondaryName}`;
+            
+            let finalName = combinedName;
+            let suffix = 0;
+            while (uniqueBotNames.includes(finalName)) {
+                suffix++;
+                finalName = `${combinedName} ${String.fromCharCode(65 + suffix)}`; 
+            }
+            uniqueBotNames.push(finalName);
+        } else {
+            uniqueBotNames.push(baseName);
+        }
+    }
+    return uniqueBotNames.slice(0, count);
+};
+
+
 const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, playerName }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { highScore } = useDivideIoProgress();
@@ -276,6 +314,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   
   const [isPlaying, setIsPlaying] = React.useState(true);
   const { playCollect, playSplit } = useGameAudio(isPlaying); // Inicializa o áudio
+  
+  // Rastreia a contagem inicial de bots e a lista de nomes
+  const initialBotCount = difficultySettings[difficulty].botCount;
+  const botNamesRef = useRef<string[]>([]);
 
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
@@ -503,7 +545,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
 
                     const preyIndexInBots = botCells.indexOf(prey);
-                    if (preyIndexInBots > -1) botCells.splice(preyIndexInBots, 1);
+                    if (preyIndexInBots > -1) {
+                        botCells.splice(preyIndexInBots, 1);
+                        // Se um bot morreu, precisamos de um respawn
+                        if (prey.isBot) {
+                            // O nome do bot que morreu é liberado para o respawn
+                            botNamesRef.current.push(prey.name);
+                        }
+                    }
                     
                     // Remove a presa do array temporário currentAllCells
                     currentAllCells.splice(currentAllCells.indexOf(prey), 1);
@@ -512,6 +561,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 }
             }
         }
+    }
+    
+    // --- 4b. Respawn de Bots ---
+    while (botCells.length < initialBotCount) {
+        // Pega um nome da lista de nomes disponíveis (ou gera um novo se necessário)
+        const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
+        
+        const newBot = new Cell(
+            Math.random() * WORLD_SIZE,
+            Math.random() * WORLD_SIZE,
+            getRandomColor(),
+            MIN_CELL_MASS + 100, // Massa inicial pequena (100 de massa = 0 de score, 200 de massa = 100 de score)
+            newBotName,
+            getNextCellId(),
+            true
+        );
+        botCells.push(newBot);
     }
     
     // Eating pellets
@@ -675,7 +741,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit]);
+  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -694,44 +760,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // Initialize Bots with UNIQUE Names
     const botCount = settings.botCount;
-    const baseNames = [...BOT_NAMES];
+    const finalBotNames = generateBotNames(botCount);
     
-    // Função para embaralhar a lista de nomes
-    const shuffleArray = (array: string[]) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    };
-
-    // Embaralha a lista base
-    shuffleArray(baseNames);
-
-    const uniqueBotNames: string[] = [];
-    
-    for (let i = 0; i < botCount; i++) {
-        const baseName = baseNames[i % baseNames.length];
-        
-        if (i >= baseNames.length) {
-            const secondaryIndex = Math.floor(i / baseNames.length) - 1;
-            const secondaryName = baseNames[secondaryIndex % baseNames.length];
-            
-            const combinationIndex = i % baseNames.length;
-            const combinedName = `${baseNames[combinationIndex]} ${secondaryName}`;
-            
-            let finalName = combinedName;
-            let suffix = 0;
-            while (uniqueBotNames.includes(finalName)) {
-                suffix++;
-                finalName = `${combinedName} ${String.fromCharCode(65 + suffix)}`; 
-            }
-            uniqueBotNames.push(finalName);
-        } else {
-            uniqueBotNames.push(baseName);
-        }
-    }
-    
-    const finalBotNames = uniqueBotNames.slice(0, botCount);
+    // Armazena os nomes iniciais para respawn
+    botNamesRef.current = [...finalBotNames];
 
     // Inicializa as células de bot como células genéricas com isBot=true
     gameInstance.botCells = Array.from({ length: botCount }, (_, i) => {
@@ -760,7 +792,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameLoop, difficulty, gameInstance, playerName]);
+  }, [gameLoop, difficulty, gameInstance, playerName, initialBotCount]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
