@@ -571,11 +571,25 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // Initialize Player Cell with Name
     gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS, playerName)];
     
-    // Initialize Bots with Names
-    const availableBotNames = [...BOT_NAMES];
-    gameInstance.bots = Array.from({ length: settings.botCount }, () => {
-        const nameIndex = Math.floor(Math.random() * availableBotNames.length);
-        const name = availableBotNames.splice(nameIndex, 1)[0] || 'Bot';
+    // Initialize Bots with UNIQUE Names
+    const botCount = settings.botCount;
+    const baseNames = [...BOT_NAMES];
+    const uniqueBotNames: string[] = [];
+
+    for (let i = 0; i < botCount; i++) {
+        const baseName = baseNames[i % baseNames.length];
+        const suffix = Math.floor(i / baseNames.length) > 0 ? ` ${Math.floor(i / baseNames.length) + 1}` : '';
+        uniqueBotNames.push(baseName + suffix);
+    }
+    
+    // Shuffle the unique names to randomize which bot gets which name
+    for (let i = uniqueBotNames.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [uniqueBotNames[i], uniqueBotNames[j]] = [uniqueBotNames[j], uniqueBotNames[i]];
+    }
+
+    gameInstance.bots = Array.from({ length: botCount }, (_, i) => {
+        const name = uniqueBotNames[i];
         
         return new Bot(
             Math.random() * WORLD_SIZE,
