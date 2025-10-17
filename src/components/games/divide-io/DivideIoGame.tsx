@@ -214,8 +214,8 @@ class Bot extends Cell {
         }
 
         // Ajuste da velocidade: menos punitiva para massas maiores
-        // Fórmula original: 50 / this.radius
-        // Nova fórmula: 50 / (this.radius * 0.5 + 10) -> Mantém a velocidade mais alta
+        // Fórmula original: 50 / playerCell.radius
+        // Nova fórmula: 50 / (playerCell.radius * 0.5 + 10) -> Mantém a velocidade mais alta
         const speed = 50 / (this.radius * 0.5 + 10); 
         this.velocity = direction.multiply(speed);
         super.update();
@@ -350,9 +350,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const force = direction.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
-        // Ajuste da velocidade do jogador (Melhoria de Jogabilidade)
-        // Fórmula original: 50 / playerCell.radius
-        // Nova fórmula: 50 / (playerCell.radius * 0.5 + 10)
+        // Clamp velocity to a max speed
         const maxSpeed = 50 / (playerCell.radius * 0.5 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
@@ -496,10 +494,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         camera.zoom = 40 / avgRadius + 0.4;
     }
 
-    // Prepare minimap data
+    // Prepare minimap data: Inclui TODOS os bots ativos
     const playerMassForMinimap = totalPlayerMass;
     const visibleBots = bots
-        .filter(bot => bot.mass > playerMassForMinimap * 1.15) // Bots 15% maiores que o jogador
         .map(bot => ({
             x: bot.position.x,
             y: bot.position.y,
@@ -513,13 +510,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         visibleBots: visibleBots,
     });
     
-    // --- Leaderboard Logic (Correção do Ranking: Lista as 5 maiores CÉLULAS, não agrupadas por nome) ---
+    // --- Leaderboard Logic (Lista as 5 maiores CÉLULAS) ---
     const leaderboardData = allCells
         .map(cell => ({
             name: cell.name,
             mass: cell.mass,
             isPlayer: cell instanceof Player,
-            id: cell.id, // Usamos o ID para garantir que cada célula seja única no ranking
+            id: cell.id,
         }))
         .sort((a, b) => b.mass - a.mass)
         .slice(0, 5); // Limita ao Top 5

@@ -15,8 +15,9 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerMass, visibleBots
   // Função para mapear coordenadas do mundo (0 a WORLD_SIZE) para coordenadas do minimapa (0 a MINIMAP_SIZE)
   const mapToMinimap = (coord: number) => (coord / WORLD_SIZE) * MINIMAP_SIZE;
 
-  // Calcula o raio do jogador no minimapa (fixo para visibilidade)
-  const playerRadius = 4; // Reduzido ligeiramente para caber no mapa menor
+  // Raio fixo para o jogador e bots no minimapa
+  const playerRadius = 4; 
+  const botRadius = 2; // Tamanho pequeno e fixo para bots
 
   return (
     <div
@@ -31,23 +32,21 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerMass, visibleBots
         {/* Desenha o fundo do mapa (opcional, mas útil para contexto) */}
         <rect width={MINIMAP_SIZE} height={MINIMAP_SIZE} fill="#f0f0f0" />
         
-        {/* Desenha os bots visíveis (maiores que o jogador) */}
+        {/* Desenha todos os bots ativos */}
         {visibleBots.map((bot, index) => {
           const minimapX = mapToMinimap(bot.x);
           const minimapY = mapToMinimap(bot.y);
           
-          // O tamanho do bot no minimapa é proporcional à sua massa em relação ao jogador, mas limitado
-          const relativeSize = Math.min(8, (bot.mass / playerMass) * 1.5); // Ajuste de limite para o novo tamanho
-          
+          // Usa um tamanho fixo para todos os bots
           return (
             <circle
               key={index}
               cx={minimapX}
               cy={minimapY}
-              r={relativeSize}
+              r={botRadius}
               fill={bot.color}
               stroke="#000"
-              strokeWidth="0.5"
+              strokeWidth="0.2"
             />
           );
         })}
