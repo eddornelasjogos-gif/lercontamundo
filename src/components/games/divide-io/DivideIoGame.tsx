@@ -184,32 +184,34 @@ class Player extends Cell {
 const botLogic = {
     target: new Map<string, Vector | null>(),
     threat: new Map<string, Vector | null>(),
+    explorationTarget: new Map<string, Vector | null>(), // Novo alvo de exploração
     decisionTimer: new Map<string, number>(),
     
     findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
         // Calcula o centro de massa do bot
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
-        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
 
         let bestTarget: Pellet | Cell | null = null;
         let minTargetDist = Infinity;
         let closestThreat: Cell | null = null;
         let minThreatDist = Infinity;
 
-        const perceptionRadius = avgRadius * 10;
+        // Aumenta o raio de percepção para bots maiores
+        const perceptionRadius = avgRadius * 15; 
 
         for (const cell of otherCells) {
             if (cell.name === botName) continue; // Não considera as próprias células
             const dist = center.subtract(cell.position).magnitude();
             if (dist > perceptionRadius) continue;
 
-            if (cell.mass > totalMass * 1.1) {
+            if (cell.mass > totalMass * 1.15) { // 15% maior para ser ameaça
                 if (dist < minThreatDist) {
                     minThreatDist = dist;
                     closestThreat = cell;
                 }
-            } else if (totalMass > cell.mass * 1.1) {
+            } else if (totalMass > cell.mass * 1.15) { // 15% maior para ser alvo
                 if (dist < minTargetDist && Math.random() < aggression) {
                     minTargetDist = dist;
                     bestTarget = cell;
@@ -217,13 +219,15 @@ const botLogic = {
             }
         }
 
-        if (closestThreat && minThreatDist < avgRadius * 3) {
+        if (closestThreat && minThreatDist < avgRadius * 5) { // Fuga se a ameaça estiver próxima
             this.threat.set(botName, closestThreat.position);
             this.target.set(botName, null);
+            this.explorationTarget.set(botName, null);
             return;
         }
 
         if (!bestTarget) {
+            // Busca por pellets se não houver células alvo
             for (const pellet of pellets) {
                 const dist = center.subtract(pellet.position).magnitude();
                 if (dist < minTargetDist) {
@@ -232,23 +236,46 @@ const botLogic = {
                 }
             }
         }
+        
         this.threat.set(botName, null);
         this.target.set(botName, bestTarget ? bestTarget.position : null);
+        
+        // Se não houver alvo (pellet ou célula), define um novo alvo de exploração
+        if (!bestTarget) {
+            let currentExplorationTarget = this.explorationTarget.get(botName);
+            
+            // Se não houver alvo de exploração ou se o bot estiver muito perto do alvo atual, escolha um novo
+            if (!currentExplorationTarget || center.subtract(currentExplorationTarget).magnitude() < WORLD_SIZE * 0.1) {
+                // Escolhe um ponto aleatório no mapa, garantindo que não seja muito perto da borda
+                const newTarget = new Vector(
+                    Math.random() * (WORLD_SIZE * 0.8) + WORLD_SIZE * 0.1,
+                    Math.random() * (WORLD_SIZE * 0.8) + WORLD_SIZE * 0.1
+                );
+                this.explorationTarget.set(botName, newTarget);
+            }
+        } else {
+            this.explorationTarget.set(botName, null);
+        }
     },
     
-    getMovementDirection(botName: string): Vector {
+    getMovementDirection(botName: string, center: Vector): Vector {
         const threat = this.threat.get(botName);
         const target = this.target.get(botName);
+        const explorationTarget = this.explorationTarget.get(botName);
         
         if (threat) {
             // Fuga: move-se na direção oposta à ameaça
-            return new Vector(0, 0).subtract(threat).normalize();
+            return center.subtract(threat).normalize();
         } else if (target) {
-            // Caça: move-se em direção ao alvo
-            return target.subtract(new Vector(0, 0)).normalize();
+            // Caça/Comida: move-se em direção ao alvo
+            return target.subtract(center).normalize();
+        } else if (explorationTarget) {
+            // Exploração: move-se em direção ao ponto de exploração
+            return explorationTarget.subtract(center).normalize();
         }
-        // Movimento aleatório suave se não houver alvo
-        return new Vector(Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05);
+        
+        // Caso de fallback (nunca deve acontecer se a lógica de exploração estiver funcionando)
+        return new Vector(0, 0);
     }
 };
 
@@ -416,15 +443,19 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
         const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
         
+        // Calcula o centro de massa do grupo
+        const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+
         // Decisão de movimento (a cada 30 frames)
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
+            // Passa o centro de massa para a lógica de busca de alvo
             botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
             decisionTimer = 30;
         }
         botLogic.decisionTimer.set(botName, decisionTimer - 1);
 
-        const targetDirection = botLogic.getMovementDirection(botName);
+        const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
         
         cells.forEach(cell => {
             // 2a. Movimento Coordenado
@@ -441,7 +472,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             // 2b. Força de Atração (para fusão)
             if (cells.length > 1 && cell.mergeCooldown <= 0) {
                 // Calcula o centro de massa do grupo
-                const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
                 const attractionVector = centerOfMass.subtract(cell.position).normalize();
                 
                 // Aplica uma força de atração suave (ajustada pela massa)
@@ -820,7 +850,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
-      {/* O SplitButton é mantido para dispositivos móveis, mas a divisão também é acionada pelo teclado no PC */}
       <SplitButton onSplit={handleSplit} />
       <Minimap {...minimapData} />
     </div>
