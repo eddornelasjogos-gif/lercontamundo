@@ -46,19 +46,12 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
   const handleInteractionStart = (e: React.MouseEvent | React.TouchEvent) => {
     // Previne o comportamento padrão de toque (como rolagem) no início da interação
     e.preventDefault();
-    
-    // Garante que o evento de mouse não seja tratado como touch
-    if ('touches' in e && e.touches.length === 0) return;
-
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     
-    // Define a posição base onde o toque/clique começou
     const newBasePos = { x: clientX, y: clientY };
     setBasePosition(newBasePos);
     setIsDragging(true);
-    
-    // Atualiza a posição do knob imediatamente
     updateKnobPosition(clientX, clientY, newBasePos);
   };
 
@@ -76,7 +69,6 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
       // CRUCIAL: Previne a rolagem da tela durante o movimento de toque
       if ('touches' in e) {
         e.preventDefault();
-        if (e.touches.length === 0) return;
       }
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -94,7 +86,6 @@ const VirtualJoystick: React.FC<VirtualJoystickProps> = ({ onMove, className }) 
       onMouseMove={handleInteractionMove}
       onTouchStart={handleInteractionStart}
       onTouchEnd={handleInteractionEnd}
-      onTouchCancel={handleInteractionEnd} // Adicionado onTouchCancel
       onTouchMove={handleInteractionMove}
     >
       {isDragging && (
