@@ -190,8 +190,9 @@ const botLogic = {
     findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
         // Calcula o centro de massa do bot
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
+        // Corrigido: Usar botCells.length para calcular avgRadius
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
-        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
 
         let bestTarget: Pellet | Cell | null = null;
         let minTargetDist = Infinity;
@@ -850,6 +851,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
       <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
+      {/* O SplitButton é mantido para dispositivos móveis, mas a divisão também é acionada pelo teclado no PC */}
       <SplitButton onSplit={handleSplit} />
       <Minimap {...minimapData} />
     </div>
