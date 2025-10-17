@@ -1,22 +1,40 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import ColorHeader from "@/components/ColorHeader";
-import { Gamepad2, Trophy } from "lucide-react";
+import { Gamepad2, Trophy, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useDivideIoProgress } from "@/hooks/useDivideIoProgress";
 import DivideIoGame from "@/components/games/divide-io/DivideIoGame";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 type GameStatus = "menu" | "playing" | "gameover";
 type Difficulty = "easy" | "medium" | "hard";
 
 const Games = () => {
   const [gameStatus, setGameStatus] = useState<GameStatus>("menu");
-  const { highScore, lastDifficulty, setDifficulty, updateHighScore } = useDivideIoProgress();
+  const { 
+    highScore, 
+    lastDifficulty, 
+    playerName, 
+    leaderboard, 
+    setDifficulty, 
+    updateHighScore, 
+    setPlayerName,
+    updateLeaderboard
+  } = useDivideIoProgress();
+  
   const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>(lastDifficulty);
   const [lastScore, setLastScore] = useState(0);
+  const [inputName, setInputName] = useState(playerName);
 
   const handlePlay = () => {
+    if (inputName.trim() === "") {
+      alert("Por favor, digite seu nome para começar a jogar!");
+      return;
+    }
+    setPlayerName(inputName.trim());
     setDifficulty(currentDifficulty);
     setGameStatus("playing");
   };
@@ -24,6 +42,7 @@ const Games = () => {
   const handleGameOver = (score: number) => {
     setLastScore(score);
     updateHighScore(score);
+    updateLeaderboard(inputName.trim(), score);
     setGameStatus("gameover");
   };
 
@@ -36,7 +55,7 @@ const Games = () => {
   };
 
   if (gameStatus === "playing") {
-    return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} />;
+    return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} playerName={inputName.trim()} />;
   }
 
   return (
@@ -63,7 +82,23 @@ const Games = () => {
 
               <div className="flex items-center justify-center gap-2 text-lg font-semibold text-foreground">
                 <Trophy className="w-6 h-6 text-amber-500" />
-                <span>Recorde: {highScore}</span>
+                <span>Recorde Pessoal: {highScore}</span>
+              </div>
+              
+              {/* Input de Nome */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-center gap-2">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <label htmlFor="playerName" className="text-sm font-body font-semibold text-foreground">Qual é o seu nome?</label>
+                </div>
+                <Input
+                  id="playerName"
+                  value={inputName}
+                  onChange={(e) => setInputName(e.target.value)}
+                  placeholder="Digite seu nome"
+                  maxLength={15}
+                  className="max-w-xs mx-auto text-center font-display font-bold"
+                />
               </div>
 
               <div className="space-y-3">
@@ -83,7 +118,7 @@ const Games = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {gameStatus === "menu" && (
-                  <Button size="lg" className="w-full sm:w-auto" onClick={handlePlay}>
+                  <Button size="lg" className="w-full sm:w-auto" onClick={handlePlay} disabled={inputName.trim() === ""}>
                     Jogar
                   </Button>
                 )}
@@ -98,6 +133,27 @@ const Games = () => {
                   </>
                 )}
               </div>
+              
+              {/* Leaderboard */}
+              {leaderboard.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-border">
+                  <h3 className="text-2xl font-display font-bold text-foreground mb-4">Placar de Líderes (Top 10)</h3>
+                  <ScrollArea className="h-60 w-full rounded-md border p-4 bg-white/70">
+                    <div className="space-y-2">
+                      {leaderboard.map((entry, index) => (
+                        <div key={index} className={`flex justify-between items-center p-2 rounded-lg ${entry.name === playerName ? 'bg-primary/10 font-bold' : 'hover:bg-muted/50'}`}>
+                          <span className="text-sm font-body">
+                            {index + 1}. {entry.name}
+                          </span>
+                          <span className="text-sm font-display font-bold text-primary">
+                            {entry.score}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
             </div>
           </Card>
         </div>

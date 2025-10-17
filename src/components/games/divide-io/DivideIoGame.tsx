@@ -2,13 +2,15 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
 import SplitButton from './SplitButton';
-import Minimap from './Minimap'; // Importando o novo componente
+import Minimap from './Minimap';
+import { BOT_NAMES } from './BotNames'; // Importando a lista de nomes
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 interface DivideIoGameProps {
   difficulty: Difficulty;
   onGameOver: (score: number) => void;
+  playerName: string; // Novo prop
 }
 
 const difficultySettings = {
@@ -67,12 +69,14 @@ class Cell {
   public radius: number;
   public velocity: Vector;
   public mergeCooldown = 0;
+  public name: string;
 
-  constructor(x: number, y: number, public color: string, initialMass: number) {
+  constructor(x: number, y: number, public color: string, initialMass: number, name: string = 'Cell') {
     this.position = new Vector(x, y);
     this.mass = initialMass;
     this.radius = this.calculateRadius();
     this.velocity = new Vector(0, 0);
+    this.name = name;
   }
 
   calculateRadius() {
@@ -92,7 +96,7 @@ class Cell {
     this.position.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.y));
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, isPlayer: boolean = false) {
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
@@ -101,6 +105,15 @@ class Cell {
     ctx.lineWidth = Math.max(1, this.radius * 0.05);
     ctx.stroke();
     ctx.closePath();
+    
+    // Draw name
+    if (this.radius > 15) {
+        ctx.fillStyle = isPlayer ? '#fff' : '#333';
+        ctx.font = `${Math.max(12, this.radius / 3)}px Quicksand`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.name, this.position.x, this.position.y);
+    }
   }
   
   split(directionVector: Vector) {
@@ -125,7 +138,8 @@ class Cell {
             this.position.x + offset.x, 
             this.position.y + offset.y, 
             this.color, 
-            splitMass
+            splitMass,
+            this.name // Mantém o nome
         );
         
         // Apply a strong impulse to the new cell
@@ -251,7 +265,7 @@ class Pellet {
   }
 }
 
-const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) => {
+const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, playerName }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { highScore } = useDivideIoProgress();
   const animationFrameId = useRef<number>();
@@ -264,7 +278,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
   });
 
   const gameInstance = useRef({
-    playerCells: [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)],
+    playerCells: [] as Player[],
     bots: [] as Bot[],
     pellets: [] as Pellet[],
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
@@ -431,7 +445,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         
         camera.x += (centerX - camera.x) * 0.1;
         camera.y += (centerY - camera.y) * 0.1;
-        // Ajuste do zoom: 40 / avgRadius + 0.4 (era 50 / avgRadius + 0.5)
+        // Ajuste do zoom: 40 / avgRadius + 0.4
         camera.zoom = 40 / avgRadius + 0.4;
     }
 
@@ -451,6 +465,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         playerMass: playerMassForMinimap,
         visibleBots: visibleBots,
     });
+    
+    // --- Leaderboard Logic ---
+    const leaderboardData = allCells
+        .map(cell => ({
+            name: cell.name,
+            mass: cell.mass,
+            isPlayer: cell instanceof Player,
+        }))
+        .sort((a, b) => b.mass - a.mass)
+        .slice(0, 10);
 
 
     // Drawing
@@ -472,19 +496,47 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
     pellets.forEach(p => p.draw(ctx));
-    allCells.sort((a, b) => a.mass - b.mass).forEach(c => c.draw(ctx));
+    
+    // Draw cells and names
+    allCells.sort((a, b) => a.mass - b.mass).forEach(c => {
+        c.draw(ctx, c instanceof Player);
+    });
 
     ctx.restore();
 
+    // Draw UI elements (Score and Leaderboard)
     ctx.fillStyle = '#333';
     ctx.font = 'bold 20px Quicksand';
     ctx.textAlign = 'left';
     ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
     ctx.textAlign = 'right';
     ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
+    
+    // Draw Leaderboard
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillRect(canvas.width - 220, 50, 200, 20 + leaderboardData.length * 25);
+    ctx.strokeStyle = '#ccc';
+    ctx.strokeRect(canvas.width - 220, 50, 200, 20 + leaderboardData.length * 25);
+
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 16px Quicksand';
+    ctx.textAlign = 'left';
+    ctx.fillText('Top 10', canvas.width - 210, 70);
+    
+    ctx.font = '14px Quicksand';
+    leaderboardData.forEach((entry, index) => {
+        const y = 95 + index * 25;
+        ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
+        ctx.fillText(`${index + 1}. ${entry.name}`, canvas.width - 210, y);
+        
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.floor(entry.mass).toString(), canvas.width - 30, y);
+        ctx.textAlign = 'left'; // Reset for next line
+    });
+
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [difficulty, onGameOver, highScore, gameInstance]);
+  }, [difficulty, onGameOver, highScore, gameInstance, playerName]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -494,13 +546,25 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
     canvas.height = window.innerHeight;
 
     const settings = difficultySettings[difficulty];
-    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS)];
-    gameInstance.bots = Array.from({ length: settings.botCount }, () => new Bot(
-        Math.random() * WORLD_SIZE,
-        Math.random() * WORLD_SIZE,
-        getRandomColor(),
-        Math.random() * 2000 + 500
-    ));
+    
+    // Initialize Player Cell with Name
+    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS, playerName)];
+    
+    // Initialize Bots with Names
+    const availableBotNames = [...BOT_NAMES];
+    gameInstance.bots = Array.from({ length: settings.botCount }, () => {
+        const nameIndex = Math.floor(Math.random() * availableBotNames.length);
+        const name = availableBotNames.splice(nameIndex, 1)[0] || 'Bot';
+        
+        return new Bot(
+            Math.random() * WORLD_SIZE,
+            Math.random() * WORLD_SIZE,
+            getRandomColor(),
+            Math.random() * 2000 + 500,
+            name
+        );
+    });
+    
     gameInstance.pellets = Array.from({ length: PELLET_COUNT }, () => new Pellet(getRandomColor()));
     gameInstance.score = 0;
 
@@ -511,7 +575,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver }) =
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameLoop, difficulty, gameInstance]);
+  }, [gameLoop, difficulty, gameInstance, playerName]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
