@@ -20,10 +20,9 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number>();
   const lastTimeRef = useRef<number>(performance.now());
-  const gameStateRef = useRef<GameState>(initializeGameState(settings));
   
-  // Usamos um estado dummy para forçar a re-renderização do HUD e Launcher
-  const [renderKey, setRenderKey] = useState(0); 
+  // Usamos o estado React para o score e a próxima bolha para garantir que o HUD e o Launcher sejam atualizados
+  const [gameState, setGameState] = useState<GameState>(() => initializeGameState(settings));
   
   const [isSoundOn, setIsSoundOn] = useState(true);
   const { playPop, playShoot } = useGameAudio(true, 'magic-bubbles');
@@ -45,16 +44,16 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   }, [isSoundOn, playPop]);
 
   const handleLaunch = useCallback((angleRadians: number) => {
-    if (!isGameActive || gameStateRef.current.shootingBubble) return;
+    if (!isGameActive || gameState.shootingBubble) return;
     
     if (isSoundOn) {
         playShoot();
     }
     
-    const speed = gameStateRef.current.settings.initialSpeed;
-    gameStateRef.current = launchBubble(gameStateRef.current, angleRadians, speed);
-    setRenderKey(k => k + 1); // Força re-renderização do Launcher
-  }, [isGameActive, isSoundOn, playShoot]);
+    const speed = gameState.settings.initialSpeed;
+    const newState = launchBubble(gameState, angleRadians, speed);
+    setGameState(newState);
+  }, [isGameActive, isSoundOn, playShoot, gameState]);
 
   const drawBubble = (ctx: CanvasRenderingContext2D, bubble: Bubble) => {
     const colorHex = BUBBLE_COLORS[bubble.color];
@@ -80,8 +79,8 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.closePath();
   };
 
-  const drawGame = useCallback((ctx: CanvasRenderingContext2D) => {
-    const { grid, shootingBubble, fallingBubbles } = gameStateRef.current;
+  const drawGame = useCallback((ctx: CanvasRenderingContext2D, state: GameState) => {
+    const { grid, shootingBubble, fallingBubbles } = state;
     
     // 1. Limpa e Desenha o Fundo Mágico
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -101,7 +100,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.stroke();
 
     // 2. Desenha todas as bolhas fixas
-    const fixedBubbles = grid.flat().filter(b => b && b.isFixed) as Bubble[];
+    const fixedBubbles = state.grid.flat().filter(b => b && b.isFixed) as Bubble[];
     fixedBubbles.forEach(bubble => {
         if (bubble) drawBubble(ctx, bubble);
     });
@@ -126,54 +125,60 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   }, []);
 
   const gameLoop = useCallback((currentTime: number) => {
-    if (!isGameActive) return;
+    if (!isGameActive) {
+        animationFrameId.current = undefined;
+        return;
+    }
 
     const deltaTime = (currentTime - lastTimeRef.current) * GAME_SPEED_MULTIPLIER;
     lastTimeRef.current = currentTime;
 
+    // Usamos uma cópia do estado para as atualizações do loop
+    let currentState = gameState;
+
     // 1. Atualiza o estado do jogo (movimento, gravidade)
-    gameStateRef.current = updateGame(gameStateRef.current, deltaTime);
+    let newState = updateGame(currentState, deltaTime);
     
     // 2. Verifica e processa colisões
-    if (gameStateRef.current.shootingBubble) {
-        const newState = processCollision(gameStateRef.current, handlePop);
-        
-        // Se houve uma mudança de estado (colisão), forçamos a re-renderização do HUD/Launcher
-        if (newState !== gameStateRef.current) {
-            gameStateRef.current = newState;
-            setRenderKey(k => k + 1);
-        }
+    if (newState.shootingBubble) {
+        newState = processCollision(newState, handlePop);
     }
     
     // 3. Verifica condições de fim de jogo
-    if (gameStateRef.current.isGameOver) {
+    if (newState.isGameOver) {
         setIsGameActive(false);
-        onGameOver(gameStateRef.current.score);
-        updateHighScore(settings.mode, settings.difficulty, gameStateRef.current.score);
+        onGameOver(newState.score);
+        updateHighScore(settings.mode, settings.difficulty, newState.score);
         toast.error("Fim de Jogo! As bolhas caíram muito.");
+        setGameState(newState);
         return;
     }
     
-    if (gameStateRef.current.isGameWon) {
+    if (newState.isGameWon) {
         setIsGameActive(false);
-        onGameWon(gameStateRef.current.score);
-        updateHighScore(settings.mode, settings.difficulty, gameStateRef.current.score);
-        // Se for modo níveis, atualiza o nível máximo
+        onGameWon(newState.score);
+        updateHighScore(settings.mode, settings.difficulty, newState.score);
         if (settings.mode === 'levels') {
-            updateMaxLevel(settings.difficulty, settings.rows + 1); // Exemplo: próximo nível
+            updateMaxLevel(settings.difficulty, settings.rows + 1);
         }
         toast.success("Vitória Mágica! Campo limpo!");
+        setGameState(newState);
         return;
     }
+    
+    // 4. Atualiza o estado React (apenas se houver mudança significativa, como colisão ou pontuação)
+    if (newState !== currentState) {
+        setGameState(newState);
+    }
 
-    // 4. Desenha
+    // 5. Desenha
     const ctx = canvasRef.current?.getContext('2d');
     if (ctx) {
-        drawGame(ctx);
+        drawGame(ctx, newState);
     }
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [isGameActive, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel]);
+  }, [isGameActive, gameState, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel]);
 
   // --- Efeitos ---
 
@@ -185,19 +190,26 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
     
-    // Inicializa o estado do jogo novamente para garantir que as bolhas iniciais sejam geradas
-    gameStateRef.current = initializeGameState(settings);
+    // Desenho inicial para garantir que o fundo e as bolhas fixas apareçam imediatamente
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        drawGame(ctx, gameState);
+    }
     
     lastTimeRef.current = performance.now();
-    animationFrameId.current = requestAnimationFrame(gameLoop);
+    
+    // Inicia o loop de animação
+    if (isGameActive) {
+        animationFrameId.current = requestAnimationFrame(gameLoop);
+    }
 
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameLoop, settings]); // Dependência 'settings' garante reinicialização ao mudar dificuldade/modo
-  
+  }, [gameLoop, isGameActive, gameState, drawGame]); // Adicionando gameState e drawGame como dependências
+
   // Timer para Modo Tempo
   useEffect(() => {
     if (settings.mode !== 'time' || !isGameActive) return;
@@ -206,8 +218,8 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         setTimeRemaining(prev => {
             if (prev <= 1) {
                 setIsGameActive(false);
-                onGameOver(gameStateRef.current.score);
-                updateHighScore(settings.mode, settings.difficulty, gameStateRef.current.score);
+                onGameOver(gameState.score);
+                updateHighScore(settings.mode, settings.difficulty, gameState.score);
                 toast.error("Tempo esgotado!");
                 clearInterval(timer);
                 return 0;
@@ -217,17 +229,15 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [settings.mode, isGameActive, onGameOver, settings.difficulty, updateHighScore]);
+  }, [settings.mode, isGameActive, onGameOver, settings.difficulty, updateHighScore, gameState.score]);
 
-  const currentScore = gameStateRef.current.score;
-  const nextBubble = gameStateRef.current.nextBubble;
 
   return (
     <div className="relative w-full max-w-4xl mx-auto bg-white/70 rounded-xl shadow-xl overflow-hidden border-4 border-primary/50">
       
       {/* HUD */}
       <HUD 
-        score={currentScore} 
+        score={gameState.score} 
         timeRemaining={timeRemaining} 
         difficulty={settings.difficulty} 
         mode={settings.mode}
@@ -240,8 +250,8 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         <canvas ref={canvasRef} style={{ display: 'block' }} />
         
         {/* Lançador e Mira (Componente React sobre o Canvas) */}
-        {isGameActive && nextBubble && (
-            <BubbleLauncher key={renderKey} nextBubble={nextBubble} onLaunch={handleLaunch} />
+        {isGameActive && gameState.nextBubble && (
+            <BubbleLauncher nextBubble={gameState.nextBubble} onLaunch={handleLaunch} />
         )}
       </div>
       
@@ -251,9 +261,9 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         <div className="absolute inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-30">
             <div className="text-center p-8 bg-white rounded-xl shadow-2xl">
                 <h2 className="text-4xl font-display font-bold text-primary mb-4">
-                    {gameStateRef.current.isGameWon ? "Vitória!" : "Fim de Jogo"}
+                    {gameState.isGameWon ? "Vitória!" : "Fim de Jogo"}
                 </h2>
-                <p className="text-xl font-body text-foreground">Pontuação Final: {currentScore}</p>
+                <p className="text-xl font-body text-foreground">Pontuação Final: {gameState.score}</p>
                 <button 
                     onClick={() => window.location.reload()} // Simplificação: recarrega para voltar ao menu
                     className="mt-6 px-6 py-3 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-colors"
