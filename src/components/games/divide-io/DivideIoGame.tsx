@@ -537,8 +537,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   
   // Referência para a imagem do mascote
   const mascotImgRef = useRef<HTMLImageElement | null>(null);
-  // Referência para o padrão de repetição do mascote
-  const mascotPatternRef = useRef<CanvasPattern | null>(null);
 
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
@@ -597,34 +595,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     };
   }, [isPlaying, handleSplit]);
   
-  // Efeito para carregar a imagem do mascote e criar o padrão
+  // Efeito para carregar a imagem do mascote (SIMPLIFICADO)
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    
     const img = new Image();
     img.src = mascotImage;
     img.onload = () => {
       mascotImgRef.current = img;
-      
-      if (ctx) {
-        // Cria um canvas temporário para desenhar o padrão com opacidade
-        const tempCanvas = document.createElement('canvas');
-        const patternSize = 256; // Tamanho da célula do padrão
-        tempCanvas.width = patternSize;
-        tempCanvas.height = patternSize;
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        if (tempCtx) {
-            // Desenha a imagem no canvas temporário com opacidade
-            tempCtx.globalAlpha = 0.1; // Opacidade suave
-            tempCtx.drawImage(img, 0, 0, patternSize, patternSize);
-            tempCtx.globalAlpha = 1.0;
-            
-            // Cria o padrão de repetição a partir do canvas temporário
-            mascotPatternRef.current = ctx.createPattern(tempCanvas, 'repeat');
-        }
-      }
     };
   }, []);
 
@@ -1096,18 +1072,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
     
-    // 2. Desenha o padrão do mascote se estiver carregado
-    if (mascotPatternRef.current) {
-        // Para usar o padrão, precisamos de uma matriz de transformação para que ele se mova com a câmera
-        const patternMatrix = new DOMMatrix()
-            .translate(camera.x, camera.y) // Move o padrão para compensar a translação da câmera
-            .scale(1 / camera.zoom); // Escala o padrão para compensar o zoom da câmera
-            
-        ctx.fillStyle = mascotPatternRef.current;
-        ctx.fillStyle.setTransform(patternMatrix);
+    // 2. Desenha a imagem repetidamente (usando drawImage)
+    if (mascotImgRef.current) {
+        const img = mascotImgRef.current;
+        // Tamanho da célula de repetição (ajustado para ser visível e sutil)
+        const patternSize = 500; 
+        const opacity = 0.1; 
         
-        // Desenha o retângulo do mundo com o padrão
-        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+        ctx.globalAlpha = opacity;
+        
+        // Desenha a imagem repetidamente para cobrir todo o WORLD_SIZE
+        for (let x = 0; x < WORLD_SIZE; x += patternSize) {
+            for (let y = 0; y < WORLD_SIZE; y += patternSize) {
+                ctx.drawImage(img, x, y, patternSize, patternSize);
+            }
+        }
+        
+        ctx.globalAlpha = 1.0; // Volta a opacidade normal
     }
     // --- FIM: Desenho do Fundo do Mundo ---
 
