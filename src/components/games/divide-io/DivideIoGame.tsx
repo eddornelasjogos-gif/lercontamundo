@@ -30,7 +30,7 @@ const MASS_TO_RADIUS_RATIO = 4;
 
 // New constants for Virus
 const VIRUS_RADIUS = 60; 
-const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATUS; 
+const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATIO; 
 const VIRUS_COUNT = 8;
 const VIRUS_COLOR = '#FF4136'; // Red color
 const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33; // Cell must be 1.33x mass of virus to explode it
