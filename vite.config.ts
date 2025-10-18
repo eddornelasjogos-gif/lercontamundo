@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => ({
         categories: ["education", "kids", "entertainment"]
       },
       devOptions: {
-        enabled: true,
+        enabled: mode === 'development',
       },
     }),
   ].filter(Boolean),
