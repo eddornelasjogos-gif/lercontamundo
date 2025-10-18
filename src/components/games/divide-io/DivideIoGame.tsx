@@ -246,9 +246,10 @@ const botLogic = {
     explorationTarget: new Map<string, Vector | null>(), 
     decisionTimer: new Map<string, number>(),
     
-    findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
+    findBestTarget(botCells: Cell[], pellets: Pellet[], allCells: Cell[], aggression: number, botName: string) {
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
-        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+        // CORREÇÃO: Usar botCells.length em vez de cells.length
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
         let bestTarget: Pellet | Cell | null = null;
@@ -258,7 +259,7 @@ const botLogic = {
 
         const perceptionRadius = avgRadius * 15; 
 
-        for (const cell of otherCells) {
+        for (const cell of allCells) {
             if (cell.name === botName) continue; 
             const dist = center.subtract(cell.position).magnitude();
             if (dist > perceptionRadius) continue;
@@ -518,6 +519,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
+            // CORREÇÃO: Passar 'cells' (células do bot) e 'allCells' (todas as células)
             botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
             decisionTimer = 30;
         }
