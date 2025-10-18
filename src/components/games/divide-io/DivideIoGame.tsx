@@ -39,8 +39,8 @@ const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33; // Cell must be 1.33x mass o
 const MIN_VIRUS_RESPAWN_DISTANCE = VIRUS_RADIUS + 100; 
 
 // Ajuste de Impulso para Divisão
-const EJECTION_IMPULSE = 200; // Aumentado de 100 para 200
-const EJECTION_OFFSET = 15; // Aumentado para garantir separação
+const EJECTION_IMPULSE = 400; // AUMENTADO para 400
+const EJECTION_OFFSET = 30; // AUMENTADO para 30
 
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
@@ -582,7 +582,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
         
         // 1b. Força de Atração (para fusão automática)
-        if (playerCells.length > 1 && playerCell.mergeCooldown > 0) {
+        if (playerCells.length > 1) {
             // Calcula o vetor de atração em direção ao centro de massa do grupo
             const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
             
