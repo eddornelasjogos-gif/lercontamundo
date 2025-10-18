@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Bell, Play, StopCircle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Bell, Play, StopCircle, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { subscribeToPush, sendTestNotification, clearSubscriptions, NOTIFICATION_MESSAGES, getStoredSubscriptions } from "@/utils/push-notifications";
 import { useProgress } from "@/contexts/ProgressContext";
@@ -10,6 +11,7 @@ import { useProgress } from "@/contexts/ProgressContext";
 // Component to manage push notifications
 const PushNotificationManager: React.FC = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false); // Toggle para ativar/desativar
   const [isSubscribing, setIsSubscribing] = useState(false);
   const { progress } = useProgress();
   const userId = `user_${progress.xp || 0}`; // Use a unique user ID, e.g., based on progress
@@ -18,23 +20,36 @@ const PushNotificationManager: React.FC = () => {
     // Check if already subscribed
     const subscriptions = getStoredSubscriptions();
     setIsSubscribed(subscriptions.length > 0);
+    setIsEnabled(subscriptions.length > 0); // Assume enabled if subscribed
   }, []);
 
-  const handleSubscribe = async () => {
-    setIsSubscribing(true);
-    try {
-      const subscription = await subscribeToPush(userId);
-      if (subscription) {
-        setIsSubscribed(true);
-        toast.success("Inscrito para notificações push!");
-      } else {
-        toast.error("Falha ao se inscrever para notificações.");
+  const handleToggle = async (checked: boolean) => {
+    if (checked) {
+      // Enable notifications
+      setIsSubscribing(true);
+      try {
+        const subscription = await subscribeToPush(userId);
+        if (subscription) {
+          setIsSubscribed(true);
+          setIsEnabled(true);
+          toast.success("Notificações ativadas!");
+        } else {
+          toast.error("Falha ao ativar notificações.");
+          setIsEnabled(false);
+        }
+      } catch (error) {
+        console.error("Subscription error:", error);
+        toast.error("Erro ao ativar notificações.");
+        setIsEnabled(false);
+      } finally {
+        setIsSubscribing(false);
       }
-    } catch (error) {
-      console.error("Subscription error:", error);
-      toast.error("Erro ao se inscrever para notificações.");
-    } finally {
-      setIsSubscribing(false);
+    } else {
+      // Disable notifications
+      clearSubscriptions();
+      setIsSubscribed(false);
+      setIsEnabled(false);
+      toast.info("Notificações desativadas.");
     }
   };
 
@@ -45,6 +60,7 @@ const PushNotificationManager: React.FC = () => {
   const handleClearSubscriptions = () => {
     clearSubscriptions();
     setIsSubscribed(false);
+    setIsEnabled(false);
     toast.info("Assinaturas removidas.");
   };
 
@@ -55,25 +71,21 @@ const PushNotificationManager: React.FC = () => {
         Gerenciar Notificações Push
       </h3>
       
-      {!isSubscribed ? (
-        <Button 
-          onClick={handleSubscribe} 
+      <div className="flex items-center justify-between p-3 bg-white/50 rounded-lg">
+        <span className="text-sm font-medium">Ativar Notificações</span>
+        <Switch 
+          checked={isEnabled}
+          onCheckedChange={handleToggle}
           disabled={isSubscribing}
-          className="w-full"
-        >
-          {isSubscribing ? (
-            <>
-              <Play className="w-4 h-4 mr-2 animate-spin" />
-              Inscrevendo...
-            </>
-          ) : (
-            <>
-              <Bell className="w-4 h-4 mr-2" />
-              Ativar Notificações
-            </>
-          )}
-        </Button>
-      ) : (
+        />
+        {isSubscribing && (
+          <div className="ml-2">
+            <Play className="w-4 h-4 animate-spin" />
+          </div>
+        )}
+      </div>
+
+      {isEnabled ? (
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Você está inscrito para receber notificações!</p>
           
@@ -124,6 +136,24 @@ const PushNotificationManager: React.FC = () => {
             Desinscrever
           </Button>
         </div>
+      ) : (
+        <Button 
+          onClick={() => handleToggle(true)} 
+          disabled={isSubscribing}
+          className="w-full"
+        >
+          {isSubscribing ? (
+            <>
+              <Play className="w-4 h-4 mr-2 animate-spin" />
+              Ativando...
+            </>
+          ) : (
+            <>
+              <Bell className="w-4 h-4 mr-2" />
+              Ativar Notificações
+            </>
+          )}
+        </Button>
       )}
     </div>
   );

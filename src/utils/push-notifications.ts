@@ -22,6 +22,9 @@ const urlB64ToUint8Array = (base64String: string) => {
   return outputArray;
 };
 
+// Backend URL (ajuste para sua URL de produção)
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+
 // Notification messages for different events
 export const NOTIFICATION_MESSAGES = {
   dailyReward: {
@@ -101,7 +104,7 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
   return permission;
 };
 
-// Subscribe to push notifications
+// Subscribe to push notifications and send to backend
 export const subscribeToPush = async (userId: string): Promise<PushSubscription | null> => {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     toast.error("Push notifications não são suportadas neste navegador.");
@@ -125,7 +128,7 @@ export const subscribeToPush = async (userId: string): Promise<PushSubscription 
       applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
     });
 
-    // Store subscription in localStorage (in production, send to your server)
+    // Store subscription in localStorage
     const subscriptions = JSON.parse(localStorage.getItem("pushSubscriptions") || "[]");
     subscriptions.push({
       userId,
@@ -133,6 +136,25 @@ export const subscribeToPush = async (userId: string): Promise<PushSubscription 
       timestamp: Date.now()
     });
     localStorage.setItem("pushSubscriptions", JSON.stringify(subscriptions));
+
+    // Send subscription to backend
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, subscription: subscription.toJSON() })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Subscription sent to server:', result);
+    } catch (error) {
+      console.error('Failed to send subscription to server:', error);
+      toast.warning("Subscrição salva localmente, mas falha ao enviar para o servidor. Notificações podem não funcionar completamente.");
+    }
 
     toast.success("Inscrito para notificações push!");
     return subscription;
@@ -143,8 +165,8 @@ export const subscribeToPush = async (userId: string): Promise<PushSubscription 
   }
 };
 
-// Function to send a test notification (for demo purposes, simulates a push)
-export const sendTestNotification = async (messageType: keyof typeof NOTIFICATION_MESSAGES) => {
+// Function to send a test notification (for demo purposes, simulates a push or sends to backend)
+export const sendTestNotification = async (messageType: keyof typeof NOTIFICATION_MESSAGES, useBackend = false) => {
   if (!("Notification" in window)) {
     toast.error("Notificações não suportadas.");
     return;
@@ -153,44 +175,70 @@ export const sendTestNotification = async (messageType: keyof typeof NOTIFICATIO
   const permission = Notification.permission;
   if (permission === "granted") {
     const message = NOTIFICATION_MESSAGES[messageType];
-    const notification = new Notification(message.title, {
-      body: message.body,
-      icon: message.icon,
-      badge: message.badge,
-      actions: message.actions,
-      requireInteraction: true,
-      silent: false
-    });
+    
+    if (useBackend) {
+      // Send to backend for real push (production)
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/send-notification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: `user_${Date.now()}`, type: messageType })
+        });
 
-    // Handle notification clicks
-    notification.onclick = () => {
-      // Close the notification
-      notification.close();
-
-      // Focus the window
-      if (window.focus) {
-        window.focus();
+        if (response.ok) {
+          toast.success("Notificação enviada para o servidor!");
+        } else {
+          throw new Error(`Server error: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Failed to send via backend:', error);
+        toast.error("Falha ao enviar via servidor. Usando notificação local.");
+        // Fallback to local notification
+        showLocalNotification(message);
       }
-
-      // Navigate based on action
-      if (notification.tag === "view") {
-        window.location.href = "/profile";
-      } else if (notification.tag === "read") {
-        window.location.href = "/reading";
-      } else if (notification.tag === "math") {
-        window.location.href = "/math";
-      } else if (notification.tag === "profile") {
-        window.location.href = "/profile";
-      }
-    };
-
-    // Auto-close after 10 seconds
-    setTimeout(() => {
-      notification.close();
-    }, 10000);
+    } else {
+      // Local notification for dev/testing
+      showLocalNotification(message);
+    }
   } else {
     toast.warning("Ative as notificações para testar!");
   }
+};
+
+// Helper to show local notification (for dev)
+const showLocalNotification = (message: any) => {
+  const notification = new Notification(message.title, {
+    body: message.body,
+    icon: message.icon,
+    badge: message.badge,
+    actions: message.actions,
+    requireInteraction: true,
+    silent: false
+  });
+
+  // Handle notification clicks
+  notification.onclick = () => {
+    notification.close();
+    if (window.focus) {
+      window.focus();
+    }
+
+    // Navigate based on action
+    if (notification.tag === "view") {
+      window.location.href = "/profile";
+    } else if (notification.tag === "read") {
+      window.location.href = "/reading";
+    } else if (notification.tag === "math") {
+      window.location.href = "/math";
+    } else if (notification.tag === "profile") {
+      window.location.href = "/profile";
+    }
+  };
+
+  // Auto-close after 10 seconds
+  setTimeout(() => {
+    notification.close();
+  }, 10000);
 };
 
 // Get stored subscriptions

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { AchievementToast } from '@/components/AchievementToast';
 import { BookOpen, Library, Calculator, BrainCircuit, Flame } from 'lucide-react';
+import { sendTestNotification, NOTIFICATION_MESSAGES } from '@/utils/push-notifications'; // Import for notifications
 
 export interface UserProgress {
   xp: number;
@@ -86,15 +87,23 @@ export const useUserProgress = () => {
         bonusXP = newConsecutiveDays * 5;
         toast.success(`🔥 Sequência de ${newConsecutiveDays} dias! +${bonusXP} XP bônus!`);
 
+        // Trigger streak notification
+        if (newConsecutiveDays >= 3 && !newAchievements.includes('streak-3')) {
+          sendTestNotification('dailyReward'); // Or send to server in production
+        }
+
         STREAK_ACHIEVEMENTS.forEach(ach => {
             if (newConsecutiveDays >= parseInt(ach.id.split('-')[1]) && !newAchievements.includes(ach.id)) {
                 newAchievements.push(ach.id);
                 toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
+                sendTestNotification('achievementUnlocked'); // Trigger achievement notification
             }
         });
 
       } else {
         newConsecutiveDays = 1;
+        // Trigger reminder notification if streak was broken
+        sendTestNotification('reminder');
       }
 
       const newXP = prev.xp + DAILY_REWARD_XP + bonusXP;
@@ -102,6 +111,7 @@ export const useUserProgress = () => {
       
       if (prev.lastLoginDate !== yesterdayStr) {
         toast.success(`🎁 Recompensa diária! Você ganhou ${DAILY_REWARD_XP} XP por voltar!`);
+        sendTestNotification('dailyReward'); // Trigger daily reward notification
       }
 
       return {
@@ -138,8 +148,14 @@ export const useUserProgress = () => {
         if (newStoriesRead >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
           toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
+          sendTestNotification('achievementUnlocked'); // Trigger achievement notification
         }
       });
+
+      // Trigger new story notification if first story completed
+      if (newStoriesRead === 1) {
+        sendTestNotification('newStory');
+      }
       
       return {
         ...prev,
@@ -166,8 +182,14 @@ export const useUserProgress = () => {
         if (newExercisesCompleted >= ach.required && !newAchievements.includes(ach.id)) {
           newAchievements.push(ach.id);
           toast.custom(() => <AchievementToast icon={ach.icon} title={ach.title} />, { duration: 5000 });
+          sendTestNotification('achievementUnlocked'); // Trigger achievement notification
         }
       });
+
+      // Trigger math challenge notification every 5 exercises
+      if (newExercisesCompleted % 5 === 0) {
+        sendTestNotification('mathChallenge');
+      }
       
       return {
         ...prev,
@@ -182,6 +204,8 @@ export const useUserProgress = () => {
 
   const resetProgress = () => {
     setProgress(DEFAULT_PROGRESS);
+    // Clear push subscriptions on reset
+    clearSubscriptions();
   };
 
   return {
