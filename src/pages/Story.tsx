@@ -91,10 +91,10 @@ import tomSawyerImage from "@/assets/tom-sawyer.png"; // CORRIGIDO: Importação
 import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png"; 
 import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png"; 
 import domQuixoteImage from "@/assets/dom-quixote.png"; 
-import mobyDickImage from "@/assets/moby-dick.m4a"; 
-import guerraEPazImage from "@/assets/guerra-e-paz.m4a"; 
-import irmaosKaramazovImage from "@/assets/irmaos-karamazov.m4a"; 
-import crimeECastigoImage from "@/assets/crime-e-castigo.m4a"; 
+import mobyDickImage from "@/assets/moby-dick.png"; // CORRIGIDO: Extensão para .png
+import guerraEPazImage from "@/assets/guerra-e-paz.png"; // CORRIGIDO: Extensão para .png
+import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png"; // CORRIGIDO: Extensão para .png
+import crimeECastigoImage from "@/assets/crime-e-castigo.png"; // CORRIGIDO: Extensão para .png
 import brancaDeNeveImage from "@/assets/branca-de-neve.png"; // Adicionando a importação que estava faltando
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
