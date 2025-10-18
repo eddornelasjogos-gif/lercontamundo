@@ -39,7 +39,8 @@ import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
 import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a";
 import robinsonCrusoeAudio from "@/assets/audio/robinson-crusoe.m4a";
-import ilhaDoTesouroAudio from "@/assets/audio/ilha-do-tesouro.m4a"; // NOVO ÁUDIO IMPORTADO
+import ilhaDoTesouroAudio from "@/assets/audio/ilha-do-tesouro.m4a";
+import medicoMonstroAudio from "@/assets/audio/medico-monstro.m4a"; // NOVO ÁUDIO IMPORTADO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -482,7 +483,7 @@ const STORY_CONTENT: Record<
     category: "Clássicos",
     xp: 180,
     text:
-      "Alonso Quixano, um fidalgo que adorava ler livros de cavalaria, decidiu tornar-se cavaleiro andante com o nome de Dom Quixote. Montado em Rocinante e com uma bacia de barbeiro como elmo, partiu pelo campo em busca de aventuras, levando no coração a ideia de defender os fracos e honrar sua dama, Dulcineia.\n\nAcompanhado de Sancho Pança, um vizinho leal e divertido, Quixote enfrentou “gigantes” que eram moinhos de vento, “exércitos” que eram rebanhos e “castelos” que eram estalagens. Entre confusões e boas intenções, Sancho tentava equilibrar fantasia e realidade, aprendendo sobre amizade e coragem no caminho.\n\nDom Quixote retornou à sua aldeia, cansado e doente. Recuperou a lucidez, reconheceu seus enganos e se despediu das aventuras com serenidade. Sua história lembra que a imaginação pode nos levar longe, mas é a prudência e o cuidado com os outros que nos mantêm no caminho certo.",
+      "Alonso Quixano, um fidalgo que adorava ler livros de cavalaria, decidiu tornar-se cavaleiro andante com o nome de Dom Quixote. Montado em Rocinante e com uma bacia de barbeiro como elmo, partiu pelo campo em busca de aventuras, levando no coração a ideia de defender os fracos e honrar sua dama, Dulcineia.\n\nAcompanhado de Sancho Pança, um vizinho leal e divertido, Quixote enfrentou “gigantes” que eram moinos de vento, “exércitos” que eram rebanhos e “castelos” que eram estalagens. Entre confusões e boas intenções, Sancho tentava equilibrar fantasia e realidade, aprendendo sobre amizade e coragem no caminho.\n\nDom Quixote retornou à sua aldeia, cansado e doente. Recuperou a lucidez, reconheceu seus enganos e se despediu das aventuras com serenidade. Sua história lembra que a imaginação pode nos levar longe, mas é a prudência e o cuidado com os outros que nos mantêm no caminho certo.",
   },
 
   402: {
@@ -1018,6 +1019,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={ilhaDoTesouroAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 305 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={medicoMonstroAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
