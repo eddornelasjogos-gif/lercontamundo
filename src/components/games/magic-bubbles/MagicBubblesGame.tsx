@@ -21,7 +21,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   const animationFrameId = useRef<number>();
   const lastTimeRef = useRef<number>(performance.now());
   
-  // Usamos o estado React para o score e a próxima bolha para garantir que o HUD e o Launcher sejam atualizados
+  // Estado do jogo (usado para renderizar HUD/Launcher e inicialização)
   const [gameState, setGameState] = useState<GameState>(() => initializeGameState(settings));
   
   const [isSoundOn, setIsSoundOn] = useState(true);
@@ -31,29 +31,34 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   const [timeRemaining, setTimeRemaining] = useState(settings.timeLimitSeconds);
   const [isGameActive, setIsGameActive] = useState(true);
 
-  // --- Game Loop Functions ---
+  // Ref para manter o estado atualizado dentro do loop sem recriar o loop
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  // --- Funções de Desenho e Lógica ---
   
   const handlePop = useCallback((count: number) => {
     if (isSoundOn) {
         playPop();
     }
-    // Feedback visual de partículas (simulado)
     if (count > 3) {
         toast.info(`Combo! +${count * 10} pontos!`, { duration: 1500 });
     }
   }, [isSoundOn, playPop]);
 
   const handleLaunch = useCallback((angleRadians: number) => {
-    if (!isGameActive || gameState.shootingBubble) return;
+    if (!isGameActive || gameStateRef.current.shootingBubble) return;
     
     if (isSoundOn) {
         playShoot();
     }
     
-    const speed = gameState.settings.initialSpeed;
-    const newState = launchBubble(gameState, angleRadians, speed);
+    const speed = gameStateRef.current.settings.initialSpeed;
+    const newState = launchBubble(gameStateRef.current, angleRadians, speed);
     setGameState(newState);
-  }, [isGameActive, isSoundOn, playShoot, gameState]);
+  }, [isGameActive, isSoundOn, playShoot]);
 
   const drawBubble = (ctx: CanvasRenderingContext2D, bubble: Bubble) => {
     const colorHex = BUBBLE_COLORS[bubble.color];
@@ -79,6 +84,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.closePath();
   };
 
+  // Função de desenho principal (não depende do estado React, recebe o estado como argumento)
   const drawGame = useCallback((ctx: CanvasRenderingContext2D, state: GameState) => {
     const { grid, shootingBubble, fallingBubbles } = state;
     
@@ -100,7 +106,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.stroke();
 
     // 2. Desenha todas as bolhas fixas
-    const fixedBubbles = state.grid.flat().filter(b => b && b.isFixed) as Bubble[];
+    const fixedBubbles = grid.flat().filter(b => b && b.isFixed) as Bubble[];
     fixedBubbles.forEach(bubble => {
         if (bubble) drawBubble(ctx, bubble);
     });
@@ -122,8 +128,9 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.fill();
     ctx.closePath();
 
-  }, []);
+  }, []); // drawGame agora é estável
 
+  // --- Game Loop ---
   const gameLoop = useCallback((currentTime: number) => {
     if (!isGameActive) {
         animationFrameId.current = undefined;
@@ -133,8 +140,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     const deltaTime = (currentTime - lastTimeRef.current) * GAME_SPEED_MULTIPLIER;
     lastTimeRef.current = currentTime;
 
-    // Usamos uma cópia do estado para as atualizações do loop
-    let currentState = gameState;
+    let currentState = gameStateRef.current;
 
     // 1. Atualiza o estado do jogo (movimento, gravidade)
     let newState = updateGame(currentState, deltaTime);
@@ -176,9 +182,12 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     if (ctx) {
         drawGame(ctx, newState);
     }
+    
+    // 6. Atualiza a referência do estado para o próximo frame
+    gameStateRef.current = newState;
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [isGameActive, gameState, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel]);
+  }, [isGameActive, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel, setGameState]);
 
   // --- Efeitos ---
 
@@ -190,10 +199,14 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
     
-    // Desenho inicial para garantir que o fundo e as bolhas fixas apareçam imediatamente
+    // Garante que o estado inicial seja definido e desenhado
+    const initialGameState = initializeGameState(settings);
+    setGameState(initialGameState);
+    gameStateRef.current = initialGameState;
+    
     const ctx = canvas.getContext('2d');
     if (ctx) {
-        drawGame(ctx, gameState);
+        drawGame(ctx, initialGameState);
     }
     
     lastTimeRef.current = performance.now();
@@ -208,7 +221,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameLoop, isGameActive, gameState, drawGame]); // Adicionando gameState e drawGame como dependências
+  }, [gameLoop, settings, isGameActive, drawGame]);
 
   // Timer para Modo Tempo
   useEffect(() => {
@@ -218,8 +231,8 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         setTimeRemaining(prev => {
             if (prev <= 1) {
                 setIsGameActive(false);
-                onGameOver(gameState.score);
-                updateHighScore(settings.mode, settings.difficulty, gameState.score);
+                onGameOver(gameStateRef.current.score);
+                updateHighScore(settings.mode, settings.difficulty, gameStateRef.current.score);
                 toast.error("Tempo esgotado!");
                 clearInterval(timer);
                 return 0;
@@ -229,7 +242,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [settings.mode, isGameActive, onGameOver, settings.difficulty, updateHighScore, gameState.score]);
+  }, [settings.mode, isGameActive, onGameOver, settings.difficulty, updateHighScore]);
 
 
   return (
