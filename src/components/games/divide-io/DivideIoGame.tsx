@@ -78,7 +78,7 @@ class Vector {
   }
 }
 
-// Ref para a direção de movimento (usada por Joystick ou Mouse)
+// Ref para a direção de movimento (usada por Joystick, Mouse ou Teclado)
 const movementDirectionRef: { current: { x: number; y: number } } = { current: { x: 0, y: 0 } };
 
 class Cell {
@@ -532,25 +532,30 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
     score: 0,
     maxScore: 0, 
-    mousePosition: new Vector(0, 0), // NOVO: Posição do mouse na tela
+    mousePosition: new Vector(0, 0), // Posição do mouse na tela
   }).current;
+  
+  // NEW REFS FOR KEYBOARD CONTROL
+  const keyboardDirectionRef = useRef({ x: 0, y: 0 });
+  const isKeyboardActiveRef = useRef(false);
 
   // --- Handlers de Movimento ---
   
   // Usado pelo VirtualJoystick (Mobile)
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
     movementDirectionRef.current = direction;
+    isKeyboardActiveRef.current = false; // Joystick takes precedence over keyboard/mouse state
   }, []);
   
   // Usado pelo Mouse (Desktop)
   const handleMouseMove = useCallback((event: MouseEvent) => {
-    if (!canvasRef.current) return;
+    // Se o teclado estiver ativo, ignoramos o mouse para movimento
+    if (!canvasRef.current || isKeyboardActiveRef.current) return; 
     
     // Armazena a posição do mouse na tela
     gameInstance.mousePosition.x = event.clientX;
     gameInstance.mousePosition.y = event.clientY;
     
-    // A direção de movimento será calculada no gameLoop
     // A direção é do centro da tela para o mouse
     const canvas = canvasRef.current;
     const centerX = canvas.width / 2;
@@ -588,7 +593,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     gameInstance.playerCells.push(...newCells);
   }, [gameInstance, playSplit]);
 
-  // Efeito para escutar a tecla Espaço (PC) e o movimento do mouse
+  // Efeito para escutar a tecla Espaço (PC) e o movimento do mouse/teclado
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -598,9 +603,100 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         event.preventDefault();
         handleSplit();
       }
+      
+      if (isMobile) return; // Keyboard movement only for desktop
+
+      let x = keyboardDirectionRef.current.x;
+      let y = keyboardDirectionRef.current.y;
+      let changed = false;
+
+      switch (event.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          if (y !== -1) { y = -1; changed = true; }
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          if (y !== 1) { y = 1; changed = true; }
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          if (x !== -1) { x = -1; changed = true; }
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          if (x !== 1) { x = 1; changed = true; }
+          break;
+      }
+      
+      if (changed) {
+          keyboardDirectionRef.current = { x, y };
+          
+          // Normalize the combined keyboard vector (e.g., diagonal movement)
+          const magnitude = Math.sqrt(x * x + y * y);
+          if (magnitude > 0) {
+              movementDirectionRef.current = { x: x / magnitude, y: y / magnitude };
+              isKeyboardActiveRef.current = true;
+          } else {
+              // Should only happen if keys cancel each other out (e.g., pressing up and down simultaneously)
+              movementDirectionRef.current = { x: 0, y: 0 };
+              isKeyboardActiveRef.current = false;
+          }
+      }
+    };
+    
+    const handleKeyUp = (event: KeyboardEvent) => {
+        if (isMobile) return; // Keyboard movement only for desktop
+
+        let x = keyboardDirectionRef.current.x;
+        let y = keyboardDirectionRef.current.y;
+        let changed = false;
+
+        switch (event.key) {
+            case 'ArrowUp':
+            case 'w':
+            case 'W':
+                if (y === -1) { y = 0; changed = true; }
+                break;
+            case 'ArrowDown':
+            case 's':
+            case 'S':
+                if (y === 1) { y = 0; changed = true; }
+                break;
+            case 'ArrowLeft':
+            case 'a':
+            case 'A':
+                if (x === -1) { x = 0; changed = true; }
+                break;
+            case 'ArrowRight':
+            case 'd':
+            case 'D':
+                if (x === 1) { x = 0; changed = true; }
+                break;
+        }
+        
+        if (changed) {
+            keyboardDirectionRef.current = { x, y };
+            
+            const magnitude = Math.sqrt(x * x + y * y);
+            if (magnitude > 0) {
+                // If other keys are still pressed (e.g., released 'left' but still holding 'up')
+                movementDirectionRef.current = { x: x / magnitude, y: y / magnitude };
+                isKeyboardActiveRef.current = true;
+            } else {
+                // Keyboard input stopped. Reset movement direction and flag.
+                movementDirectionRef.current = { x: 0, y: 0 };
+                isKeyboardActiveRef.current = false;
+            }
+        }
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     
     if (!isMobile) {
         // Adiciona listener de mouse APENAS no desktop
@@ -612,19 +708,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [isPlaying, handleSplit, isMobile, handleMouseMove]);
-  
-  // Efeito para carregar a imagem de fundo
-  useEffect(() => {
-    const img = new Image();
-    img.src = heroBgImage;
-    img.onload = () => {
-      bgImgRef.current = img;
-    };
-  }, []);
-
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
