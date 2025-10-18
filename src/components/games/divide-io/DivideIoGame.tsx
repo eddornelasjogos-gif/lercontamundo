@@ -5,7 +5,7 @@ import SplitButton from './SplitButton';
 import Minimap from './Minimap';
 import { BOT_NAMES } from './BotNames';
 import { useGameAudio } from '@/hooks/useGameAudio'; // Importando o hook de áudio
-import mascotImage from '@/assets/mascot-owl.png'; // Importando a imagem do mascote
+import heroBgImage from '@/assets/hero-bg.jpg'; // Importando a imagem de fundo do herói
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -535,8 +535,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const initialBotCount = difficultySettings[difficulty].botCount;
   const botNamesRef = useRef<string[]>([]);
   
-  // Referência para a imagem do mascote
-  const mascotImgRef = useRef<HTMLImageElement | null>(null);
+  // Referência para a imagem de fundo
+  const bgImgRef = useRef<HTMLImageElement | null>(null);
 
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
@@ -595,12 +595,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     };
   }, [isPlaying, handleSplit]);
   
-  // Efeito para carregar a imagem do mascote (SIMPLIFICADO)
+  // Efeito para carregar a imagem de fundo
   useEffect(() => {
     const img = new Image();
-    img.src = mascotImage;
+    img.src = heroBgImage; // Usando heroBgImage
     img.onload = () => {
-      mascotImgRef.current = img;
+      bgImgRef.current = img;
     };
   }, []);
 
@@ -1066,27 +1066,21 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
     
-    // --- Desenho do Fundo do Mundo (Cor e Padrão) ---
+    // --- Desenho do Fundo do Mundo (Imagem Única) ---
     
-    // 1. Desenha o fundo branco do mundo
+    // 1. Desenha o fundo branco do mundo (como fallback)
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
     
-    // 2. Desenha a imagem repetidamente (usando drawImage)
-    if (mascotImgRef.current) {
-        const img = mascotImgRef.current;
-        // Tamanho da célula de repetição (ajustado para ser visível e sutil)
-        const patternSize = 300; 
-        const opacity = 0.4; // AUMENTADO para 0.4
+    // 2. Desenha a imagem de fundo esticada
+    if (bgImgRef.current) {
+        const img = bgImgRef.current;
+        const opacity = 0.4; // Mantendo a opacidade ajustada
         
         ctx.globalAlpha = opacity;
         
-        // Desenha a imagem repetidamente para cobrir todo o WORLD_SIZE
-        for (let x = 0; x < WORLD_SIZE; x += patternSize) {
-            for (let y = 0; y < WORLD_SIZE; y += patternSize) {
-                ctx.drawImage(img, x, y, patternSize, patternSize);
-            }
-        }
+        // Desenha a imagem uma única vez, cobrindo todo o WORLD_SIZE
+        ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
         
         ctx.globalAlpha = 1.0; // Volta a opacidade normal
     }
@@ -1208,7 +1202,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     nextCellId = 1; 
     
     // Massa inicial reduzida pela metade
-    const initialPlayerMass = MIN_CELL_MASS / 2; 
+    const initialPlayerMass = MIN_CELL_RADIUS * MIN_CELL_RADIUS / 2; 
     
     // Initialize Player Cell with Name
     gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', initialPlayerMass, playerName)];
