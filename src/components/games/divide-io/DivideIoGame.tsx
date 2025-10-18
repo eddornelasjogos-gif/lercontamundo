@@ -593,9 +593,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             // Calcula o vetor de atração em direção ao centro de massa do grupo
             const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
             
-            // Aplica uma força de atração suave (ajustada pela massa)
-            // A força é mais forte para células menores e mais fraca para células maiores
-            const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius); 
+            // Calcula o fator de atração (0 no início do cooldown, 1 no final)
+            const mergeProgress = 1 - (playerCell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+            const attractionFactor = Math.max(0, mergeProgress); // Garante que não seja negativo
+            
+            // Aplica uma força de atração suave (ajustada pela massa e pelo fator de atração)
+            const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius) * attractionFactor; 
             playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
         }
     });
@@ -648,8 +651,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 // Calcula o centro de massa do grupo
                 const attractionVector = centerOfMass.subtract(cell.position).normalize();
                 
-                // Aplica uma força de atração suave (ajustada pela massa)
-                const attractionForce = 0.5 * (avgRadius / cell.radius); 
+                // Calcula o fator de atração (0 no início do cooldown, 1 no final)
+                const mergeProgress = 1 - (cell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+                const attractionFactor = Math.max(0, mergeProgress); 
+                
+                // Aplica uma força de atração suave (ajustada pela massa e pelo fator de atração)
+                const attractionForce = 0.5 * (avgRadius / cell.radius) * attractionFactor; 
                 cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
             }
             
@@ -673,7 +680,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 // Bots podem se fundir a qualquer momento se o cooldown for 0
                 if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
                     const dist = cellA.position.subtract(cellB.position).magnitude();
-                    // Fusão ocorre quando a distância é menor que a soma dos raios (ou ligeiramente menos)
+                    // Fusão ocorre quando a distância é menor que a soma dos raios
                     if (dist < cellA.radius + cellB.radius) { 
                         const bigger = cellA.mass > cellB.mass ? cellA : cellB;
                         const smaller = cellA.mass > cellB.mass ? cellB : cellA;
@@ -711,7 +718,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         // A fusão só ocorre se o cooldown for 0 em AMBAS as células
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          // Fusão ocorre quando a distância é menor que a soma dos raios (ou ligeiramente menos)
+          // Fusão ocorre quando a distância é menor que a soma dos raios
           if (dist < cellA.radius + cellB.radius) { 
             const bigger = cellA.mass > cellB.mass ? cellA : cellB;
             const smaller = cellA.mass > cellB.mass ? cellB : cellA;
