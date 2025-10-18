@@ -22,6 +22,9 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   const lastTimeRef = useRef<number>(performance.now());
   const gameStateRef = useRef<GameState>(initializeGameState(settings));
   
+  // Usamos um estado dummy para forçar a re-renderização do HUD e Launcher
+  const [renderKey, setRenderKey] = useState(0); 
+  
   const [isSoundOn, setIsSoundOn] = useState(true);
   const { playPop, playShoot } = useGameAudio(true, 'magic-bubbles');
   const { updateHighScore, updateMaxLevel } = useMagicBubblesProgress();
@@ -50,6 +53,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     
     const speed = gameStateRef.current.settings.initialSpeed;
     gameStateRef.current = launchBubble(gameStateRef.current, angleRadians, speed);
+    setRenderKey(k => k + 1); // Força re-renderização do Launcher
   }, [isGameActive, isSoundOn, playShoot]);
 
   const drawBubble = (ctx: CanvasRenderingContext2D, bubble: Bubble) => {
@@ -77,9 +81,10 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   };
 
   const drawGame = useCallback((ctx: CanvasRenderingContext2D) => {
-    const { grid, shootingBubble } = gameStateRef.current;
+    const { grid, shootingBubble, fallingBubbles } = gameStateRef.current;
     
-    // 1. Desenha o Fundo Mágico
+    // 1. Limpa e Desenha o Fundo Mágico
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     const backgroundGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
     backgroundGradient.addColorStop(0, '#c4b5fd'); // Roxo claro
     backgroundGradient.addColorStop(1, '#93c5fd'); // Azul claro
@@ -95,19 +100,23 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.lineTo(CANVAS_WIDTH, gameOverThreshold);
     ctx.stroke();
 
-    // Desenha todas as bolhas ativas (fixas e caindo)
-    const allBubbles = grid.flat().filter(b => b) as Bubble[];
-    
-    allBubbles.forEach(bubble => {
+    // 2. Desenha todas as bolhas fixas
+    const fixedBubbles = grid.flat().filter(b => b && b.isFixed) as Bubble[];
+    fixedBubbles.forEach(bubble => {
         if (bubble) drawBubble(ctx, bubble);
     });
     
-    // Desenha bolha de tiro
+    // 3. Desenha bolhas caindo
+    fallingBubbles.forEach(bubble => {
+        drawBubble(ctx, bubble);
+    });
+    
+    // 4. Desenha bolha de tiro
     if (shootingBubble) {
         drawBubble(ctx, shootingBubble);
     }
     
-    // Desenha o lançador (apenas um círculo de base)
+    // 5. Desenha o lançador (apenas um círculo de base)
     ctx.beginPath();
     ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT, BUBBLE_RADIUS * 1.5, Math.PI, 2 * Math.PI);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
@@ -127,7 +136,13 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     
     // 2. Verifica e processa colisões
     if (gameStateRef.current.shootingBubble) {
-        gameStateRef.current = processCollision(gameStateRef.current, handlePop);
+        const newState = processCollision(gameStateRef.current, handlePop);
+        
+        // Se houve uma mudança de estado (colisão), forçamos a re-renderização do HUD/Launcher
+        if (newState !== gameStateRef.current) {
+            gameStateRef.current = newState;
+            setRenderKey(k => k + 1);
+        }
     }
     
     // 3. Verifica condições de fim de jogo
@@ -170,6 +185,9 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
     
+    // Inicializa o estado do jogo novamente para garantir que as bolhas iniciais sejam geradas
+    gameStateRef.current = initializeGameState(settings);
+    
     lastTimeRef.current = performance.now();
     animationFrameId.current = requestAnimationFrame(gameLoop);
 
@@ -178,7 +196,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameLoop]);
+  }, [gameLoop, settings]); // Dependência 'settings' garante reinicialização ao mudar dificuldade/modo
   
   // Timer para Modo Tempo
   useEffect(() => {
@@ -223,7 +241,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
         
         {/* Lançador e Mira (Componente React sobre o Canvas) */}
         {isGameActive && nextBubble && (
-            <BubbleLauncher nextBubble={nextBubble} onLaunch={handleLaunch} />
+            <BubbleLauncher key={renderKey} nextBubble={nextBubble} onLaunch={handleLaunch} />
         )}
       </div>
       

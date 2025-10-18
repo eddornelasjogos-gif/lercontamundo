@@ -41,6 +41,7 @@ export interface GameState {
     isGameOver: boolean;
     isGameWon: boolean;
     settings: GameSettings;
+    fallingBubbles: Bubble[]; // Adicionado para gerenciar bolhas caindo
 }
 
 const getRandomColor = (colorCount: number): BubbleColor => {
@@ -90,6 +91,7 @@ export const initializeGameState = (settings: GameSettings): GameState => {
         isGameOver: false,
         isGameWon: false,
         settings,
+        fallingBubbles: [], // Inicializa vazio
     };
 };
 
@@ -233,17 +235,11 @@ const finalizeShot = (state: GameState, col: number, row: number, onPop: (count:
 
     // Garante que a posição de fixação esteja dentro dos limites e vazia
     if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS || grid[row][col]) {
-        // Se a posição estiver ocupada ou fora dos limites, tenta encontrar a célula vazia mais próxima
         
-        // Se a bolha colidiu com o topo (row=0), mas a célula [0][col] está ocupada,
-        // o jogo deve empurrar a grade para baixo ou considerar Game Over.
         if (row === 0 && grid[row][col]) {
             return { ...state, isGameOver: true, shootingBubble: null };
         }
         
-        // Para colisões na grade, se a célula calculada estiver ocupada,
-        // vamos apenas usar a célula do vizinho que causou a colisão (simplificação extrema)
-        // Para evitar bugs complexos de grade, vamos apenas retornar se a célula calculada estiver ocupada.
         if (grid[row][col]) {
              // Se a célula calculada estiver ocupada, tentamos a célula acima
              if (row > 0 && !grid[row - 1][col]) {
@@ -269,6 +265,7 @@ const finalizeShot = (state: GameState, col: number, row: number, onPop: (count:
     const matches = findConnectedBubbles(grid, shootingBubble);
     let newScore = state.score;
     let bubblesPopped = 0;
+    let newFallingBubbles = [...state.fallingBubbles];
 
     if (matches.length >= 3) {
         matches.forEach(b => {
@@ -289,12 +286,13 @@ const finalizeShot = (state: GameState, col: number, row: number, onPop: (count:
                 b.isFixed = false;
                 b.velocity = { x: Math.random() * 4 - 2, y: Math.random() * 4 + 2 };
                 newScore += 5; // Bônus por queda
+                newFallingBubbles.push(b);
             }
         });
     }
     
     // 3. Verifica condição de vitória (grade limpa)
-    const isGameWon = grid.flat().every(b => b === null || b.isFalling);
+    const isGameWon = grid.flat().every(b => b === null);
 
     // 4. Prepara a próxima bolha
     const nextBubbleColor = getRandomColor(settings.colorCount);
@@ -307,6 +305,7 @@ const finalizeShot = (state: GameState, col: number, row: number, onPop: (count:
         nextBubble,
         score: newScore,
         isGameWon,
+        fallingBubbles: newFallingBubbles,
     };
 };
 
@@ -314,6 +313,7 @@ const finalizeShot = (state: GameState, col: number, row: number, onPop: (count:
 
 export const updateGame = (state: GameState, deltaTime: number): GameState => {
     const { shootingBubble, grid } = state;
+    let newFallingBubbles = [...state.fallingBubbles];
     
     // 1. Atualiza bolha de tiro
     if (shootingBubble) {
@@ -330,43 +330,35 @@ export const updateGame = (state: GameState, deltaTime: number): GameState => {
     }
     
     // 2. Atualiza bolhas caindo
-    const fallingBubbles = grid.flat().filter(b => b && b.isFalling) as Bubble[];
+    const remainingFallingBubbles: Bubble[] = [];
     
-    fallingBubbles.forEach(b => {
+    newFallingBubbles.forEach(b => {
         // Aplica gravidade
         b.velocity.y += 0.5; 
         b.x += b.velocity.x * deltaTime;
         b.y += b.velocity.y * deltaTime;
+        
+        // Mantém apenas as bolhas que ainda estão na tela
+        if (b.y < CANVAS_HEIGHT + BUBBLE_RADIUS) {
+            remainingFallingBubbles.push(b);
+        }
     });
     
-    // Remove bolhas que caíram para fora da tela
+    // 3. Verifica Game Over (bolhas fixas atingem o limite inferior)
     const activeBubbles = grid.flat().filter(b => b && !b.isFalling) as Bubble[];
-    // Filtra as bolhas caindo que ainda estão visíveis (para a próxima renderização)
-    const remainingFallingBubbles = fallingBubbles.filter(b => b.y < CANVAS_HEIGHT + BUBBLE_RADIUS);
     
-    // Reconstroi a grade (apenas para manter a tipagem, mas as bolhas caindo não estão mais na grade)
-    const newGrid = state.grid.map(row => row.map(cell => {
-        if (cell && cell.isFalling) return null;
-        return cell;
-    }));
-    
-    // 3. Verifica Game Over (bolhas atingem o limite inferior)
     const BUBBLE_DIAMETER = BUBBLE_RADIUS * 2;
     const gameOverThreshold = CANVAS_HEIGHT - BUBBLE_DIAMETER * 2; // Linha de Game Over
     
     const hitThreshold = activeBubbles.some(b => b.y > gameOverThreshold);
     
     if (hitThreshold) {
-        return { ...state, isGameOver: true };
+        return { ...state, isGameOver: true, fallingBubbles: remainingFallingBubbles };
     }
 
     return { 
         ...state, 
-        grid: newGrid,
-        // Nota: As bolhas caindo precisam ser gerenciadas fora da grade para renderização,
-        // mas como o estado é passado por referência no React, precisamos garantir que
-        // a lista de bolhas caindo seja atualizada corretamente.
-        // Para simplificar, vamos garantir que a renderização as pegue do grid.flat()
+        fallingBubbles: remainingFallingBubbles,
     };
 };
 
