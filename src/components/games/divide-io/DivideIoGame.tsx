@@ -15,9 +15,9 @@ interface DivideIoGameProps {
 }
 
 const difficultySettings = {
-  easy: { botCount: 15, botAggression: 0.2, botSplitChance: 0.001 },
-  medium: { botCount: 25, botAggression: 0.5, botSplitChance: 0.002 },
-  hard: { botCount: 40, botAggression: 0.8, botSplitChance: 0.005 },
+  easy: { botCount: 18, botAggression: 0.2, botSplitChance: 0.001 },
+  medium: { botCount: 18, botAggression: 0.5, botSplitChance: 0.002 },
+  hard: { botCount: 18, botAggression: 0.8, botSplitChance: 0.005 },
 };
 
 const WORLD_SIZE = 3000;
