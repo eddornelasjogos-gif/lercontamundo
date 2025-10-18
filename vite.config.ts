@@ -49,6 +49,18 @@ export default defineConfig(({ mode }) => ({
         description: "Um mundo de diversão, aprendizado e alegria para as crianças no Planeta Sorrisos!",
         dir: "ltr",
         prefer_related_applications: false,
+        related_applications: [
+          {
+            platform: "play",
+            url: "https://play.google.com/store/apps/details?id=com.example.app",
+            id: "com.example.app" // Substitua pelo ID real do seu app Android
+          },
+          {
+            platform: "itunes",
+            url: "https://itunes.apple.com/app/example-app/id123456789"
+          }
+        ],
+        iarc_rating_id: "9a5e3e64-4d4a-4e3a-8e6f-5b9d6c8d7a4f", // Substitua pelo ID IARC real
         icons: [
           {
             src: "/icons/mascot-panda-192.png",
