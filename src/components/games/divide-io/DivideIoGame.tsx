@@ -583,8 +583,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
-        // Aumenta o numerador de 50 para 100 para dobrar a velocidade inicial
-        const maxSpeed = 100 / (playerCell.radius * 0.5 + 10); 
+        // NOVO CÁLCULO DE VELOCIDADE MÁXIMA: Mais lento no início e desaceleração mais suave
+        const maxSpeed = 50 / (playerCell.radius * 0.2 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
         }
@@ -642,7 +642,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             cell.velocity = cell.velocity.add(force);
             
             // Usar a mesma fórmula de velocidade para bots
-            const maxSpeed = 100 / (cell.radius * 0.5 + 10); 
+            const maxSpeed = 50 / (cell.radius * 0.2 + 10); 
             if (cell.velocity.magnitude() > maxSpeed) {
                 cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
             }
