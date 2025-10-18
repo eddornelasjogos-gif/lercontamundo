@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
+        // Aumenta o limite de tamanho de arquivo para 5 MiB (5 * 1024 * 1024 bytes)
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         // Cache de todos os ativos estáticos (JS, CSS, HTML, Imagens, Áudios)
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,m4a,mp3,woff,woff2,ttf,otf}'],
         // Estratégia de cache para ativos dinâmicos (imagens e áudios)
