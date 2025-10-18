@@ -79,8 +79,12 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
   const drawGame = useCallback((ctx: CanvasRenderingContext2D) => {
     const { grid, shootingBubble } = gameStateRef.current;
     
-    // Limpa o canvas
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    // 1. Desenha o Fundo Mágico
+    const backgroundGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+    backgroundGradient.addColorStop(0, '#c4b5fd'); // Roxo claro
+    backgroundGradient.addColorStop(1, '#93c5fd'); // Azul claro
+    ctx.fillStyle = backgroundGradient;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     // Desenha a linha de Game Over
     ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
@@ -92,7 +96,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.stroke();
 
     // Desenha todas as bolhas ativas (fixas e caindo)
-    const allBubbles = gameStateRef.current.grid.flat().filter(b => b) as Bubble[];
+    const allBubbles = grid.flat().filter(b => b) as Bubble[];
     
     allBubbles.forEach(bubble => {
         if (bubble) drawBubble(ctx, bubble);
