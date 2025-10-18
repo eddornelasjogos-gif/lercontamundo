@@ -75,9 +75,12 @@ import patinhoFeioImage from "@/assets/o-patinho-feio.png";
 import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
 import cinderelaImage from "@/assets/cinderela.png";
 import joaoPeDeFeijaoImage from "@/assets/joao-e-o-pe-de-feijao.png";
-import belaAdormecidaImage from "@/assets/a-bela-adormecida.png"; // NOVO
-import chapeuzinhoVermelhoImage from "@/assets/chapeuzinho-vermelho.png"; // NOVO
-import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png"; // NOVO
+import belaAdormecidaImage from "@/assets/a-bela-adormecida.png";
+import chapeuzinhoVermelhoImage from "@/assets/chapeuzinho-vermelho.png";
+import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png";
+import pinocchioImage from "@/assets/pinocchio.png"; // NOVO
+import pequenaSereiaImage from "@/assets/a-pequena-sereia.png"; // NOVO
+import rapunzelImage from "@/assets/rapunzel.png"; // NOVO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -775,6 +778,28 @@ const Story = () => {
             </Card>
           )}
           
+          {/* Imagem de Rapunzel (ID 203) */}
+          {storyId === 203 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={rapunzelImage} 
+                alt="Rapunzel" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A Pequena Sereia (versão resumida) (ID 204) */}
+          {storyId === 204 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={pequenaSereiaImage} 
+                alt="A Pequena Sereia (versão resumida)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
           {/* Imagem do Príncipe Sapo (ID 205) */}
           {storyId === 205 && (
             <Card className="p-4 shadow-soft">
@@ -946,6 +971,17 @@ const Story = () => {
               <img 
                 src={oPescadorEOGenioImage} 
                 alt="O Pescador e o Gênio" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Pinóquio (ID 301) */}
+          {storyId === 301 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={pinocchioImage} 
+                alt="Pinóquio" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
