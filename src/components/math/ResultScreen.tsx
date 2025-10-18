@@ -169,11 +169,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
       </Card>
 
       <div className="space-y-4">
-        <Button 
-            size="lg" 
-            onClick={onRestart} 
-            className="w-full gradient-primary"
-        >
+        <Button size="lg" onClick={onRestart} className="w-full gradient-primary">
           Jogar Novamente
         </Button>
         <Button 
@@ -185,11 +181,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
             <Save className={cn("w-5 h-5 mr-2", isSaving && "animate-spin")} />
             {isSaving ? "Salvando Desempenho..." : "Salvar Desempenho e Ver Relatórios"}
         </Button>
-        <Button 
-            variant="outline" 
-            onClick={() => navigate('/math')} 
-            className="w-full"
-        >
+        <Button variant="outline" onClick={() => navigate('/math')} className="w-full">
           Voltar para Seleção de Nível
         </Button>
       </div>
