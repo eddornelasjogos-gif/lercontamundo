@@ -54,7 +54,8 @@ import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a";
 import raposaUvasImage from "@/assets/raposa-uvas.png";
 import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
 import principeSapoImage from "@/assets/principe-sapo.png";
-import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png"; // NOVO: Imagem de Rumpelstiltskin
+import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png";
+import rainhaDaNeveImage from "@/assets/rainha-da-neve.png"; // NOVO: Imagem da Rainha da Neve
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -670,6 +671,17 @@ const Story = () => {
               <img 
                 src={rumpelstiltskinImage} 
                 alt="Rumpelstiltskin" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem da Rainha da Neve (ID 207) */}
+          {storyId === 207 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={rainhaDaNeveImage} 
+                alt="A Rainha da Neve" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
