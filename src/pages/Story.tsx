@@ -56,7 +56,8 @@ import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
 import principeSapoImage from "@/assets/principe-sapo.png";
 import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png";
 import rainhaDaNeveImage from "@/assets/rainha-da-neve.png";
-import gataBorralheiraImage from "@/assets/gata-borralheira.png"; // NOVO: Imagem da Gata Borralheira
+import gataBorralheiraImage from "@/assets/gata-borralheira.png";
+import magicoDeOzImage from "@/assets/magico-de-oz.png"; // NOVO: Imagem do Mágico de Oz
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -694,6 +695,17 @@ const Story = () => {
               <img 
                 src={gataBorralheiraImage} 
                 alt="A Gata Borralheira" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem do Mágico de Oz (ID 209) */}
+          {storyId === 209 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={magicoDeOzImage} 
+                alt="O Mágico de Oz" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
