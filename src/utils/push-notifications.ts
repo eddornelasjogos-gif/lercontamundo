@@ -2,9 +2,13 @@
 
 import { toast } from "sonner";
 
-// VAPID public key (you need to generate this on your server or use a service like web-push for production)
-// For demo purposes, replace with your actual VAPID public key
-const VAPID_PUBLIC_KEY = "YOUR_VAPID_PUBLIC_KEY_HERE"; // Replace with actual key
+// Read VAPID public key from environment variable
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+
+// Validate VAPID key on load
+if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY === "YOUR_VAPID_PUBLIC_KEY_HERE") {
+  console.warn("VAPID_PUBLIC_KEY not set in .env! Push notifications will not work.");
+}
 
 // Convert VAPID public key to Uint8Array
 const urlB64ToUint8Array = (base64String: string) => {
@@ -104,28 +108,39 @@ export const subscribeToPush = async (userId: string): Promise<PushSubscription 
     return null;
   }
 
+  if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY === "YOUR_VAPID_PUBLIC_KEY_HERE") {
+    toast.error("Chave VAPID não configurada! Configure VITE_VAPID_PUBLIC_KEY no .env.");
+    return null;
+  }
+
   const permission = await requestNotificationPermission();
   if (permission !== "granted") {
     return null;
   }
 
-  const registration = await navigator.serviceWorker.ready;
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
-  });
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
 
-  // Store subscription in localStorage (in production, send to your server)
-  const subscriptions = JSON.parse(localStorage.getItem("pushSubscriptions") || "[]");
-  subscriptions.push({
-    userId,
-    subscription: subscription.toJSON(),
-    timestamp: Date.now()
-  });
-  localStorage.setItem("pushSubscriptions", JSON.stringify(subscriptions));
+    // Store subscription in localStorage (in production, send to your server)
+    const subscriptions = JSON.parse(localStorage.getItem("pushSubscriptions") || "[]");
+    subscriptions.push({
+      userId,
+      subscription: subscription.toJSON(),
+      timestamp: Date.now()
+    });
+    localStorage.setItem("pushSubscriptions", JSON.stringify(subscriptions));
 
-  toast.success("Inscrito para notificações push!");
-  return subscription;
+    toast.success("Inscrito para notificações push!");
+    return subscription;
+  } catch (error) {
+    console.error("Subscription error:", error);
+    toast.error(`Erro ao se inscrever: ${error.message || 'Falha desconhecida'}`);
+    return null;
+  }
 };
 
 // Function to send a test notification (for demo purposes, simulates a push)
