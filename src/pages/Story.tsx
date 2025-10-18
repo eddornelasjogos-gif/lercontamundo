@@ -160,8 +160,8 @@ const STORY_METADATA_BY_DIFFICULTY: Record<Difficulty, StoryMetadata[]> = {
       { id: 306, title: "A Volta ao Mundo em 80 Dias (trechos)", category: "Clássicos", xp: 150, stars: 4 },
       { id: 307, title: "Heidi (trechos)", category: "Clássicos", xp: 120, stars: 4 },
       { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", xp: 130, stars: 4 },
-      { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", xp: 140, stars: 4 },
-      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
+      { id: 309: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", xp: 140, stars: 4 },
+      { id: 310: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
     ],
     "very-hard": [
       // Clássicos (trechos) (401-405)
