@@ -59,7 +59,8 @@ import rainhaDaNeveImage from "@/assets/rainha-da-neve.png";
 import gataBorralheiraImage from "@/assets/gata-borralheira.png";
 import magicoDeOzImage from "@/assets/magico-de-oz.png";
 import pequenoPolegarImage from "@/assets/pequeno-polegar.png";
-import tresPorquinhosImage from "@/assets/tres-porquinhos.png"; // NOVO: Imagem dos Três Porquinhos
+import tresPorquinhosImage from "@/assets/tres-porquinhos.png";
+import pedroLoboImage from "@/assets/pedro-e-o-lobo.png"; // NOVO: Imagem de Pedro e o Lobo
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -730,6 +731,17 @@ const Story = () => {
               <img 
                 src={tresPorquinhosImage} 
                 alt="Os Três Porquinhos" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Pedro e o Lobo (ID 212) */}
+          {storyId === 212 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={pedroLoboImage} 
+                alt="Pedro e o Lobo" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
