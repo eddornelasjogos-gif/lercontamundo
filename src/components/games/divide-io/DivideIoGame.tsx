@@ -516,7 +516,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const initialBotCount = difficultySettings[difficulty].botCount;
   const botNamesRef = useRef<string[]>([]);
   
-  const bgImgRef = useRef<HTMLImageElement | null>(null);
+  const bgImgRef = useRef<HTMLImageElement | null>(null); // Referência para a imagem de fundo
 
   const [minimapData, setMinimapData] = React.useState({
     playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
@@ -592,6 +592,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     gameInstance.playerCells.push(...newCells);
   }, [gameInstance, playSplit]);
+
+  // Efeito para carregar a imagem de fundo
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      bgImgRef.current = img;
+    };
+    img.src = heroBgImage;
+  }, []);
+
 
   // Efeito para escutar a tecla Espaço (PC) e o movimento do mouse/teclado
   useEffect(() => {
@@ -1132,6 +1142,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         ctx.globalAlpha = opacity;
         
+        // Desenha a imagem de fundo esticada para preencher o mundo
         ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
         
         ctx.globalAlpha = 1.0;
