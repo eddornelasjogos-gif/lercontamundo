@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { DifficultyCard } from "@/components/DifficultyCard";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator } from "lucide-react";
+import { Sparkles, Star, Rocket, Zap, BookOpen, Calculator, Gamepad2 } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { useState, useRef, useEffect } from "react";
 import mascotBackground from "@/assets/mascot-owl.png";
@@ -124,6 +124,15 @@ const Index = () => {
                   ref={buttonsSectionRef}
                   className="flex flex-col md:flex-row gap-4 justify-center mt-12 animate-scale-in"
                 >
+                  <Button
+                    variant="gradient"
+                    size="lg"
+                    onClick={() => navigate("/games")}
+                    className="font-display"
+                  >
+                    <Gamepad2 className="mr-2" />
+                    Jogar
+                  </Button>
                   <Button
                     variant="gradient"
                     size="lg"
