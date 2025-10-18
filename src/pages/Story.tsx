@@ -69,7 +69,8 @@ import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
 import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
 import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
 import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
-import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png"; // NOVO: Imagem de A Cigarra e a Formiga
+import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
+import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png"; // NOVO: Imagem de A Lebre e a Tartaruga
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -652,6 +653,17 @@ const Story = () => {
               <img 
                 src={cigarraFormigaImage} 
                 alt="A Cigarra e a Formiga" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A Lebre e a Tartaruga (ID 102) */}
+          {storyId === 102 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={lebreTartarugaImage} 
+                alt="A Lebre e a Tartaruga" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
