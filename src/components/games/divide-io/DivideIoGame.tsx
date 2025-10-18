@@ -30,7 +30,7 @@ const MASS_TO_RADIUS_RATIO = 4;
 
 // New constants for Virus
 const VIRUS_RADIUS = 60; 
-const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATIO; 
+const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATUS; 
 const VIRUS_COUNT = 8;
 const VIRUS_COLOR = '#FF4136'; // Red color
 const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33; // Cell must be 1.33x mass of virus to explode it
@@ -524,7 +524,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     cellsToSplit.forEach(cell => {
       // Verifica se a célula ainda existe no array principal (para evitar bugs se a célula foi comida no mesmo frame, embora improvável)
       if (gameInstance.playerCells.includes(cell as Player)) {
-        // CORREÇÃO TS2554: Chama cell.split() sem argumentos, pois Player.split() encapsula a lógica de direção/ID.
         const newCell = cell.split(); 
         if (newCell) {
           newCells.push(newCell);
@@ -940,7 +939,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // --- 7. Atualização de Câmera e Score ---
     // totalPlayerMass já foi calculado na seção 1
     const initialMassForScore = MIN_CELL_MASS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialPlayerMass);
+    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
     
     gameInstance.score = currentScore;
     if (currentScore > gameInstance.maxScore) {
