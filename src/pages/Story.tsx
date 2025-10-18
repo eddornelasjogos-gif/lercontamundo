@@ -34,7 +34,7 @@ import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
 import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
 import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a";
 import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
-import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
+import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a"; // Mantém o áudio
 import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
 import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a";
@@ -67,12 +67,12 @@ import oRouxinolImage from "@/assets/o-rouxinol.png";
 import barbaAzulImage from "@/assets/barba-azul.png";
 import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
 import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
-import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.m4a";
+// import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.m4a"; // REMOVIDO: Importação incorreta
 import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
 import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
 import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png";
 import leaoRatoImage from "@/assets/o-leao-e-o-rato.png";
-import patinhoFeioImage from "@/assets/o-patinho-feio.png"; // NOVO: Imagem de O Patinho Feio
+import patinhoFeioImage from "@/assets/o-patinho-feio.png";
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -414,7 +414,7 @@ const STORY_CONTENT: Record<
     category: "Contos",
     xp: 70,
     text:
-      "Um pobre pescador lançou sua rede e, em vez de peixes, pescou um jarro de cobre selado. Ao abri-lo, um Gênio enorme e furioso saiu, prometendo matar o pescador por tê-lo libertado após séculos de prisão. O pescador, esperto, não se desesperou.\n\nEle duvidou que o Gênio fosse tão grande a ponto de caber de volta no jarro. O Gênio, ofendido, demonstrou seu poder voltando para o jarro. O pescador selou o jarro rapidamente, prendendo o Gênio novamente.\n\nO Gênio implorou para ser libertado, prometendo riquezas. O pescador, após negociar, libertou-o, mas exigiu que o Gênio o ajudasse a pescar. O Gênio, humilhado, cumpriu a promessa. O pescador aprendeu que a inteligência e a calma são mais poderosas que a força bruta, e que a astúcia pode transformar a ameaça em oportunidade.",
+      "Um pobre pescador lançou sua rede e, em vez de peixes, pescou um jarro de cobre selado. Ao abri-lo, um Gênio enorme e furioso saiu, prometendo matar o pescador por tê-lo libertado após séculos de prisão. O pescador, esperto, não se desesperou.\n\nEle duvidou que o Gênio fosse tão grande a ponto de caber de volta no jarro. O Gênio, ofendido, demonstrou seu poder voltando para o jarro. O pescador selou o jarro rapidamente, prendendo o Gênio novamente.\n\nO pescador aprendeu que a inteligência e a calma são mais poderosas que a força bruta, e que a astúcia pode transformar a ameaça em oportunidade.",
   },
 
   /* Nível difícil (301–310) - textos completos */
@@ -869,8 +869,355 @@ const Story = () => {
             </Card>
           )}
           
-          {/* Imagem de A Lenda da Lua (ID 219) */}
-          {storyId === 219 && (
+          {/* Imagem de O Pescador e o Gênio (ID 220) */}
+          {storyId === 220 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={oPescadorEOGenioImage} 
+                alt="O Pescador e o Gênio" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+
+          {storyId === 101 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={cigarraAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 102 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={lebreAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 103 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={leaoAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 104 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={raposaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 105 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={galinhaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 111 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={patinhoFeioAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 112 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={joaoPeDeFeijaoAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 113 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={cinderelaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 114 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={brancaDeNeveAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 115 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={flautistaHamelinAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 201 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={chapeuzinhoAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 202 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={belaAdormecidaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 203 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={rapunzelAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 204 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={pequenaSereiaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 205 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={principeSapoAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 206 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={rumpelstiltskinAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 207 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={rainhaDaNeveAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 208 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={gataBorralheiraAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 209 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={magicoDeOzAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 210 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={pequenoPolegarAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+          
+          {storyId === 211 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={tresPorquinhosAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 212 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={pedroLoboAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 213 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={simbadMarinheiroAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 214 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={aliBabaAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 215 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={oRouxinolAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 216 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={barbaAzulAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 217 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={aFadaVoadoraAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 218 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={oCavaloEOHomemAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {/* REMOVIDO: Bloco de imagem incorreto para ID 219 */}
+          {/* storyId === 219 && (
             <Card className="p-4 shadow-soft">
               <img 
                 src={aLendaDaLuaImage} 
@@ -878,7 +1225,7 @@ const Story = () => {
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
-          )}
+          )*/}
           
           {/* Imagem de O Pescador e o Gênio (ID 220) */}
           {storyId === 220 && (
