@@ -162,12 +162,15 @@ const Math = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
-              <ColorHeader
-                title="Área de Matemática"
-                subtitle={`Nível selecionado: ${DIFFICULTY_LABELS[selectedDifficulty]}`}
-                gradientFrom="#93c5fd"
-                gradientTo="#f472b6"
-              />
+              {/* Envolve o ColorHeader em um Card/Div com fundo mais opaco */}
+              <div className="p-3 rounded-xl bg-white/80 backdrop-blur-sm shadow-md border border-white/50">
+                <ColorHeader
+                  title="Área de Matemática"
+                  subtitle={`Nível selecionado: ${DIFFICULTY_LABELS[selectedDifficulty]}`}
+                  gradientFrom="#93c5fd"
+                  gradientTo="#f472b6"
+                />
+              </div>
             </div>
             <div className="flex flex-col items-center gap-3">
                 <LevelSelector value={selectedDifficulty} onChange={handleDifficultyChange} />
