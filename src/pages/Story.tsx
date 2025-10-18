@@ -72,9 +72,12 @@ import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
 import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png";
 import leaoRatoImage from "@/assets/o-leao-e-o-rato.png";
 import patinhoFeioImage from "@/assets/o-patinho-feio.png";
-import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png"; // NOVO: Imagem de A Lenda da Lua
-import cinderelaImage from "@/assets/cinderela.png"; // NOVO: Imagem de Cinderela
-import joaoPeDeFeijaoImage from "@/assets/joao-e-o-pe-de-feijao.png"; // NOVO: Imagem de João e o Pé de Feijão
+import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
+import cinderelaImage from "@/assets/cinderela.png";
+import joaoPeDeFeijaoImage from "@/assets/joao-e-o-pe-de-feijao.png";
+import belaAdormecidaImage from "@/assets/a-bela-adormecida.png"; // NOVO
+import chapeuzinhoVermelhoImage from "@/assets/chapeuzinho-vermelho.png"; // NOVO
+import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png"; // NOVO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -348,11 +351,11 @@ const STORY_CONTENT: Record<
   },
   212: {
     id: 212,
-    title: "João e o Pé de Feijão",
+    title: "Pedro e o Lobo",
     category: "Contos",
     "xp": 55,
     text:
-      "João vivia com sua mãe em uma pequena casa de chão batido. Um dia, por necessidade, ela pediu que João vendesse a última vaca da família. No caminho, um homem misterioso ofereceu a João alguns feijões em troca da vaca, prometendo que eram mágicos.\n\nAo voltar, a mãe, enfurecida com a troca, jogou os feijões pela janela e mandou João para sua cama sem jantar. Durante a noite, algo incrível aconteceu: um pé de feijão gigantesco cresceu até as nuvens. Curioso, João escalou a planta e chegou a um reino nas nuvens, lar de um gigante e seus tesouros.\n\nCom coragem e esperteza, João descobriu riquezas e um ganso que botava ovos de ouro. Ele roubou alguns tesouros e voltou para a terra firme para ajudar sua mãe. O gigante perseguiu João, mas o jovem cortou o pé de feijão, fazendo com que o gigante caísse e sumisse.\n\nJoão e sua mãe conheceram prosperidade, mas aprenderam também sobre responsabilidade e medidas: a aventura trouxe bênçãos, mas também mostrou que escolhas perigosas exigem coragem e prudência. A história celebra curiosidade, astúcia e a chance de transformar a sorte com coragem.",
+      "Pedro, um jovem pastor, vivia perto de uma floresta perigosa. Para se divertir, ele gritava que o lobo estava atacando, fazendo com que os aldeões corressem para ajudá-lo. Depois de ser enganado algumas vezes, os aldeões pararam de acreditar em Pedro.\n\nUm dia, o lobo de verdade apareceu e começou a ameaçar o rebanho. Pedro gritou por socorro, mas ninguém veio. Os aldeões pensaram que era mais uma de suas brincadeiras. O lobo conseguiu levar algumas ovelhas.\n\nTriste e arrependido, Pedro aprendeu uma lição dolorosa: a mentira destrói a confiança. Ele prometeu nunca mais enganar ninguém e, com o tempo e a verdade, reconquistou a confiança dos aldeões, mostrando que a honestidade é mais valiosa que qualquer piada.",
   },
   213: {
     id: 213,
@@ -734,6 +737,39 @@ const Story = () => {
               <img 
                 src={cinderelaImage} 
                 alt="Cinderela" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Flautista de Hamelin (ID 115) */}
+          {storyId === 115 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={flautistaHamelinImage} 
+                alt="O Flautista de Hamelin" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Chapeuzinho Vermelho (ID 201) */}
+          {storyId === 201 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={chapeuzinhoVermelhoImage} 
+                alt="Chapeuzinho Vermelho" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A Bela Adormecida (ID 202) */}
+          {storyId === 202 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={belaAdormecidaImage} 
+                alt="A Bela Adormecida" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
