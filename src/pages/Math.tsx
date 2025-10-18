@@ -5,21 +5,22 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import mathImage from "@/assets/math-numbers.png";
 import ColorHeader from "../components/ColorHeader";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import mascotBackground from "@/assets/mascot-owl.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mascot } from "@/components/Mascot";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import MathGame from "@/components/math/MathGame";
-import LevelSelector from "@/components/LevelSelector"; // Importando LevelSelector
+import LevelSelector from "@/components/LevelSelector";
+import { ExitConfirmationModal } from "@/components/math/ExitConfirmationModal"; // Importando o modal
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 type MathStatus = "menu" | "playing";
 
 const STORAGE_KEY_DIFFICULTY = "mathDifficulty";
 const STORAGE_KEY_PLAYER_NAME = "mathPlayerName";
-const GLOBAL_DIFFICULTY_KEY = "userDifficulty"; // Chave global usada no Index e Reading
+const GLOBAL_DIFFICULTY_KEY = "userDifficulty";
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: "Fácil",
@@ -31,28 +32,55 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 const Math = () => {
   const { progress } = useProgress();
   const navigate = useNavigate();
+  const location = useLocation(); // Usado para detectar mudanças de rota
 
-  // 1. Ler a dificuldade inicial da chave global (definida no Index/Reading)
   const initialDifficulty = (localStorage.getItem(GLOBAL_DIFFICULTY_KEY) as Difficulty) || "easy";
   const initialPlayerName = localStorage.getItem(STORAGE_KEY_PLAYER_NAME) || "Aluno(a)";
   
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(initialDifficulty);
   const [playerName, setPlayerName] = useState<string>(initialPlayerName);
   const [mathStatus, setMathStatus] = useState<MathStatus>("menu");
+  
+  // Estado para o modal de confirmação de saída
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
-  // 2. Sincronizar a dificuldade selecionada com a chave global
+  // 1. Sincronizar a dificuldade selecionada com a chave global
   useEffect(() => {
     localStorage.setItem(GLOBAL_DIFFICULTY_KEY, selectedDifficulty);
     localStorage.setItem(STORAGE_KEY_PLAYER_NAME, playerName);
   }, [selectedDifficulty, playerName]);
   
-  // 3. Atualizar o estado local se a chave global mudar (ex: se o usuário voltar do Index)
+  // 2. Atualizar o estado local se a chave global mudar
   useEffect(() => {
     const currentGlobalDifficulty = (localStorage.getItem(GLOBAL_DIFFICULTY_KEY) as Difficulty) || "easy";
     if (currentGlobalDifficulty !== selectedDifficulty) {
         setSelectedDifficulty(currentGlobalDifficulty);
     }
   }, []);
+
+  // 3. Lógica de Interceptação de Navegação
+  useEffect(() => {
+    if (mathStatus !== 'playing') return;
+
+    // Esta função será chamada quando o usuário tentar navegar para fora da página
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = ''; // Mensagem padrão do navegador
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // O React Router v6 não tem um hook nativo para bloquear a navegação de forma simples
+    // em componentes de rota, mas podemos usar o estado para gerenciar a navegação interna.
+    
+    // Nota: A navegação via <Navigation /> será tratada pelo componente Navigation
+    // que agora aceitará uma função de bloqueio.
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [mathStatus]);
 
 
   const handleStartGame = () => {
@@ -70,25 +98,54 @@ const Math = () => {
   const handleBackToMenu = () => {
     setMathStatus("menu");
   };
+  
+  // Função passada para o Navigation para verificar se a saída deve ser bloqueada
+  const checkNavigationBlock = useCallback((targetPath: string): boolean => {
+    if (mathStatus === 'playing' && targetPath !== location.pathname) {
+      setShowExitModal(true);
+      setPendingPath(targetPath);
+      return true; // Bloqueia a navegação
+    }
+    return false; // Permite a navegação
+  }, [mathStatus, location.pathname]);
+  
+  const handleConfirmExit = () => {
+    setShowExitModal(false);
+    if (pendingPath) {
+      setMathStatus("menu"); // Reseta o estado do jogo
+      navigate(pendingPath);
+      setPendingPath(null);
+    }
+  };
+  
+  const handleCancelExit = () => {
+    setShowExitModal(false);
+    setPendingPath(null);
+  };
 
   if (mathStatus === "playing") {
     return (
       <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
-        <Navigation />
+        <Navigation checkBlock={checkNavigationBlock} />
         <div className="container mx-auto px-4 py-8">
           <MathGame 
             difficulty={selectedDifficulty} 
             playerName={playerName} 
-            onBackToMenu={handleBackToMenu} // Passando a função de volta ao menu
+            onBackToMenu={handleBackToMenu}
           />
         </div>
+        <ExitConfirmationModal 
+            isOpen={showExitModal}
+            onConfirmExit={handleConfirmExit}
+            onCancel={handleCancelExit}
+        />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
-      <Navigation />
+      <Navigation checkBlock={checkNavigationBlock} />
 
       {/* HERO COLORIDO DO TOPO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(202,95%,84%)] via-[hsl(288,95%,86%)] to-[hsl(145,90%,84%)] shadow-soft">
@@ -165,6 +222,11 @@ const Math = () => {
           </div>
         </section>
       </div>
+      <ExitConfirmationModal 
+          isOpen={showExitModal}
+          onConfirmExit={handleConfirmExit}
+          onCancel={handleCancelExit}
+      />
     </div>
   );
 };

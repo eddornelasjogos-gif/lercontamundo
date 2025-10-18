@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ProgressProvider } from "@/contexts/ProgressContext";
 import Index from "./pages/Index";
 import Reading from "./pages/Reading";
@@ -13,8 +13,28 @@ import Story from "./pages/Story";
 import ScrollToTop from "./components/ScrollToTop";
 import Games from "./pages/Games";
 import MathReports from "./pages/MathReports";
+import { Navigation } from "./components/Navigation";
 
 const queryClient = new QueryClient();
+
+// Componente Wrapper para a navegação
+const NavigationWrapper = () => {
+  const location = useLocation();
+  
+  // A página Math.tsx gerencia seu próprio estado de bloqueio.
+  // Se a rota for /math, a Navigation é renderizada DENTRO de Math.tsx,
+  // que passa a prop `checkBlock`.
+  // Para todas as outras rotas, renderizamos a Navigation sem a prop `checkBlock`.
+  
+  if (location.pathname.startsWith('/math')) {
+    // A Navigation será renderizada dentro de Math.tsx
+    return null; 
+  }
+  
+  // Para todas as outras páginas, renderizamos a navegação padrão
+  return <Navigation />;
+};
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,6 +44,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <NavigationWrapper /> 
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/games" element={<Games />} />
