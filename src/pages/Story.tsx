@@ -67,11 +67,12 @@ import oRouxinolImage from "@/assets/o-rouxinol.png";
 import barbaAzulImage from "@/assets/barba-azul.png";
 import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
 import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
-import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
+import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.m4a";
 import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
 import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
 import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png";
-import leaoRatoImage from "@/assets/o-leao-e-o-rato.png"; // NOVO: Imagem de O Leão e o Rato
+import leaoRatoImage from "@/assets/o-leao-e-o-rato.png";
+import patinhoFeioImage from "@/assets/o-patinho-feio.png"; // NOVO: Imagem de O Patinho Feio
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -698,6 +699,17 @@ const Story = () => {
               <img 
                 src={galinhaOvosOuroImage} 
                 alt="A Galinha dos Ovos de Ouro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Patinho Feio (ID 111) */}
+          {storyId === 111 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={patinhoFeioImage} 
+                alt="O Patinho Feio" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
