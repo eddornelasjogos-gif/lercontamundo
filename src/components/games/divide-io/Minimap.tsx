@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import heroBgImage from '@/assets/hero-bg.jpg'; // Importa a imagem de fundo
 
-const MINIMAP_SIZE = 120; // Tamanho fixo do minimapa em pixels (reduzido em 20%)
+const MINIMAP_SIZE = 120; // Tamanho fixo do minimapa em pixels
 const WORLD_SIZE = 3000; // Deve ser o mesmo valor de DivideIoGame.tsx
 const SCALE_FACTOR = MINIMAP_SIZE / WORLD_SIZE;
 
@@ -13,6 +14,18 @@ interface MinimapProps {
 }
 
 const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBots, className }) => {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = heroBgImage;
+    img.onload = () => {
+      imgRef.current = img;
+      setIsImageLoaded(true);
+    };
+  }, []);
+
   // Função para mapear coordenadas do mundo (0 a WORLD_SIZE) para coordenadas do minimapa (0 a MINIMAP_SIZE)
   const mapToMinimap = (coord: number) => coord * SCALE_FACTOR;
 
@@ -25,15 +38,28 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
   return (
     <div
       className={cn(
-        // Alterado de top-4 para top-16 para descer o minimapa
         "fixed top-16 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
         className
       )}
       style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
     >
       <svg width={MINIMAP_SIZE} height={MINIMAP_SIZE} viewBox={`0 0 ${MINIMAP_SIZE} ${MINIMAP_SIZE}`}>
-        {/* Desenha o fundo do mapa (opcional, mas útil para contexto) */}
-        <rect width={MINIMAP_SIZE} height={MINIMAP_SIZE} fill="#f0f0f0" />
+        
+        {/* Desenha a imagem de fundo esticada se estiver carregada */}
+        {isImageLoaded && (
+            <image 
+                href={heroBgImage} 
+                x="0" 
+                y="0" 
+                width={MINIMAP_SIZE} 
+                height={MINIMAP_SIZE} 
+                preserveAspectRatio="none" // Estica a imagem para preencher
+                style={{ opacity: 0.6 }} // Opacidade para não ofuscar os pontos
+            />
+        )}
+        
+        {/* Desenha o fundo do mapa (fallback se a imagem não carregar) */}
+        {!isImageLoaded && <rect width={MINIMAP_SIZE} height={MINIMAP_SIZE} fill="#f0f0f0" />}
         
         {/* Desenha todos os bots ativos */}
         {visibleBots.map((bot, index) => {
