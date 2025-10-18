@@ -204,16 +204,40 @@ class Virus {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    const numSpikes = 20; // Número de pontas
+    const innerRadius = this.radius * 0.8; // Raio interno
+    const outerRadius = this.radius * 1.1; // Raio externo (para as pontas)
+    
+    ctx.save();
+    ctx.translate(this.position.x, this.position.y);
+    
     ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    
+    for (let i = 0; i < numSpikes * 2; i++) {
+        const angle = (i * Math.PI) / numSpikes;
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
+        const x = r * Math.cos(angle);
+        const y = r * Math.sin(angle);
+        
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    
+    ctx.closePath();
+    
+    // Preenchimento
     ctx.fillStyle = this.color;
     ctx.fill();
     
-    // Add a distinct border/style
+    // Borda
     ctx.strokeStyle = '#A00000'; 
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 3;
     ctx.stroke();
-    ctx.closePath();
+    
+    ctx.restore();
   }
 }
 
