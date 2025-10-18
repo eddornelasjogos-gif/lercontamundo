@@ -50,7 +50,8 @@ import domQuixoteAudio from "@/assets/audio/dom-quixote.m4a";
 import mobyDickAudio from "@/assets/audio/moby-dick.m4a";
 import guerraEPazAudio from "@/assets/audio/guerra-e-paz.m4a";
 import irmaosKaramazovAudio from "@/assets/audio/irmaos-karamazov.m4a";
-import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a"; // NOVO ÁUDIO IMPORTADO
+import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a";
+import raposaUvasImage from "@/assets/raposa-uvas.png"; // NOVO: Imagem da Raposa e as Uvas
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -626,6 +627,17 @@ const Story = () => {
               </div>
             </div>
           </Card>
+
+          {/* Imagem da Raposa e as Uvas (ID 104) */}
+          {storyId === 104 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={raposaUvasImage} 
+                alt="A Raposa e as Uvas" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
 
           {storyId === 101 && (
             <Card className="p-6 shadow-soft">
