@@ -70,7 +70,8 @@ import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
 import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
 import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
 import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
-import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png"; // NOVO: Imagem de A Lebre e a Tartaruga
+import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png";
+import leaoRatoImage from "@/assets/o-leao-e-o-rato.png"; // NOVO: Imagem de O Leão e o Rato
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -295,7 +296,7 @@ const STORY_CONTENT: Record<
     category: "Contos Clássicos",
     xp: 70,
     text:
-      "Um moleiro gabou-se ao rei dizendo que sua filha transformava palha em ouro. O rei, ávido, trancou a jovem num celeiro e exigiu o impossível. Desesperada, ela recebeu a visita de um homenzinho misterioso, que fez o milagre em troca de seus colares, anéis e, por fim, da promessa do primeiro filho.\n\nQuando a moça casou com o rei e teve um bebê, o ser voltou para cobrar. Com pena, ofereceu-lhe um acordo: se ela descobrisse seu nome em três dias, ficaria com a criança. Mensageiros rodaram o reino até flagrarem o homenzinho dançando no bosque e cantando: “Ninguém sabe que me chamo Rumpelstiltskin.”\n\nAo ouvir o nome, o pacto se desfez. O pequeno enfureceu-se e desapareceu. A rainha salvou o filho e entendeu o peso das palavras — e de nunca aceitar acordos sem saber o preço.",
+      "Um moleiro gabou-se ao rei dizendo que sua filha transformava palha em ouro. O rei, ávido, trancou a jovem num celeiro e exigiu o impossível. Desesperada, ela recebeu a visita de um homenzinho misterioso, que fez o milagre em troca de seus colares, anéis e, por fim, da promessa do primeiro filho. Quando a moça casou com o rei e teve um bebê, o ser voltou para cobrar. Com pena, ofereceu-lhe um acordo: se ela descobrisse seu nome em três dias, ficaria com a criança. Mensageiros rodaram o reino até flagrarem o homenzinho dançando no bosque e cantando: “Ninguém sabe que me chamo Rumpelstiltskin.” Ao ouvir o nome, o pacto se desfez. O pequeno enfureceu-se e desapareceu. A rainha salvou o filho e entendeu o peso das palavras — e de nunca aceitar acordos sem saber o preço.",
   },
 
   207: {
@@ -664,6 +665,17 @@ const Story = () => {
               <img 
                 src={lebreTartarugaImage} 
                 alt="A Lebre e a Tartaruga" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Leão e o Rato (ID 103) */}
+          {storyId === 103 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={leaoRatoImage} 
+                alt="O Leão e o Rato" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
