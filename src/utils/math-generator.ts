@@ -1,4 +1,5 @@
 import { shuffle } from 'lodash';
+import { generateStoryQuestionText, resetStoryProblemUsage } from './math-story-generator';
 
 export type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 export type OperationType = 'addition' | 'subtraction' | 'multiplication' | 'division' | 'equation';
@@ -58,7 +59,7 @@ const generateOptions = (correctAnswer: number, difficulty: Difficulty): number[
   return shuffle(options);
 };
 
-const generateEasyQuestion = (id: number): Question => {
+const generateEasyQuestion = (id: number): Omit<Question, 'questionText'> => {
   const isAddition = Math.random() < 0.5;
   const xpReward = 40;
   
@@ -70,7 +71,6 @@ const generateEasyQuestion = (id: number): Question => {
       id,
       operation: 'addition',
       expression: `${num1} + ${num2}`,
-      questionText: `Se você tem ${num1} maçãs e ganha mais ${num2}, quantas maçãs você tem no total?`,
       answer,
       options: generateOptions(answer, 'easy'),
       xpReward,
@@ -83,7 +83,6 @@ const generateEasyQuestion = (id: number): Question => {
       id,
       operation: 'subtraction',
       expression: `${num1} - ${num2}`,
-      questionText: `Havia ${num1} pássaros na árvore. ${num2} voaram. Quantos pássaros restaram?`,
       answer,
       options: generateOptions(answer, 'easy'),
       xpReward,
@@ -91,7 +90,7 @@ const generateEasyQuestion = (id: number): Question => {
   }
 };
 
-const generateMediumQuestion = (id: number): Question => {
+const generateMediumQuestion = (id: number): Omit<Question, 'questionText'> => {
   const isMultiplication = Math.random() < 0.5;
   const xpReward = 60;
   
@@ -103,7 +102,6 @@ const generateMediumQuestion = (id: number): Question => {
       id,
       operation: 'multiplication',
       expression: `${num1} x ${num2}`,
-      questionText: `Você tem ${num1} caixas, e em cada caixa há ${num2} brinquedos. Quantos brinquedos no total?`,
       answer,
       options: generateOptions(answer, 'medium'),
       xpReward,
@@ -116,7 +114,6 @@ const generateMediumQuestion = (id: number): Question => {
       id,
       operation: 'division',
       expression: `${num1} ÷ ${num2}`,
-      questionText: `Você precisa dividir ${num1} doces igualmente entre ${num2} amigos. Quantos doces cada um recebe?`,
       answer,
       options: generateOptions(answer, 'medium'),
       xpReward,
@@ -124,7 +121,7 @@ const generateMediumQuestion = (id: number): Question => {
   }
 };
 
-const generateHardQuestion = (id: number): Question => {
+const generateHardQuestion = (id: number): Omit<Question, 'questionText'> => {
   const isMultiplication = Math.random() < 0.5;
   const xpReward = 90;
   
@@ -136,7 +133,6 @@ const generateHardQuestion = (id: number): Question => {
       id,
       operation: 'multiplication',
       expression: `${num1} x ${num2}`,
-      questionText: `Um tecido custa R$ ${num1} por metro. Se você comprar ${num2} metros, quanto custará?`,
       answer,
       options: generateOptions(answer, 'hard'),
       xpReward,
@@ -149,7 +145,6 @@ const generateHardQuestion = (id: number): Question => {
       id,
       operation: 'division',
       expression: `${num1} ÷ ${num2}`,
-      questionText: `Você tem ${num1} litros de suco para dividir em ${num2} garrafas. Quanto suco em cada garrafa?`,
       answer,
       options: generateOptions(answer, 'hard'),
       xpReward,
@@ -157,7 +152,7 @@ const generateHardQuestion = (id: number): Question => {
   }
 };
 
-const generateVeryHardQuestion = (id: number, operationType: OperationType): Question => {
+const generateVeryHardQuestion = (id: number, operationType: OperationType): Omit<Question, 'questionText'> => {
   const xpReward = 120;
   
   if (operationType === 'equation') {
@@ -171,7 +166,6 @@ const generateVeryHardQuestion = (id: number, operationType: OperationType): Que
       id,
       operation: 'equation',
       expression: `${a}x + ${b} = ${c}`,
-      questionText: `Resolva o enigma: ${a} vezes um número misterioso, mais ${b}, é igual a ${c}. Qual é o número misterioso (x)?`,
       answer,
       options: generateOptions(answer, 'very-hard'),
       xpReward,
@@ -185,7 +179,6 @@ const generateVeryHardQuestion = (id: number, operationType: OperationType): Que
       id,
       operation: 'multiplication',
       expression: `${num1} x ${num2}`,
-      questionText: `Um fazendeiro plantou ${num1} fileiras com ${num2} sementes em cada. Quantas sementes no total?`,
       answer,
       options: generateOptions(answer, 'very-hard'),
       xpReward,
@@ -199,7 +192,6 @@ const generateVeryHardQuestion = (id: number, operationType: OperationType): Que
       id,
       operation: 'division',
       expression: `${num1} ÷ ${num2}`,
-      questionText: `Uma fábrica produziu ${num1} brinquedos para dividir em ${num2} lojas. Quantos brinquedos para cada loja?`,
       answer,
       options: generateOptions(answer, 'very-hard'),
       xpReward,
@@ -208,8 +200,11 @@ const generateVeryHardQuestion = (id: number, operationType: OperationType): Que
 };
 
 export const generateMathQuestions = (difficulty: Difficulty): Question[] => {
-  let questions: Question[] = [];
+  let questions: Omit<Question, 'questionText'>[] = [];
   let idCounter = 1;
+  
+  // Resetar o uso de problemas de história ao gerar um novo conjunto
+  resetStoryProblemUsage();
   
   switch (difficulty) {
     case 'easy':
@@ -267,8 +262,15 @@ export const generateMathQuestions = (difficulty: Difficulty): Question[] => {
   const targetCount = difficulty === 'very-hard' ? 25 : 20;
   questions = shuffle(questions.slice(0, targetCount));
   
-  // Re-indexa IDs após o shuffle
-  return questions.map((q, index) => ({ ...q, id: index + 1 }));
+  // Re-indexa IDs após o shuffle e adiciona o texto da história
+  return questions.map((q, index) => {
+      const questionWithText: Question = {
+          ...q,
+          id: index + 1,
+          questionText: generateStoryQuestionText(q as Question),
+      };
+      return questionWithText;
+  });
 };
 
 export const getHelpContent = (question: Question): HelpContent => {
@@ -338,7 +340,7 @@ export const getHelpContent = (question: Question): HelpContent => {
         };
       }
     case 'equation':
-      // Ex: 2x + 6 = 14
+      // Ex: ax + b = c
       const [aStr, , bStr, , cStr] = expression.split(' ').filter(Boolean);
       const a = parseInt(aStr.replace('x', ''));
       const b = parseInt(bStr);
