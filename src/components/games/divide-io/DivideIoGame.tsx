@@ -538,7 +538,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const [minimapData, setMinimapData] = React.useState({
     playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
     playerRadius: MIN_CELL_RADIUS, 
-    visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string }>,
+    visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string; radius: number }>,
   });
 
   const gameInstance = useRef({
@@ -1007,6 +1007,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             y: bot.position.y,
             mass: bot.mass,
             color: bot.color,
+            radius: bot.radius, // Incluindo o raio real do bot
         }));
 
     setMinimapData({

@@ -7,8 +7,8 @@ const SCALE_FACTOR = MINIMAP_SIZE / WORLD_SIZE;
 
 interface MinimapProps {
   playerCenter: { x: number; y: number };
-  playerRadius: number; // Recebe o raio real do jogador
-  visibleBots: Array<{ x: number; y: number; mass: number; color: string }>;
+  playerRadius: number; // Recebe o raio médio real do jogador
+  visibleBots: Array<{ x: number; y: number; mass: number; color: string; radius: number }>; // Inclui o raio do bot
   className?: string;
 }
 
@@ -18,7 +18,9 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
 
   // Raio do jogador no minimapa é proporcional ao seu raio real
   const minimapPlayerRadius = Math.max(2, playerRadius * SCALE_FACTOR); 
-  const botRadius = 2; // Tamanho pequeno e fixo para bots
+  
+  // Define um raio mínimo para que mesmo as células pequenas sejam visíveis
+  const MIN_DOT_RADIUS = 1.5; 
 
   return (
     <div
@@ -38,13 +40,15 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
           const minimapX = mapToMinimap(bot.x);
           const minimapY = mapToMinimap(bot.y);
           
-          // Usa um tamanho fixo para todos os bots
+          // Usa o raio real do bot, mapeado para o minimapa, com um mínimo para visibilidade
+          const minimapBotRadius = Math.max(MIN_DOT_RADIUS, bot.radius * SCALE_FACTOR);
+
           return (
             <circle
               key={index}
               cx={minimapX}
               cy={minimapY}
-              r={botRadius}
+              r={minimapBotRadius}
               fill={bot.color}
               stroke="#000"
               strokeWidth="0.2"
