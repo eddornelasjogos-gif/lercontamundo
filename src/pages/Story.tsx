@@ -84,9 +84,17 @@ import rapunzelImage from "@/assets/rapunzel.png";
 import ilhaDoTesouroImage from "@/assets/ilha-do-tesouro.png";
 import robinsonCrusoeImage from "@/assets/robinson-crusoe.png";
 import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png";
-import medicoMonstroImage from "@/assets/medico-monstro.png"; // NOVO
-import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png"; // NOVO
-import heidiImage from "@/assets/heidi.png"; // NOVO
+import medicoMonstroImage from "@/assets/medico-monstro.png";
+import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png";
+import heidiImage from "@/assets/heidi.png";
+import tomSawyerImage from "@/assets/tom-sawyer.png"; // NOVO
+import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png"; // NOVO
+import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png"; // NOVO
+import domQuixoteImage from "@/assets/dom-quixote.png"; // NOVO
+import mobyDickImage from "@/assets/moby-dick.png"; // NOVO
+import guerraEPazImage from "@/assets/guerra-e-paz.png"; // NOVO
+import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png"; // NOVO
+import crimeECastigoImage from "@/assets/crime-e-castigo.png"; // JÁ EXISTE
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -1054,6 +1062,94 @@ const Story = () => {
               <img 
                 src={heidiImage} 
                 alt="Heidi" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A História de Tom Sawyer (ID 308) */}
+          {storyId === 308 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={tomSawyerImage} 
+                alt="A História de Tom Sawyer (trechos)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Corcunda de Notre-Dame (ID 309) */}
+          {storyId === 309 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={corcundaNotreDameImage} 
+                alt="O Corcunda de Notre-Dame (trechos)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Grimm: Histórias Selecionadas (ID 310) */}
+          {storyId === 310 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={grimmHistoriasSelecionadasImage} 
+                alt="Grimm: Histórias Selecionadas (trechos)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Dom Quixote (ID 401) */}
+          {storyId === 401 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={domQuixoteImage} 
+                alt="Dom Quixote (trechos)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Moby Dick (ID 402) */}
+          {storyId === 402 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={mobyDickImage} 
+                alt="Moby Dick (trechos)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Guerra e Paz (ID 403) */}
+          {storyId === 403 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={guerraEPazImage} 
+                alt="Guerra e Paz (trecho simplificado)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Os Irmãos Karamázov (ID 404) */}
+          {storyId === 404 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={irmaosKaramazovImage} 
+                alt="Os Irmãos Karamázov (trecho)" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Crime e Castigo (ID 405) */}
+          {storyId === 405 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={crimeECastigoImage} 
+                alt="Crime e Castigo (trecho)" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
