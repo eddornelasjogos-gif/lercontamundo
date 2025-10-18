@@ -563,7 +563,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // --- 1. Lógica do Jogador ---
     const playerDirection = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
+    
+    // Calcula o centro de massa do jogador
+    const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+    const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
+    const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+
     playerCells.forEach(playerCell => {
+        // 1a. Movimento do Jogador (Input)
         const acceleration = 1;
         const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
@@ -572,6 +579,17 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const maxSpeed = 100 / (playerCell.radius * 0.5 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
+        }
+        
+        // 1b. Força de Atração (para fusão automática)
+        if (playerCells.length > 1 && playerCell.mergeCooldown > 0) {
+            // Calcula o vetor de atração em direção ao centro de massa do grupo
+            const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
+            
+            // Aplica uma força de atração suave (ajustada pela massa)
+            // A força é mais forte para células menores e mais fraca para células maiores
+            const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius); 
+            playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
         }
     });
 
@@ -645,6 +663,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 const cellA = cells[i];
                 const cellB = cells[j];
                 
+                // Bots podem se fundir a qualquer momento se o cooldown for 0
                 if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
                     const dist = cellA.position.subtract(cellB.position).magnitude();
                     if (dist < (cellA.radius + cellB.radius) * 0.8) { 
@@ -672,6 +691,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     gameInstance.botCells.push(...newBotCells);
     
     // --- 3. Atualização e Fusão do Jogador ---
+    // A atualização do jogador (incluindo a decrementação do cooldown) foi movida para a seção 1.
     playerCells.forEach(cell => cell.update());
 
     // Player cell merging
@@ -679,6 +699,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       for (let j = i - 1; j >= 0; j--) {
         const cellA = playerCells[i];
         const cellB = playerCells[j];
+        
+        // A fusão só ocorre se o cooldown for 0 em AMBAS as células
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
           if (dist < (cellA.radius + cellB.radius) * 0.8) { // Require more overlap to merge
@@ -895,8 +917,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
 
     // --- 7. Atualização de Câmera e Score ---
-    const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    // A pontuação é calculada a partir da massa total menos a massa inicial mínima (50)
+    // totalPlayerMass já foi calculado na seção 1
     const initialMassForScore = MIN_CELL_MASS / 2; 
     const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
     
@@ -911,9 +932,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     let avgRadius = MIN_CELL_RADIUS;
 
     if (playerCells.length > 0) {
-        centerX = playerCells.reduce((sum, cell) => sum + cell.position.x * cell.mass, 0) / totalPlayerMass;
-        centerY = playerCells.reduce((sum, cell) => sum + cell.position.y * cell.mass, 0) / totalPlayerMass;
-        avgRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+        centerX = playerCenterOfMass.x;
+        centerY = playerCenterOfMass.y;
+        avgRadius = avgPlayerRadius;
         
         camera.x += (centerX - camera.x) * 0.1;
         camera.y += (centerY - camera.y) * 0.1;
