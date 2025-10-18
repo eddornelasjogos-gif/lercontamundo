@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -17,10 +17,6 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      // MUDANÇA: Usar injectManifest para Service Worker customizado
-      strategies: 'injectManifest',
-      srcDir: 'src',
-      filename: 'sw.js',
       workbox: {
         // Aumenta o limite de tamanho de arquivo para 5 MiB (5 * 1024 * 1024 bytes)
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
