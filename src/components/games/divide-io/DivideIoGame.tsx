@@ -5,6 +5,7 @@ import SplitButton from './SplitButton';
 import Minimap from './Minimap';
 import { BOT_NAMES } from './BotNames';
 import { useGameAudio } from '@/hooks/useGameAudio'; // Importando o hook de áudio
+import mascotImage from '@/assets/mascot-owl.png'; // Importando a imagem do mascote
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -533,6 +534,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   // Rastreia a contagem inicial de bots e a lista de nomes
   const initialBotCount = difficultySettings[difficulty].botCount;
   const botNamesRef = useRef<string[]>([]);
+  
+  // Referência para a imagem do mascote
+  const mascotImgRef = useRef<HTMLImageElement | null>(null);
 
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
@@ -590,6 +594,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isPlaying, handleSplit]);
+  
+  // Efeito para carregar a imagem do mascote
+  useEffect(() => {
+    const img = new Image();
+    img.src = mascotImage;
+    img.onload = () => {
+      mascotImgRef.current = img;
+    };
+  }, []);
 
 
   const gameLoop = useCallback(() => {
@@ -1052,6 +1065,26 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
+    
+    // --- NOVO: Desenho da Imagem de Fundo do Mascote ---
+    if (mascotImgRef.current) {
+        const img = mascotImgRef.current;
+        const patternSize = 1000; // Tamanho da repetição da imagem (ajustado para ser grande)
+        const opacity = 0.1; // Opacidade suave
+        
+        ctx.globalAlpha = opacity;
+        
+        // Desenha a imagem repetidamente para cobrir todo o WORLD_SIZE
+        for (let x = 0; x < WORLD_SIZE; x += patternSize) {
+            for (let y = 0; y < WORLD_SIZE; y += patternSize) {
+                ctx.drawImage(img, x, y, patternSize, patternSize);
+            }
+        }
+        
+        ctx.globalAlpha = 1.0; // Volta a opacidade normal
+    }
+    // --- FIM: Desenho da Imagem de Fundo do Mascote ---
+
 
     // Draw World Grid
     ctx.strokeStyle = '#eee';
