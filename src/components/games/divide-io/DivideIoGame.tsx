@@ -1123,18 +1123,18 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // --- Desenho do Fundo do Mundo ---
     
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-    
+    // 1. Desenha a imagem de fundo com opacidade
     if (bgImgRef.current) {
         const img = bgImgRef.current;
         const opacity = 0.4;
         
         ctx.globalAlpha = opacity;
-        
         ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
-        
         ctx.globalAlpha = 1.0;
+    } else {
+        // Fallback para cor de fundo se a imagem não carregar
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
     }
     // --- FIM: Desenho do Fundo do Mundo ---
 
@@ -1234,6 +1234,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    
+    // Carrega a imagem de fundo
+    if (!bgImgRef.current) {
+        const img = new Image();
+        img.onload = () => {
+            bgImgRef.current = img;
+        };
+        img.src = heroBgImage;
+    }
 
     const settings = difficultySettings[difficulty];
     

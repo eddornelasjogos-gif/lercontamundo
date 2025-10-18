@@ -55,6 +55,7 @@ const Games = () => {
   };
 
   if (gameStatus === "playing") {
+    // Retorna apenas o jogo para ocupar a tela inteira, sem a navegação
     return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} playerName={inputName.trim()} />;
   }
 
