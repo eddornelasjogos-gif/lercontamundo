@@ -78,9 +78,12 @@ import joaoPeDeFeijaoImage from "@/assets/joao-e-o-pe-de-feijao.png";
 import belaAdormecidaImage from "@/assets/a-bela-adormecida.png";
 import chapeuzinhoVermelhoImage from "@/assets/chapeuzinho-vermelho.png";
 import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png";
-import pinocchioImage from "@/assets/pinocchio.png"; // NOVO
-import pequenaSereiaImage from "@/assets/a-pequena-sereia.png"; // NOVO
-import rapunzelImage from "@/assets/rapunzel.png"; // NOVO
+import pinocchioImage from "@/assets/pinocchio.png";
+import pequenaSereiaImage from "@/assets/a-pequena-sereia.png";
+import rapunzelImage from "@/assets/rapunzel.png";
+import ilhaDoTesouroImage from "@/assets/ilha-do-tesouro.png"; // NOVO
+import robinsonCrusoeImage from "@/assets/robinson-crusoe.png"; // NOVO
+import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png"; // NOVO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -982,6 +985,39 @@ const Story = () => {
               <img 
                 src={pinocchioImage} 
                 alt="Pinóquio" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Alice no País das Maravilhas (ID 302) */}
+          {storyId === 302 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={alicePaisMaravilhasImage} 
+                alt="Alice no País das Maravilhas" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de As Aventuras de Robinson Crusoé (ID 303) */}
+          {storyId === 303 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={robinsonCrusoeImage} 
+                alt="As Aventuras de Robinson Crusoé" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A Ilha do Tesouro (ID 304) */}
+          {storyId === 304 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={ilhaDoTesouroImage} 
+                alt="A Ilha do Tesouro" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
