@@ -28,6 +28,13 @@ const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5; // 5 seconds at 60fps
 const MASS_TO_RADIUS_RATIO = 4;
 
+// New constants for Virus
+const VIRUS_RADIUS = 60; 
+const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATIO; 
+const VIRUS_COUNT = 8;
+const VIRUS_COLOR = '#FF4136'; // Red color
+const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33; // Cell must be 1.33x mass of virus to explode it
+
 // Ajuste de Impulso para Divisão
 const EJECTION_IMPULSE = 200; // Aumentado de 100 para 200
 const EJECTION_OFFSET = 15; // Aumentado para garantir separação
@@ -180,6 +187,37 @@ class Player extends Cell {
     }
 }
 
+// New Virus class
+class Virus {
+  public position: Vector;
+  public radius: number;
+  public mass: number;
+  public color: string;
+  public id: number;
+
+  constructor(x: number, y: number, id: number) {
+    this.position = new Vector(x, y);
+    this.radius = VIRUS_RADIUS;
+    this.mass = VIRUS_MASS;
+    this.color = VIRUS_COLOR;
+    this.id = id;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    
+    // Add a distinct border/style
+    ctx.strokeStyle = '#A00000'; 
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    ctx.closePath();
+  }
+}
+
+
 // Lógica de Bot movida para uma função auxiliar
 const botLogic = {
     target: new Map<string, Vector | null>(),
@@ -297,6 +335,33 @@ class Pellet {
   }
 }
 
+const PELLET_MASS_VALUE = 10; // Implicit mass value of a single pellet
+
+const generatePelletsFromMass = (mass: number, position: Vector) => {
+    const pellets: Pellet[] = [];
+    const pelletCount = Math.floor(mass / PELLET_MASS_VALUE);
+    
+    for (let i = 0; i < pelletCount; i++) {
+        const pellet = new Pellet(getRandomColor());
+        
+        // Distribute pellets around the explosion point
+        const angle = Math.random() * Math.PI * 2;
+        // Spread distance proportional to the exploded mass/radius
+        const explosionRadius = Math.sqrt(mass / Math.PI) * MASS_TO_RADIUS_RATIO;
+        const distance = Math.random() * explosionRadius * 1.5; 
+        
+        pellet.position = position.add(new Vector(Math.cos(angle) * distance, Math.sin(angle) * distance));
+        
+        // Boundary clamping for pellets
+        pellet.position.x = Math.max(pellet.radius, Math.min(WORLD_SIZE - pellet.radius, pellet.position.x));
+        pellet.position.y = Math.max(pellet.radius, Math.min(WORLD_SIZE - pellet.radius, pellet.position.y));
+        
+        pellets.push(pellet);
+    }
+    return pellets;
+};
+
+
 // Função auxiliar para gerar nomes de bot
 const generateBotNames = (count: number) => {
     const baseNames = [...BOT_NAMES];
@@ -341,7 +406,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const animationFrameId = useRef<number>();
   
   const [isPlaying, setIsPlaying] = React.useState(true);
-  const { playCollect, playSplit } = useGameAudio(isPlaying); // Inicializa o áudio
+  const { playCollect, playSplit } = useGameAudio(isPlaying); 
   
   // Rastreia a contagem inicial de bots e a lista de nomes
   const initialBotCount = difficultySettings[difficulty].botCount;
@@ -350,17 +415,18 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   // Estado para o minimapa
   const [minimapData, setMinimapData] = React.useState({
     playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
-    playerRadius: MIN_CELL_RADIUS, // Agora passamos o raio médio
+    playerRadius: MIN_CELL_RADIUS, 
     visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string }>,
   });
 
   const gameInstance = useRef({
     playerCells: [] as Player[],
-    botCells: [] as Cell[], // Agora armazena todas as células de bot aqui
+    botCells: [] as Cell[], 
     pellets: [] as Pellet[],
+    viruses: [] as Virus[], // ADDED
     camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
     score: 0,
-    maxScore: 0, // Novo campo para rastrear a pontuação máxima da sessão
+    maxScore: 0, 
   }).current;
 
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
@@ -402,7 +468,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    const { playerCells, botCells, pellets, camera } = gameInstance;
+    const { playerCells, botCells, pellets, viruses, camera } = gameInstance;
     
     if (playerCells.length === 0) {
       setIsPlaying(false);
@@ -410,7 +476,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       return;
     }
 
-    const allCells: Cell[] = [...playerCells, ...botCells];
+    let allCells: Cell[] = [...playerCells, ...botCells]; // Define allCells here
+
     const settings = difficultySettings[difficulty];
 
     // --- 1. Lógica do Jogador ---
@@ -550,15 +617,78 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       }
     }
 
-    // --- 4. Detecção de Colisão (Comer) ---
-    
-    // Re-cria allCells após fusões
-    const currentAllCells: Cell[] = [...playerCells, ...botCells];
+    // Rebuild allCells after player fusion
+    allCells = [...playerCells, ...botCells];
 
-    for (let i = currentAllCells.length - 1; i >= 0; i--) {
+    // --- 4. Detecção de Colisão (Vírus/Obstáculos) ---
+    
+    // Check for collisions between cells and viruses
+    for (let v = viruses.length - 1; v >= 0; v--) {
+        const virus = viruses[v];
+        
+        // Iterate over a copy of allCells to safely handle removals
+        for (let c = allCells.length - 1; c >= 0; c--) {
+            const cell = allCells[c];
+            
+            const distVec = cell.position.subtract(virus.position);
+            const distance = distVec.magnitude();
+            
+            // Collision check
+            if (distance < cell.radius + virus.radius) {
+                
+                if (cell.mass > EXPLOSION_THRESHOLD_MASS) {
+                    // EXPLOSION!
+                    
+                    // 1. Generate pellets from the cell's mass
+                    const cellPellets = generatePelletsFromMass(cell.mass, cell.position);
+                    gameInstance.pellets.push(...cellPellets);
+                    
+                    // 2. Generate pellets from the virus's mass (Virus also explodes)
+                    const virusPellets = generatePelletsFromMass(virus.mass, virus.position);
+                    gameInstance.pellets.push(...virusPellets);
+                    
+                    // 3. Remove cell and virus
+                    
+                    // Remove cell from playerCells or botCells
+                    const cellIndexInPlayer = playerCells.indexOf(cell as Player);
+                    if (cellIndexInPlayer > -1) {
+                        playerCells.splice(cellIndexInPlayer, 1);
+                    } else {
+                        const cellIndexInBots = botCells.indexOf(cell);
+                        if (cellIndexInBots > -1) {
+                            botCells.splice(cellIndexInBots, 1);
+                            botNamesRef.current.push(cell.name);
+                        }
+                    }
+                    
+                    // Remove virus
+                    viruses.splice(v, 1);
+                    
+                    // If the player exploded, end game
+                    if (playerCells.length === 0) {
+                        setIsPlaying(false);
+                        onGameOver(gameInstance.maxScore); 
+                        return;
+                    }
+                    
+                    // Since the virus was removed, we break the inner loop and continue the outer loop (v--)
+                    break; 
+                }
+                
+                // If the cell is smaller, it can pass through or hide inside. No explosion.
+            }
+        }
+    }
+    
+    // Rebuild allCells after virus explosions
+    allCells = [...playerCells, ...botCells];
+
+    // --- 5. Detecção de Colisão (Comer) ---
+    
+    for (let i = allCells.length - 1; i >= 0; i--) {
         for (let j = i - 1; j >= 0; j--) {
-            const cellA = currentAllCells[i];
-            const cellB = currentAllCells[j];
+            const cellA = allCells[i];
+            const cellB = allCells[j];
             if (!cellA || !cellB) continue;
 
             const distVec = cellA.position.subtract(cellB.position);
@@ -578,6 +708,25 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 
                 // Não permite que células do mesmo jogador/bot se comam
                 if (predator.name === prey.name) continue;
+
+                // --- NOVO: Regra de Imunidade do Vírus ---
+                let isPreyImmune = false;
+                // Check if prey is entirely inside a virus AND smaller than the virus
+                for (const virus of viruses) {
+                    const distToVirus = prey.position.subtract(virus.position).magnitude();
+                    
+                    // Check if prey is entirely inside the virus (distance + prey_radius < virus_radius)
+                    // AND if the prey is smaller than the virus (prey.mass <= VIRUS_MASS)
+                    if (distToVirus + prey.radius < virus.radius && prey.mass <= VIRUS_MASS) {
+                        isPreyImmune = true;
+                        break;
+                    }
+                }
+                
+                if (isPreyImmune) {
+                    continue; // Skip eating if the prey is immune inside a virus
+                }
+                // --- FIM: Regra de Imunidade do Vírus ---
 
                 const deathDistance = predator.radius - prey.radius * 0.3;
                 if (distance < deathDistance) {
@@ -602,16 +751,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         }
                     }
                     
-                    // Remove a presa do array temporário currentAllCells
-                    currentAllCells.splice(currentAllCells.indexOf(prey), 1);
-                    if (currentAllCells.indexOf(predator) < i) i--;
-                    if (currentAllCells.indexOf(predator) < j) j--;
+                    // Remove a presa do array temporário allCells
+                    allCells.splice(allCells.indexOf(prey), 1);
+                    if (allCells.indexOf(predator) < i) i--;
+                    if (allCells.indexOf(predator) < j) j--;
                 }
             }
         }
     }
     
-    // --- 4b. Respawn de Bots ---
+    // --- 6. Respawn de Bots and Pellets ---
     while (botCells.length < initialBotCount) {
         // Pega um nome da lista de nomes disponíveis (ou gera um novo se necessário)
         const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
@@ -631,7 +780,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // Eating pellets
     for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
-        for (const cell of currentAllCells) {
+        for (const cell of allCells) {
             if (!pellet) continue;
             const dist = cell.position.subtract(pellet.position).magnitude();
             if (dist < cell.radius) {
@@ -649,8 +798,18 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (pellets.length < PELLET_COUNT) {
       pellets.push(new Pellet(getRandomColor()));
     }
+    
+    // Respawn Viruses
+    while (viruses.length < VIRUS_COUNT) {
+        viruses.push(new Virus(
+            Math.random() * WORLD_SIZE,
+            Math.random() * WORLD_SIZE,
+            viruses.length + 1 // Simple ID assignment
+        ));
+    }
 
-    // --- 5. Atualização de Câmera e Score ---
+
+    // --- 7. Atualização de Câmera e Score ---
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
     const initialMass = MIN_CELL_MASS;
     const currentScore = Math.floor(totalPlayerMass - initialMass);
@@ -690,7 +849,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         visibleBots: visibleBots,
     });
     
-    // --- 6. Leaderboard Logic ---
+    // --- 8. Leaderboard Logic ---
     
     // 1. Agrupa a massa total dos bots pelo nome
     const botMassMap = new Map<string, number>();
@@ -739,9 +898,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
     pellets.forEach(p => p.draw(ctx));
-    
+    viruses.forEach(v => v.draw(ctx)); // Draw viruses
+
     // Draw cells and names
-    currentAllCells.sort((a, b) => a.mass - b.mass).forEach(c => {
+    allCells.sort((a, b) => a.mass - b.mass).forEach(c => {
         c.draw(ctx, c instanceof Player);
     });
 
@@ -810,6 +970,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // Initialize Player Cell with Name
     gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS, playerName)];
+    
+    // Initialize Viruses
+    gameInstance.viruses = Array.from({ length: VIRUS_COUNT }, (_, i) => {
+        return new Virus(
+            Math.random() * WORLD_SIZE,
+            Math.random() * WORLD_SIZE,
+            i + 1
+        );
+    });
     
     // Initialize Bots with UNIQUE Names
     const botCount = settings.botCount;
