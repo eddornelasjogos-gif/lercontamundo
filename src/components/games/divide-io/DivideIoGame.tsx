@@ -1067,9 +1067,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.translate(-camera.x, -camera.y);
     
     // --- NOVO: Desenho da Imagem de Fundo do Mascote ---
+    // 1. Desenha o fundo branco do mundo
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+    
+    // 2. Desenha a imagem repetidamente
     if (mascotImgRef.current) {
         const img = mascotImgRef.current;
-        const patternSize = 1000; // Tamanho da repetição da imagem (ajustado para ser grande)
+        const patternSize = 1000; // Tamanho da repetição da imagem
         const opacity = 0.1; // Opacidade suave
         
         ctx.globalAlpha = opacity;
@@ -1099,7 +1104,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     pellets.forEach(p => p.draw(ctx));
     
-    // --- NOVO: Lógica de Desenho de Camadas ---
+    // --- Lógica de Desenho de Camadas ---
     
     const cellsInsideVirus: Cell[] = [];
     const cellsOutsideVirus: Cell[] = [];
@@ -1258,7 +1263,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: 'none' }}>
-      <canvas ref={canvasRef} style={{ display: 'block', background: '#fff' }} />
+      <canvas ref={canvasRef} style={{ display: 'block' }} />
       <VirtualJoystick onMove={handleJoystickMove} />
       {/* O SplitButton é mantido para dispositivos móveis, mas a divisão também é acionada pelo teclado no PC */}
       <SplitButton onSplit={handleSplit} />
