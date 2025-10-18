@@ -81,9 +81,12 @@ import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png";
 import pinocchioImage from "@/assets/pinocchio.png";
 import pequenaSereiaImage from "@/assets/a-pequena-sereia.png";
 import rapunzelImage from "@/assets/rapunzel.png";
-import ilhaDoTesouroImage from "@/assets/ilha-do-tesouro.png"; // NOVO
-import robinsonCrusoeImage from "@/assets/robinson-crusoe.png"; // NOVO
-import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png"; // NOVO
+import ilhaDoTesouroImage from "@/assets/ilha-do-tesouro.png";
+import robinsonCrusoeImage from "@/assets/robinson-crusoe.png";
+import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png";
+import medicoMonstroImage from "@/assets/medico-monstro.png"; // NOVO
+import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png"; // NOVO
+import heidiImage from "@/assets/heidi.png"; // NOVO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -1018,6 +1021,39 @@ const Story = () => {
               <img 
                 src={ilhaDoTesouroImage} 
                 alt="A Ilha do Tesouro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Médico e o Monstro (ID 305) */}
+          {storyId === 305 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={medicoMonstroImage} 
+                alt="O Médico e o Monstro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de A Volta ao Mundo em 80 Dias (ID 306) */}
+          {storyId === 306 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={voltaAoMundo80DiasImage} 
+                alt="A Volta ao Mundo em 80 Dias" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Heidi (ID 307) */}
+          {storyId === 307 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={heidiImage} 
+                alt="Heidi" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
