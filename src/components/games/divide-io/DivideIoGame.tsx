@@ -673,7 +673,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 // Bots podem se fundir a qualquer momento se o cooldown for 0
                 if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
                     const dist = cellA.position.subtract(cellB.position).magnitude();
-                    if (dist < (cellA.radius + cellB.radius) * 0.8) { 
+                    // Fusão ocorre quando a distância é menor que a soma dos raios (ou ligeiramente menos)
+                    if (dist < cellA.radius + cellB.radius) { 
                         const bigger = cellA.mass > cellB.mass ? cellA : cellB;
                         const smaller = cellA.mass > cellB.mass ? cellB : cellA;
                         
@@ -710,7 +711,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         // A fusão só ocorre se o cooldown for 0 em AMBAS as células
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < (cellA.radius + cellB.radius) * 0.8) { // Require more overlap to merge
+          // Fusão ocorre quando a distância é menor que a soma dos raios (ou ligeiramente menos)
+          if (dist < cellA.radius + cellB.radius) { 
             const bigger = cellA.mass > cellB.mass ? cellA : cellB;
             const smaller = cellA.mass > cellB.mass ? cellB : cellA;
             bigger.mass += smaller.mass;
