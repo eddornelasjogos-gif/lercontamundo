@@ -34,7 +34,7 @@ import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
 import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
 import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a";
 import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
-import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a"; // NOVO: Áudio de A Lenda da Lua
+import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
 import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
 import aliceAudio from "@/assets/audio/alice-pais-maravilhas.m4a";
@@ -67,7 +67,8 @@ import oRouxinolImage from "@/assets/o-rouxinol.png";
 import barbaAzulImage from "@/assets/barba-azul.png";
 import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
 import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
-import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png"; // NOVO: Imagem de A Lenda da Lua
+import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
+import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png"; // NOVO: Imagem de O Pescador e o Gênio
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -343,7 +344,7 @@ const STORY_CONTENT: Record<
     id: 212,
     title: "Pedro e o Lobo",
     category: "Contos",
-    xp: 55,
+    "xp": 55,
     text:
       "Pedro, um jovem pastor, vivia perto de uma floresta perigosa. Para se divertir, ele gritava que o lobo estava atacando, fazendo com que os aldeões corressem para ajudá-lo. Depois de ser enganado algumas vezes, os aldeões pararam de acreditar em Pedro.\n\nUm dia, o lobo de verdade apareceu e começou a ameaçar o rebanho. Pedro gritou por socorro, mas ninguém veio. Os aldeões pensaram que era mais uma de suas brincadeiras. O lobo conseguiu levar algumas ovelhas.\n\nTriste e arrependido, Pedro aprendeu uma lição dolorosa: a mentira destrói a confiança. Ele prometeu nunca mais enganar ninguém e, com o tempo e a verdade, reconquistou a confiança dos aldeões, mostrando que a honestidade é mais valiosa que qualquer piada.",
   },
@@ -826,6 +827,17 @@ const Story = () => {
               <img 
                 src={aLendaDaLuaImage} 
                 alt="A Lenda da Lua" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Pescador e o Gênio (ID 220) */}
+          {storyId === 220 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={oPescadorEOGenioImage} 
+                alt="O Pescador e o Gênio" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
