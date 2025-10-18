@@ -248,7 +248,6 @@ const botLogic = {
     
     findBestTarget(botCells: Cell[], pellets: Pellet[], allCells: Cell[], aggression: number, botName: string) {
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
-        // CORREÇÃO: Usar botCells.length
         const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
@@ -510,6 +509,28 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
         }
     });
+    
+    // Aplica força de separação entre células do jogador em cooldown
+    for (let i = 0; i < playerCells.length; i++) {
+        for (let j = i + 1; j < playerCells.length; j++) {
+            const cellA = playerCells[i];
+            const cellB = playerCells[j];
+
+            if (cellA.mergeCooldown > 0 || cellB.mergeCooldown > 0) {
+                const distVec = cellA.position.subtract(cellB.position);
+                const distance = distVec.magnitude();
+                const minSeparation = cellA.radius + cellB.radius;
+
+                // Aplica força repulsiva se estiverem muito próximos
+                if (distance < minSeparation * 1.5) { 
+                    const separationForce = distVec.normalize().multiply(minSeparation / distance * 0.5);
+                    cellA.velocity = cellA.velocity.add(separationForce);
+                    cellB.velocity = cellB.velocity.subtract(separationForce);
+                }
+            }
+        }
+    }
+
 
     // Lógica dos Bots
     botGroups.forEach((cells, botName) => {
@@ -519,13 +540,32 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
-            // CORREÇÃO: Passar 'cells' (células do bot) e 'allCells' (todas as células)
             botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
             decisionTimer = 30;
         }
         botLogic.decisionTimer.set(botName, decisionTimer - 1);
 
         const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
+        
+        // Aplica força de separação entre células do bot em cooldown
+        for (let i = 0; i < cells.length; i++) {
+            for (let j = i + 1; j < cells.length; j++) {
+                const cellA = cells[i];
+                const cellB = cells[j];
+
+                if (cellA.mergeCooldown > 0 || cellB.mergeCooldown > 0) {
+                    const distVec = cellA.position.subtract(cellB.position);
+                    const distance = distVec.magnitude();
+                    const minSeparation = cellA.radius + cellB.radius;
+
+                    if (distance < minSeparation * 1.5) {
+                        const separationForce = distVec.normalize().multiply(minSeparation / distance * 0.5);
+                        cellA.velocity = cellA.velocity.add(separationForce);
+                        cellB.velocity = cellB.velocity.subtract(separationForce);
+                    }
+                }
+            }
+        }
         
         cells.forEach(cell => {
             const acceleration = 1;
