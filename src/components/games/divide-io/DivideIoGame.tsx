@@ -295,7 +295,7 @@ const botLogic = {
     
     findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
-        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
+        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
         let bestTarget: Pellet | Cell | null = null;
@@ -331,6 +331,7 @@ const botLogic = {
         }
 
         if (!bestTarget) {
+            // Otimização: Apenas procura por pellets se não houver células alvo/ameaça próximas
             for (const pellet of pellets) {
                 const dist = center.subtract(pellet.position).magnitude();
                 if (dist < minTargetDist) {
@@ -716,7 +717,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx) {
+        animationFrameId.current = requestAnimationFrame(gameLoop);
+        return;
+    }
 
     const { playerCells, botCells, pellets, viruses, camera } = gameInstance;
     
@@ -780,7 +784,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
-            botLogic.findBestTarget(cells, pellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
+            // Passa apenas os pellets visíveis para a lógica do bot para otimizar
+            const visiblePellets = pellets.filter(p => {
+                const dist = centerOfMass.subtract(p.position).magnitude();
+                return dist < avgRadius * 15; // Percepção do bot
+            });
+            botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
             decisionTimer = 30;
         }
         botLogic.decisionTimer.set(botName, decisionTimer - 1);
@@ -949,7 +958,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     prey = cellB;
                 } else if (cellB.mass > cellA.mass * 1.15) {
                     predator = cellB;
-                    prey = cellA;
+                    prey = cellB;
                 } else {
                     continue;
                 }
@@ -1014,9 +1023,50 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         botCells.push(newBot);
     }
     
-    // Eating pellets
+    // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
+    
+    // 7. Atualização de Câmera e Score (necessário para definir a área de visão)
+    const initialMassForScore = MIN_CELL_MASS / 2; 
+    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
+    
+    gameInstance.score = currentScore;
+    if (currentScore > gameInstance.maxScore) {
+        gameInstance.maxScore = currentScore;
+    }
+
+    let centerX = WORLD_SIZE / 2;
+    let centerY = WORLD_SIZE / 2;
+    let avgRadius = MIN_CELL_RADIUS;
+
+    if (playerCells.length > 0) {
+        centerX = playerCenterOfMass.x;
+        centerY = playerCenterOfMass.y;
+        avgRadius = avgPlayerRadius;
+        
+        camera.x += (centerX - camera.x) * 0.1;
+        camera.y += (centerY - camera.y) * 0.1;
+        camera.zoom = 40 / avgRadius + 0.4;
+    }
+    
+    // Calcula a área de visão (viewport)
+    const viewportWidth = canvas.width / camera.zoom;
+    const viewportHeight = canvas.height / camera.zoom;
+    const viewLeft = camera.x - viewportWidth / 2;
+    const viewTop = camera.y - viewportHeight / 2;
+    const viewRight = camera.x + viewportWidth / 2;
+    const viewBottom = camera.y + viewportHeight / 2;
+
+    // Colisão de Pellets (Otimizado)
     for (let i = pellets.length - 1; i >= 0; i--) {
         const pellet = pellets[i];
+        
+        // 1. Verifica se o pellet está na área de visão (otimização de renderização)
+        if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
+            pellet.position.y < viewTop || pellet.position.y > viewBottom) {
+            continue; // Pula a verificação de colisão se estiver fora da tela
+        }
+        
+        // 2. Verifica colisão com células
         for (const cell of allCells) {
             if (!pellet) continue;
             const dist = cell.position.subtract(pellet.position).magnitude();
@@ -1032,6 +1082,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             }
         }
     }
+    
+    // Respawn de Pellets
     if (pellets.length < PELLET_COUNT) {
       pellets.push(new Pellet(getRandomColor()));
     }
@@ -1047,30 +1099,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         ));
     }
 
-
-    // --- 7. Atualização de Câmera e Score ---
-    const initialMassForScore = MIN_CELL_MASS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
-    
-    gameInstance.score = currentScore;
-    if (currentScore > gameInstance.maxScore) {
-        gameInstance.maxScore = currentScore;
-    }
-
-
-    let centerX = WORLD_SIZE / 2;
-    let centerY = WORLD_SIZE / 2;
-    let avgRadius = MIN_CELL_RADIUS;
-
-    if (playerCells.length > 0) {
-        centerX = playerCenterOfMass.x;
-        centerY = playerCenterOfMass.y;
-        avgRadius = avgPlayerRadius;
-        
-        camera.x += (centerX - camera.x) * 0.1;
-        camera.y += (centerY - camera.y) * 0.1;
-        camera.zoom = 40 / avgRadius + 0.4;
-    }
 
     // Prepare minimap data
     const visibleBots = botCells
@@ -1150,7 +1178,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.lineWidth = 20; 
     ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
-    pellets.forEach(p => p.draw(ctx));
+    // Otimização de Renderização de Pellets
+    pellets.forEach(p => {
+        if (p.position.x >= viewLeft && p.position.x <= viewRight &&
+            p.position.y >= viewTop && p.position.y <= viewBottom) {
+            p.draw(ctx);
+        }
+    });
     
     // --- Lógica de Desenho de Camadas ---
     
@@ -1179,7 +1213,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         c.draw(ctx, c instanceof Player);
     });
 
-    viruses.forEach(v => v.draw(ctx)); 
+    // Otimização de Renderização de Vírus
+    viruses.forEach(v => {
+        if (v.position.x + v.radius >= viewLeft && v.position.x - v.radius <= viewRight &&
+            v.position.y + v.radius >= viewTop && v.position.y - v.radius <= viewBottom) {
+            v.draw(ctx);
+        }
+    }); 
     
     // --- FIM: Lógica de Desenho de Camadas ---
 
