@@ -53,7 +53,8 @@ import irmaosKaramazovAudio from "@/assets/audio/irmaos-karamazov.m4a";
 import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a";
 import raposaUvasImage from "@/assets/raposa-uvas.png";
 import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
-import principeSapoImage from "@/assets/principe-sapo.png"; // NOVO: Imagem do Príncipe Sapo
+import principeSapoImage from "@/assets/principe-sapo.png";
+import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png"; // NOVO: Imagem de Rumpelstiltskin
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -658,6 +659,17 @@ const Story = () => {
               <img 
                 src={principeSapoImage} 
                 alt="O Príncipe Sapo" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Rumpelstiltskin (ID 206) */}
+          {storyId === 206 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={rumpelstiltskinImage} 
+                alt="Rumpelstiltskin" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
