@@ -11,9 +11,51 @@ import ColorHeader from "@/components/ColorHeader";
 import LevelSelector from "@/components/LevelSelector";
 import mascotBackground from "@/assets/mascot-owl.png"; // Importando a imagem do mascote
 
+// Importações de imagens para o nível FÁCIL
+import raposaUvasImage from "@/assets/raposa-uvas.png";
+import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
+import principeSapoImage from "@/assets/principe-sapo.png";
+import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png";
+import rainhaDaNeveImage from "@/assets/rainha-da-neve.png";
+import gataBorralheiraImage from "@/assets/gata-borralheira.png";
+import magicoDeOzImage from "@/assets/magico-de-oz.png";
+import pequenoPolegarImage from "@/assets/pequeno-polegar.png";
+import tresPorquinhosImage from "@/assets/tres-porquinhos.png";
+import pedroLoboImage from "@/assets/pedro-e-o-lobo.png";
+import simbadMarinheiroImage from "@/assets/simbad-marinheiro.png";
+import aliBabaLadroesImage from "@/assets/ali-baba-ladroes.png";
+import oRouxinolImage from "@/assets/o-rouxinol.png";
+import barbaAzulImage from "@/assets/barba-azul.png";
+import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
+import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
+import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
+import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
+
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 
 const STORAGE_KEY = "userDifficulty";
+
+// Mapeamento de IDs de histórias para caminhos de imagem
+const STORY_IMAGE_MAP: Record<number, string> = {
+    104: raposaUvasImage,
+    105: galinhaOvosOuroImage,
+    205: principeSapoImage,
+    206: rumpelstiltskinImage,
+    207: rainhaDaNeveImage,
+    208: gataBorralheiraImage,
+    209: magicoDeOzImage,
+    210: pequenoPolegarImage,
+    211: tresPorquinhosImage,
+    212: pedroLoboImage,
+    213: simbadMarinheiroImage,
+    214: aliBabaLadroesImage,
+    215: oRouxinolImage,
+    216: barbaAzulImage,
+    217: aFadaVoadoraImage,
+    218: oCavaloEOHomemImage,
+    219: aLendaDaLuaImage,
+    220: oPescadorEOGenioImage,
+};
 
 const Reading = () => {
   const { progress } = useProgress();
@@ -188,6 +230,17 @@ const Reading = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredStories.map((story) => {
                   const isCompleted = progress.completedStories.includes(story.id);
+                  const storyImage = STORY_IMAGE_MAP[story.id];
+                  
+                  // Estilo de fundo sutil
+                  const backgroundStyle = userDifficulty === 'easy' && storyImage
+                    ? {
+                        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.95)), url(${storyImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundBlendMode: 'lighten',
+                      }
+                    : {};
 
                   return (
                     <Card
@@ -200,11 +253,17 @@ const Reading = () => {
                       }}
                       role="button"
                       tabIndex={0}
-                      className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${
+                      className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group relative overflow-hidden ${
                         isCompleted ? "border-success bg-success/5" : "border-border hover:border-primary"
                       }`}
+                      style={backgroundStyle}
                     >
-                      <div className="space-y-4">
+                      {/* Overlay para garantir a legibilidade do texto */}
+                      {userDifficulty === 'easy' && storyImage && (
+                        <div className="absolute inset-0 bg-white/80 group-hover:bg-white/90 transition-colors z-0" />
+                      )}
+                      
+                      <div className="relative z-10 space-y-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
                             <span className="text-xs font-body font-semibold text-accent uppercase">
@@ -214,7 +273,7 @@ const Reading = () => {
                               {story.title}
                             </h3>
                           </div>
-                          <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-primary/10"}`}>
+                          <div className={`flex-shrink-0 p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-primary/10"}`}>
                             {isCompleted ? (
                               <CheckCircle className="w-5 h-5 text-success" />
                             ) : (
