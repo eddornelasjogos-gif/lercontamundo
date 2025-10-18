@@ -82,7 +82,7 @@ const Index = () => {
         <div className="relative container mx-auto px-4 py-12 md:py-16">
           <div className="text-center space-y-6 max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 animate-bounce-gentle animate-scale-in">
-              Lêr + Conta Mundo
+              Planeta Sorrisos
             </h1>
             <p className="text-lg md:text-xl font-body text-gray-900 max-w-2xl mx-auto">
               Uma aventura mágica de aprendizado através da leitura e matemática! Escolha seu nível e comece a explorar.

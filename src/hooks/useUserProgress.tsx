@@ -27,7 +27,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   consecutiveDays: 0,
 };
 
-const STORAGE_KEY = 'ler-conta-mundo-progress';
+const STORAGE_KEY = 'planeta-sorrisos-progress';
 const DAILY_REWARD_XP = 25;
 
 const READING_ACHIEVEMENTS = [
