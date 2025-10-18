@@ -135,7 +135,8 @@ class Cell {
     }
   }
   
-  split(directionVector: Vector, nextCellId: number) {
+  // Método split genérico usado por Bots
+  split(directionVector: Vector, nextCellId: number): Cell | null {
     if (this.mass >= MIN_SPLIT_MASS) {
         const splitMass = this.mass / 2;
         this.mass = splitMass;
@@ -185,9 +186,47 @@ class Player extends Cell {
     }
     
     // Sobrescreve split para não aceitar argumentos e encapsular a lógica de direção/ID
-    split() {
+    // CRUCIAL: Garante que a nova célula seja uma instância de Player.
+    split(): Player | null {
+        if (this.mass < MIN_SPLIT_MASS) {
+            return null;
+        }
+        
+        const splitMass = this.mass / 2;
+        this.mass = splitMass;
+        this.radius = this.calculateRadius();
+        this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        
         const joystickVec = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
-        return super.split(joystickVec, getNextCellId());
+        
+        // Determine the direction for the impulse
+        const direction = joystickVec.magnitude() > 0.1
+            ? joystickVec.normalize()
+            : this.velocity.magnitude() > 0.1 
+                ? this.velocity.normalize() 
+                : new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1).normalize();
+
+        // Calculate initial position offset to ensure separation
+        const offsetDistance = this.radius + EJECTION_OFFSET; 
+        const offset = direction.multiply(offsetDistance);
+
+        // Cria uma nova instância de Player
+        const newCell = new Player(
+            this.position.x + offset.x, 
+            this.position.y + offset.y, 
+            this.color, 
+            splitMass,
+            this.name
+        );
+        
+        // Aplica impulso e cooldown
+        newCell.velocity = this.velocity.add(direction.multiply(EJECTION_IMPULSE));
+        newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+        
+        // Aplica contra-impulso na célula original
+        this.velocity = this.velocity.add(direction.multiply(-EJECTION_IMPULSE * 0.1));
+
+        return newCell;
     }
 }
 
@@ -517,13 +556,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   }, []);
 
   const handleSplit = useCallback(() => {
-    const newCells: Cell[] = [];
+    const newCells: Player[] = [];
     // CRUCIAL: Cria uma cópia das células do jogador ANTES de qualquer divisão
     const cellsToSplit = [...gameInstance.playerCells]; 
     
     cellsToSplit.forEach(cell => {
       // Verifica se a célula ainda existe no array principal (para evitar bugs se a célula foi comida no mesmo frame, embora improvável)
-      if (gameInstance.playerCells.includes(cell as Player)) {
+      if (gameInstance.playerCells.includes(cell)) {
         const newCell = cell.split(); 
         if (newCell) {
           newCells.push(newCell);
@@ -533,7 +572,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     });
     
     // Adiciona todas as novas células de uma vez
-    gameInstance.playerCells.push(...(newCells as Player[]));
+    gameInstance.playerCells.push(...newCells);
   }, [gameInstance, playSplit]);
 
   // Efeito para escutar a tecla Espaço (apenas para PC)
