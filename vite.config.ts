@@ -48,18 +48,6 @@ export default defineConfig(({ mode }) => ({
         description: "Um mundo de diversão, aprendizado e alegria para as crianças no Planeta Sorrisos!",
         icons: [
           {
-            src: "/icons/icon-192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
-            src: "/icons/icon-512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable"
-          },
-          {
             src: "/icons/mascot-panda-192.png",
             sizes: "192x192",
             type: "image/png",
