@@ -278,6 +278,7 @@ const botLogic = {
                     closestThreat = cell;
                 }
             } else if (totalMass > cell.mass * 1.15) { // 15% maior para ser alvo
+                // A chance de atacar é controlada pela agressão
                 if (dist < minTargetDist && Math.random() < aggression) {
                     minTargetDist = dist;
                     bestTarget = cell;
@@ -647,8 +648,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             }
             
             // 2b. Força de Atração (para fusão)
-            if (cells.length > 1 && cell.mergeCooldown <= 0) {
-                // Calcula o centro de massa do grupo
+            if (cells.length > 1) {
+                // Calcula o vetor de atração em direção ao centro de massa do grupo
                 const attractionVector = centerOfMass.subtract(cell.position).normalize();
                 
                 // Calcula o fator de atração (0 no início do cooldown, 1 no final)
