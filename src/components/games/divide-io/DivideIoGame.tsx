@@ -253,7 +253,7 @@ const botLogic = {
         // Calcula o centro de massa do bot
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
         // Corrigido: Usar botCells.length para calcular avgRadius
-        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
+        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
         let bestTarget: Pellet | Cell | null = null;
@@ -836,8 +836,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // --- 7. Atualização de Câmera e Score ---
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    const initialMass = MIN_CELL_MASS;
-    const currentScore = Math.floor(totalPlayerMass - initialMass);
+    // A pontuação é calculada a partir da massa total menos a massa inicial mínima (50)
+    const initialMassForScore = MIN_CELL_MASS / 2; 
+    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
     
     gameInstance.score = currentScore;
     if (currentScore > gameInstance.maxScore) {
@@ -1025,8 +1026,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // Resetar o contador de ID para garantir IDs únicos por jogo
     nextCellId = 1; 
     
+    // Massa inicial reduzida pela metade
+    const initialPlayerMass = MIN_CELL_MASS / 2; 
+    
     // Initialize Player Cell with Name
-    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', MIN_CELL_MASS, playerName)];
+    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', initialPlayerMass, playerName)];
     
     // Initialize Viruses
     gameInstance.viruses = Array.from({ length: VIRUS_COUNT }, (_, i) => {
@@ -1048,11 +1052,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     gameInstance.botCells = Array.from({ length: botCount }, (_, i) => {
         const name = finalBotNames[i];
         
+        // Massa inicial dos bots também reduzida pela metade (faixa de 250 a 1250)
+        const initialBotMass = Math.random() * 1000 + 250; 
+        
         return new Cell(
             Math.random() * WORLD_SIZE,
             Math.random() * WORLD_SIZE,
             getRandomColor(),
-            Math.random() * 2000 + 500,
+            initialBotMass,
             name,
             getNextCellId(),
             true // É um bot
