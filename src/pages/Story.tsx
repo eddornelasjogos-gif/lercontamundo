@@ -52,7 +52,8 @@ import guerraEPazAudio from "@/assets/audio/guerra-e-paz.m4a";
 import irmaosKaramazovAudio from "@/assets/audio/irmaos-karamazov.m4a";
 import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a";
 import raposaUvasImage from "@/assets/raposa-uvas.png";
-import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png"; // NOVO: Imagem da Galinha dos Ovos de Ouro
+import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
+import principeSapoImage from "@/assets/principe-sapo.png"; // NOVO: Imagem do Príncipe Sapo
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -646,6 +647,17 @@ const Story = () => {
               <img 
                 src={galinhaOvosOuroImage} 
                 alt="A Galinha dos Ovos de Ouro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem do Príncipe Sapo (ID 205) */}
+          {storyId === 205 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={principeSapoImage} 
+                alt="O Príncipe Sapo" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
