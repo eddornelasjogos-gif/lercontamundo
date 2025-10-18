@@ -1,76 +1,105 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calculator, Star, Trophy, CheckCircle } from "lucide-react";
+import { Calculator, Star, Trophy, CheckCircle, BarChart3 } from "lucide-react";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
-import { toast } from "sonner";
 import mathImage from "@/assets/math-numbers.png";
-import ColorHeader from "../components/ColorHeader.tsx";
-import LevelSelector from "@/components/LevelSelector";
+import ColorHeader from "../components/ColorHeader";
 import { useState, useEffect } from "react";
-import mascotBackground from "@/assets/mascot-owl.png"; // Importando a imagem do mascote
+import mascotBackground from "@/assets/mascot-owl.png";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Mascot } from "@/components/Mascot";
+import { useNavigate } from "react-router-dom";
+import MathGame from "@/components/math/MathGame";
+import { DifficultyCard } from "@/components/DifficultyCard";
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
-const STORAGE_KEY = "userDifficulty";
+type MathStatus = "menu" | "playing";
+
+const STORAGE_KEY_DIFFICULTY = "mathDifficulty";
+const STORAGE_KEY_PLAYER_NAME = "mathPlayerName";
 
 const Math = () => {
-  const { progress, completeExercise } = useProgress();
+  const { progress } = useProgress();
+  const navigate = useNavigate();
 
-  const initialDifficulty = (localStorage.getItem(STORAGE_KEY) as Difficulty) || "easy";
+  const initialDifficulty = (localStorage.getItem(STORAGE_KEY_DIFFICULTY) as Difficulty) || "easy";
+  const initialPlayerName = localStorage.getItem(STORAGE_KEY_PLAYER_NAME) || "Aluno(a)";
+  
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(initialDifficulty);
+  const [playerName, setPlayerName] = useState<string>(initialPlayerName);
+  const [mathStatus, setMathStatus] = useState<MathStatus>("menu");
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, selectedDifficulty);
-  }, [selectedDifficulty]);
+    localStorage.setItem(STORAGE_KEY_DIFFICULTY, selectedDifficulty);
+    localStorage.setItem(STORAGE_KEY_PLAYER_NAME, playerName);
+  }, [selectedDifficulty, playerName]);
 
-  const handleCompleteExercise = (exerciseId: number, xpReward: number) => {
-    completeExercise(exerciseId, xpReward);
-    toast.success(`🎉 Parabéns! Você ganhou ${xpReward} XP!`);
+  const handleStartGame = () => {
+    if (playerName.trim() === "") {
+      alert("Por favor, digite seu nome para começar!");
+      return;
+    }
+    setMathStatus("playing");
   };
+  
+  const difficulties = [
+    {
+      id: "easy",
+      title: "Fácil",
+      description: "Soma e Subtração (até 100)",
+      ageRange: "7-8 anos",
+      icon: Star,
+      color: "border-success hover:border-success",
+      background: "bg-gradient-to-br from-emerald-300/50 via-emerald-200/50 to-emerald-100/50",
+    },
+    {
+      id: "medium",
+      title: "Médio",
+      description: "Multiplicação e Divisão (inteiros)",
+      ageRange: "9-10 anos",
+      icon: Trophy,
+      color: "border-secondary hover:border-secondary",
+      background: "bg-gradient-to-br from-sky-300/50 via-sky-200/50 to-sky-100/50",
+    },
+    {
+      id: "hard",
+      title: "Difícil",
+      description: "Multiplicação e Divisão (decimais)",
+      ageRange: "11-12 anos",
+      icon: Calculator,
+      color: "border-accent hover:border-accent",
+      background: "bg-gradient-to-br from-cyan-300/50 via-teal-200/50 to-emerald-100/50",
+    },
+    {
+      id: "very-hard",
+      title: "Muito Difícil",
+      description: "Números grandes e Equações (com 'x')",
+      ageRange: "13-14 anos",
+      icon: CheckCircle,
+      color: "border-primary hover:border-primary",
+      background: "bg-gradient-to-br from-violet-300/50 via-fuchsia-200/50 to-pink-100/50",
+    },
+  ];
 
-  const exercisesByDifficulty: Record<Difficulty, Array<any>> = {
-    easy: [
-      { id: 1, title: "Soma Divertida", description: "Pratique adições básicas", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
-      { id: 2, title: "Subtração Mágica", description: "Aprenda a subtrair", difficulty: "Fácil", exercises: 10, xp: 40, completed: false },
-      { id: 3, title: "Contando com Objetos", description: "Quantos são?", difficulty: "Fácil", exercises: 8, xp: 30, completed: false },
-      { id: 4, title: "Formas e Números", description: "Combina formas com números", difficulty: "Fácil", exercises: 6, xp: 25, completed: false },
-    ],
-    medium: [
-      { id: 10, title: "Multiplicação Estelar", description: "Tabuada interativa", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
-      { id: 11, title: "Divisão Espacial", description: "Divida e conquiste", difficulty: "Médio", exercises: 15, xp: 60, completed: false },
-      { id: 12, title: "Frações Simples", description: "Aprenda frações básicas", difficulty: "Médio", exercises: 12, xp: 55, completed: false },
-      { id: 13, title: "Medidas e Unidades", description: "Compreendendo medidas", difficulty: "Médio", exercises: 10, xp: 50, completed: false },
-    ],
-    hard: [
-      { id: 20, title: "Proporções e Razões", description: "Problemas de proporção", difficulty: "Difícil", exercises: 12, xp: 90, completed: false },
-      { id: 21, title: "Equações Básicas", description: "Introdução a equações", difficulty: "Difícil", exercises: 14, xp: 100, completed: false },
-      { id: 22, title: "Problemas de Texto", description: "Resolver usando lógica", difficulty: "Difícil", exercises: 16, xp: 110, completed: false },
-      { id: 23, title: "Geometria Básica", description: "Perímetros e áreas", difficulty: "Difícil", exercises: 12, xp: 95, completed: false },
-    ],
-    "very-hard": [
-      { id: 30, title: "Desafios Avançados", description: "Problemas complexos", difficulty: "Muito Difícil", exercises: 20, xp: 150, completed: false },
-      { id: 31, title: "Raciocínio Lógico Avançado", description: "Desafios de lógica", difficulty: "Muito Difícil", exercises: 18, xp: 140, completed: false },
-      { id: 32, title: "Mistura de Operações", description: "Misture tudo e resolva", difficulty: "Muito Difícil", exercises: 20, xp: 160, completed: false },
-    ],
-  };
-
-  const exercises = exercisesByDifficulty[selectedDifficulty];
-
-  const difficultyColors: Record<string, string> = {
-    Fácil: "text-success bg-success/10 border-success",
-    Médio: "text-secondary bg-secondary/10 border-secondary",
-    Difícil: "text-accent bg-accent/10 border-accent",
-    "Muito Difícil": "text-primary bg-primary/10 border-primary",
-  };
+  if (mathStatus === "playing") {
+    return (
+      <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <MathGame difficulty={selectedDifficulty} playerName={playerName} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
       <Navigation />
 
-      {/* HERO COLORIDO DO TOPO (com Header colorido ao lado) */}
+      {/* HERO COLORIDO DO TOPO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[hsl(202,95%,84%)] via-[hsl(288,95%,86%)] to-[hsl(145,90%,84%)] shadow-soft">
-        {/* Mascote de fundo no HERO */}
         <div
           className="absolute inset-0 opacity-40"
           style={{
@@ -80,8 +109,6 @@ const Math = () => {
           }}
         />
         <div className="absolute -top-12 right-4 h-56 w-56 rounded-full bg-[hsl(286,100%,85%)] opacity-60 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-60 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(52,100%,90%)] opacity-60 blur-3xl" />
         <div className="relative z-10 container mx-auto px-4 py-12 md:py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -93,9 +120,14 @@ const Math = () => {
                 gradientTo="#f472b6"
               />
             </div>
-            <div className="flex flex-col items-center gap-3">
-              <LevelSelector value={selectedDifficulty} onChange={(d) => setSelectedDifficulty(d)} />
-            </div>
+            <Button 
+                variant="secondary" 
+                onClick={() => navigate('/math/reports')}
+                className="shadow-soft"
+            >
+                <BarChart3 className="w-5 h-5 mr-2" />
+                Relatórios
+            </Button>
           </div>
         </div>
       </section>
@@ -107,69 +139,46 @@ const Math = () => {
         </div>
 
         <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(210,95%,82%)] via-[hsl(286,90%,80%)] to-[hsl(145,90%,78%)] px-6 py-12 shadow-glow md:px-12 md:py-16">
-          {/* Mascote de fundo na seção principal */}
-          <div
-            className="absolute inset-0 opacity-20 z-0"
-            style={{
-              backgroundImage: `url(${mascotBackground})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          
-          <div className="absolute -top-24 -right-16 h-60 w-60 rounded-full bg-[hsl(286,100%,85%)] opacity-70 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-72 w-72 -translate-y-1/4 -translate-x-1/4 rounded-full bg-[hsl(145,95%,80%)] opacity-70 blur-3xl" />
-          <div className="absolute top-1/2 left-12 h-48 w-48 -translate-y-1/2 rounded-full bg-[hsl(52,100%,88%)] opacity-80 blur-3xl" />
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=%27160%27 height=%27160%27 viewBox=%270 0 200 200%27 fill=%27none%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Ccircle cx=%2740%27 cy=%2780%27 r=%2716%27 fill=%27%23ffffff33%27/%3E%3Ccircle cx=%27150%27 cy=%2740%27 r=%2712%27 fill=%27%23ffffff2d%27/%3E%3Ccircle cx=%2790%27 cy=%27160%27 r=%2724%27 fill=%27%23ffffff2d%27/%3E%3C/svg%3E')] opacity-40" />
-
-          <div className="relative z-10 space-y-8">
-            {exercises.map((exercise) => {
-              const isCompleted = progress.completedExercises.includes(exercise.id);
-
-              return (
-                <Card key={exercise.id} className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group ${isCompleted ? "border-success bg-success/5" : "border-border hover:border-primary"}`}>
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <span className="text-xs font-body font-semibold text-accent uppercase">
-                          {exercise.difficulty}
-                        </span>
-                        <h3 className="text-xl font-display font-bold text-foreground group-hover:text-secondary transition-smooth">
-                          {exercise.title}
-                        </h3>
-                      </div>
-                      <div className={`p-2 rounded-full ${isCompleted ? "bg-success/20" : "bg-primary/10"}`}>
-                        {isCompleted ? (
-                          <CheckCircle className="w-5 h-5 text-success" />
-                        ) : (
-                          <Calculator className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Trophy className="w-4 h-4" />
-                        <span>{exercise.exercises} exercícios</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-secondary fill-secondary" />
-                        <span>{exercise.xp} XP</span>
-                      </div>
-                    </div>
-
-                    <Button
-                      variant={isCompleted ? "outline" : "secondary"}
-                      className="w-full"
-                      onClick={() => !isCompleted && handleCompleteExercise(exercise.id, exercise.xp)}
-                      disabled={isCompleted}
+          <div className="absolute inset-0 opacity-20 z-0" style={{ backgroundImage: `url(${mascotBackground})`, backgroundSize: "cover", backgroundPosition: "center" }} />
+          <div className="relative z-10 space-y-8 max-w-4xl mx-auto">
+            
+            <div className="text-center space-y-4">
+                <Mascot message="Escolha seu nível e vamos começar a calcular!" className="mx-auto" />
+                <h2 className="text-3xl font-display font-bold text-foreground">Selecione o Desafio</h2>
+            </div>
+            
+            {/* Seleção de Nível */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {difficulties.map((d) => (
+                    <DifficultyCard
+                        key={d.id}
+                        {...d}
+                        onClick={() => setSelectedDifficulty(d.id as Difficulty)}
+                        className={selectedDifficulty === d.id ? "border-4 border-primary shadow-glow" : ""}
+                    />
+                ))}
+            </div>
+            
+            {/* Input de Nome e Botão Iniciar */}
+            <Card className="p-6 border-2 border-primary/30 shadow-card space-y-4">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <Input
+                        placeholder="Seu nome (para o relatório)"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        className="flex-grow font-body font-semibold text-center"
+                        maxLength={20}
+                    />
+                    <Button 
+                        size="lg" 
+                        onClick={handleStartGame} 
+                        disabled={playerName.trim() === ""}
+                        className="w-full sm:w-auto gradient-primary shadow-soft"
                     >
-                      {isCompleted ? "✓ Completado" : "Começar Desafio"}
+                        Começar Nível {difficulties.find(d => d.id === selectedDifficulty)?.title || 'Fácil'}
                     </Button>
-                  </div>
-                </Card>
-              );
-            })}
+                </div>
+            </Card>
           </div>
         </section>
       </div>

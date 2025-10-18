@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      math_sessions: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          difficulty: string
+          id: string
+          performance_data: Json
+          player_name: string
+          time_spent_seconds: number
+          total_questions: number
+        }
+        Insert: {
+          correct_answers: number
+          created_at?: string
+          difficulty: string
+          id?: string
+          performance_data: Json
+          player_name: string
+          time_spent_seconds: number
+          total_questions: number
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          difficulty?: string
+          id?: string
+          performance_data?: Json
+          player_name?: string
+          time_spent_seconds?: number
+          total_questions?: number
+        }
+        Relationships: []
+      }
       [_ in never]: never
     }
     Views: {
