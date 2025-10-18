@@ -83,8 +83,8 @@ export const generateStoryQuestionText = (question: Question): string => {
     const { operation, expression, answer } = question;
     
     // Extrai os números da expressão
-    // Corrigido: Substituído \x por x literal para evitar erro de escape hexadecimal.
-    const parts = expression.split(/[\s\+\-\x\÷\=x]+/g).filter(Boolean);
+    // Corrigido: Removido o escape hexadecimal incorreto (\x)
+    const parts = expression.split(/[\s\+\-\÷\=x]+/g).filter(Boolean);
     
     let num1 = parseFloat(parts[0]);
     let num2 = parseFloat(parts[1]);
