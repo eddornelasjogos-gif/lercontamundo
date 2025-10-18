@@ -14,6 +14,7 @@ import { Mascot } from "@/components/Mascot";
 interface MathGameProps {
   difficulty: Difficulty;
   playerName: string;
+  onBackToMenu: () => void; // Nova prop
 }
 
 interface SessionProgress {
@@ -33,7 +34,7 @@ const INITIAL_PERFORMANCE: Record<OperationType, { correct: number; total: numbe
     equation: { correct: 0, total: 0, time: 0 },
 };
 
-const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName }) => {
+const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName, onBackToMenu }) => {
   const navigate = useNavigate();
   const { progress, addXP } = useProgress();
   
@@ -144,6 +145,7 @@ const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName }) => {
             totalQuestions: totalQuestions,
         }}
         onRestart={handleRestart} // Passa a função de reinício
+        onBackToMenu={onBackToMenu} // Passa a função de voltar ao menu
       />
     );
   }

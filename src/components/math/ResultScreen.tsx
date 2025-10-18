@@ -27,6 +27,7 @@ interface ResultScreenProps {
   playerName: string;
   session: SessionData;
   onRestart: () => void;
+  onBackToMenu: () => void; // Nova prop
 }
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -46,7 +47,7 @@ const OPERATION_LABELS: Record<OperationType, string> = {
 
 const LOCAL_STORAGE_REPORTS_KEY = 'math_reports';
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, session, onRestart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, session, onRestart, onBackToMenu }) => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -181,7 +182,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
             <Save className={cn("w-5 h-5 mr-2", isSaving && "animate-spin")} />
             {isSaving ? "Salvando Desempenho..." : "Salvar Desempenho e Ver Relatórios"}
         </Button>
-        <Button variant="outline" onClick={() => navigate('/math')} className="w-full">
+        <Button variant="outline" onClick={onBackToMenu} className="w-full">
           Voltar para Seleção de Nível
         </Button>
       </div>

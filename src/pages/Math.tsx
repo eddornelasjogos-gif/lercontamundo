@@ -66,13 +66,21 @@ const Math = () => {
   const handleDifficultyChange = (d: Difficulty) => {
     setSelectedDifficulty(d);
   };
+  
+  const handleBackToMenu = () => {
+    setMathStatus("menu");
+  };
 
   if (mathStatus === "playing") {
     return (
       <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
-          <MathGame difficulty={selectedDifficulty} playerName={playerName} />
+          <MathGame 
+            difficulty={selectedDifficulty} 
+            playerName={playerName} 
+            onBackToMenu={handleBackToMenu} // Passando a função de volta ao menu
+          />
         </div>
       </div>
     );
