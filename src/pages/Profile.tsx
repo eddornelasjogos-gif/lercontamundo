@@ -33,7 +33,14 @@ const Profile = () => {
   ];
 
   const getVisibleAchievements = (seriesIds: string[]) => {
-    const lastUnlockedIndex = seriesIds.findLastIndex(id => progress.achievements.includes(id));
+    let lastUnlockedIndex = -1;
+    for (let i = seriesIds.length - 1; i >= 0; i--) {
+      if (progress.achievements.includes(seriesIds[i])) {
+        lastUnlockedIndex = i;
+        break;
+      }
+    }
+    
     const visibleIds = seriesIds.slice(0, lastUnlockedIndex + 2);
     return allAchievements.filter(ach => visibleIds.includes(ach.id));
   };

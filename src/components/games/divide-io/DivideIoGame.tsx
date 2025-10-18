@@ -184,6 +184,7 @@ class Player extends Cell {
         super(x, y, color, initialMass, name, getNextCellId(), false);
     }
     
+    // Sobrescreve split para não aceitar argumentos e encapsular a lógica de direção/ID
     split() {
         const joystickVec = new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y);
         return super.split(joystickVec, getNextCellId());
@@ -523,7 +524,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     cellsToSplit.forEach(cell => {
       // Verifica se a célula ainda existe no array principal (para evitar bugs se a célula foi comida no mesmo frame, embora improvável)
       if (gameInstance.playerCells.includes(cell as Player)) {
-        const newCell = cell.split(new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y), getNextCellId());
+        // CORREÇÃO TS2554: Chama cell.split() sem argumentos, pois Player.split() encapsula a lógica de direção/ID.
+        const newCell = cell.split(); 
         if (newCell) {
           newCells.push(newCell);
           playSplit(); // Toca SFX de divisão
@@ -584,6 +586,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         playerCell.velocity = playerCell.velocity.add(force);
 
         // NOVO CÁLCULO DE VELOCIDADE MÁXIMA: Mais lento no início e desaceleração mais suave
+        // Reduzido de 100 para 50 (metade da velocidade inicial) e ajustado o denominador para suavizar a queda.
         const maxSpeed = 50 / (playerCell.radius * 0.2 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
@@ -663,6 +666,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             
             // 2c. Lógica de Divisão (se o bot for grande e estiver caçando)
             if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
+                // Bots usam a função split da classe base, que requer direção e ID
                 const newCell = cell.split(targetDirection, getNextCellId());
                 if (newCell) {
                     newBotCells.push(newCell);
@@ -936,7 +940,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // --- 7. Atualização de Câmera e Score ---
     // totalPlayerMass já foi calculado na seção 1
     const initialMassForScore = MIN_CELL_MASS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
+    const currentScore = Math.floor(totalPlayerMass - initialPlayerMass);
     
     gameInstance.score = currentScore;
     if (currentScore > gameInstance.maxScore) {
