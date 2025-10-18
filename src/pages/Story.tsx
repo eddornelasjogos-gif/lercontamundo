@@ -68,7 +68,8 @@ import barbaAzulImage from "@/assets/barba-azul.png";
 import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
 import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
 import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
-import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png"; // NOVO: Imagem de O Pescador e o Gênio
+import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
+import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png"; // NOVO: Imagem de A Cigarra e a Formiga
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -644,6 +645,17 @@ const Story = () => {
               </div>
             </div>
           </Card>
+
+          {/* Imagem de A Cigarra e a Formiga (ID 101) */}
+          {storyId === 101 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={cigarraFormigaImage} 
+                alt="A Cigarra e a Formiga" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
 
           {/* Imagem da Raposa e as Uvas (ID 104) */}
           {storyId === 104 && (
