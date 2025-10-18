@@ -294,7 +294,7 @@ const Reading = () => {
             </div>
 
             {/* Stories Grid */}
-            <div className="rounded-3xl bg-white/65 p-6 md:p-8 shadow-soft backdrop-blur-sm">
+            <div className="rounded-3xl bg-white/60 p-6 md:p-8 shadow-soft backdrop-blur-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredStories.map((story) => {
                   const isCompleted = progress.completedStories.includes(story.id);
@@ -303,10 +303,9 @@ const Reading = () => {
                   // Estilo de fundo aprimorado: aplica a imagem e um gradiente de sobreposição
                   const backgroundStyle = storyImage
                     ? {
-                        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url(${storyImage})`,
+                        backgroundImage: `url(${storyImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        backgroundBlendMode: 'lighten', // Mistura a cor de fundo com a imagem
                       }
                     : {};
 
@@ -321,19 +320,22 @@ const Reading = () => {
                       }}
                       role="button"
                       tabIndex={0}
-                      className={`p-6 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group relative overflow-hidden ${
+                      className={`p-0 hover:shadow-glow transition-smooth cursor-pointer border-2 animate-scale-in group relative overflow-hidden h-64 ${
                         isCompleted ? "border-success bg-success/5" : "border-border hover:border-primary"
                       }`}
                       style={backgroundStyle}
                     >
+                      {/* Overlay para garantir legibilidade do texto */}
+                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                      
                       {/* Conteúdo do Card (Texto e Botões) */}
-                      <div className="relative z-10 space-y-4">
+                      <div className="relative z-10 p-6 h-full flex flex-col justify-between text-white space-y-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
-                            <span className="text-xs font-body font-semibold text-accent uppercase">
+                            <span className="text-xs font-body font-semibold text-amber-300 uppercase">
                               {story.category}
                             </span>
-                            <h3 className="text-xl font-display font-bold text-foreground group-hover:text-primary transition-smooth">
+                            <h3 className="text-xl font-display font-bold transition-smooth">
                               {story.title}
                             </h3>
                           </div>
@@ -346,24 +348,26 @@ const Reading = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-secondary fill-secondary" />
-                            <span>{story.xp} XP</span>
-                          </div>
-                        </div>
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-4 text-sm text-white/80">
+                              <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                <span>{story.xp} XP</span>
+                              </div>
+                            </div>
 
-                        <Button
-                          variant={isCompleted ? "outline" : "gradient"}
-                          className="w-full"
-                          onClick={(e) => {
-                            // prevent the click on the button from bubbling up and causing double navigation side-effects
-                            e.stopPropagation();
-                            navigate(`/reading/${story.id}`);
-                          }}
-                        >
-                          {isCompleted ? "✓ Completado" : "Começar Leitura"}
-                        </Button>
+                            <Button
+                              variant={isCompleted ? "outline" : "default"}
+                              className="w-full bg-white text-primary hover:bg-gray-100"
+                              onClick={(e) => {
+                                // prevent the click on the button from bubbling up and causing double navigation side-effects
+                                e.stopPropagation();
+                                navigate(`/reading/${story.id}`);
+                              }}
+                            >
+                              {isCompleted ? "✓ Completado" : "Começar Leitura"}
+                            </Button>
+                        </div>
                       </div>
                     </Card>
                   );
