@@ -121,7 +121,7 @@ const Reading = () => {
       { id: 307, title: "Heidi (trechos)", category: "Clássicos", xp: 120, stars: 4 },
       { id: 308, title: "A História de Tom Sawyer (trechos)", category: "Clássicos", xp: 130, stars: 4 },
       { id: 309, title: "O Corcunda de Notre-Dame (trechos)", category: "Clássicos", xp: 140, stars: 4 },
-      { id: 310, title: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
+      { id: 310: "Grimm: Histórias Selecionadas (trechos)", category: "Clássicos", xp: 125, stars: 4 },
     ],
     "very-hard": [
       // Clássicos (trechos) (401-405)
@@ -232,13 +232,13 @@ const Reading = () => {
                   const isCompleted = progress.completedStories.includes(story.id);
                   const storyImage = STORY_IMAGE_MAP[story.id];
                   
-                  // Estilo de fundo sutil
+                  // Estilo de fundo aprimorado: aplica a imagem e um gradiente de sobreposição
                   const backgroundStyle = userDifficulty === 'easy' && storyImage
                     ? {
-                        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.95)), url(${storyImage})`,
+                        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url(${storyImage})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
-                        backgroundBlendMode: 'lighten',
+                        backgroundBlendMode: 'lighten', // Mistura a cor de fundo com a imagem
                       }
                     : {};
 
@@ -258,11 +258,7 @@ const Reading = () => {
                       }`}
                       style={backgroundStyle}
                     >
-                      {/* Overlay para garantir a legibilidade do texto */}
-                      {userDifficulty === 'easy' && storyImage && (
-                        <div className="absolute inset-0 bg-white/80 group-hover:bg-white/90 transition-colors z-0" />
-                      )}
-                      
+                      {/* Conteúdo do Card (Texto e Botões) */}
                       <div className="relative z-10 space-y-4">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
