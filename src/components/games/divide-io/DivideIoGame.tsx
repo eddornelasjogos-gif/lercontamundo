@@ -922,12 +922,52 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
     pellets.forEach(p => p.draw(ctx));
-    viruses.forEach(v => v.draw(ctx)); // Draw viruses
-
-    // Draw cells and names
-    allCells.sort((a, b) => a.mass - b.mass).forEach(c => {
+    
+    // --- NOVO: Lógica de Desenho de Camadas ---
+    
+    const cellsInsideVirus: Cell[] = [];
+    const cellsOutsideVirus: Cell[] = [];
+    
+    // 1. Classificar células
+    allCells.forEach(cell => {
+        let isInside = false;
+        if (cell.mass <= VIRUS_MASS) {
+            for (const virus of viruses) {
+                const distToVirus = cell.position.subtract(virus.position).magnitude();
+                // Se a célula estiver totalmente dentro do vírus
+                if (distToVirus + cell.radius < virus.radius) {
+                    isInside = true;
+                    break;
+                }
+            }
+        }
+        if (isInside) {
+            cellsInsideVirus.push(cell);
+        } else {
+            cellsOutsideVirus.push(cell);
+        }
+    });
+    
+    // 2. Desenhar células fora do vírus (camada inferior)
+    cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
         c.draw(ctx, c instanceof Player);
     });
+
+    // 3. Desenhar vírus (camada intermediária)
+    viruses.forEach(v => v.draw(ctx)); 
+
+    // 4. Desenhar células dentro do vírus (camada superior, mas invisível, pois o vírus as cobriu)
+    // Na verdade, se a célula está totalmente dentro do vírus, ela não precisa ser desenhada, pois o vírus já foi desenhado por cima.
+    // Se quisermos que a célula seja *visível* dentro do vírus (como no Agar.io original, onde o vírus é semi-transparente), precisaríamos de transparência no vírus.
+    // Como o vírus é opaco, desenhar as células internas aqui não fará diferença, pois elas estão sob o vírus.
+    // Se a intenção é que elas fiquem invisíveis, a classificação acima já garante que elas não sejam desenhadas na camada 2.
+    
+    // Se a intenção é que elas fiquem invisíveis, não precisamos desenhar cellsInsideVirus.
+    // Se a intenção é que elas fiquem visíveis, o vírus precisa ser semi-transparente. Vamos manter o vírus opaco por enquanto, fazendo com que as células internas fiquem invisíveis.
+    
+    // 5. Desenhar células que estão parcialmente fora do vírus ou são maiores (já desenhadas na camada 2)
+    
+    // --- FIM: Lógica de Desenho de Camadas ---
 
     ctx.restore();
 
