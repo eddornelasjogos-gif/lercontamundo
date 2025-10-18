@@ -1076,8 +1076,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (mascotImgRef.current) {
         const img = mascotImgRef.current;
         // Tamanho da célula de repetição (ajustado para ser visível e sutil)
-        const patternSize = 500; 
-        const opacity = 0.1; 
+        const patternSize = 300; // Reduzido para 300
+        const opacity = 0.2; // Aumentado para 0.2
         
         ctx.globalAlpha = opacity;
         
