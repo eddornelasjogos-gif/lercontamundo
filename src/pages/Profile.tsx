@@ -1,18 +1,53 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Edit, Save, X } from "lucide-react";
 import { Star, Trophy as TrophyIcon, BookOpen, Calculator, Award, Flame, Library, BrainCircuit } from "lucide-react";
 import { Trophy } from "@/components/Trophy";
 import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import { Mascot } from "@/components/Mascot";
-import PushNotificationManager from "@/components/PushNotificationManager"; // Import the new component
 
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
+
+  // Estado para o nome do usuário (global, salvo no localStorage)
+  const [userName, setUserName] = useState<string>(() => {
+    return localStorage.getItem('userName') || '';
+  });
+  const [isEditingName, setIsEditingName] = useState<boolean>(!userName); // Edita se não houver nome
+
+  // Carrega o nome do localStorage ao montar
+  useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setUserName(savedName);
+      setIsEditingName(false);
+    }
+  }, []);
+
+  // Salva o nome no localStorage e atualiza estado
+  const handleSaveName = () => {
+    if (userName.trim().length < 3) {
+      toast.error("O nome deve ter pelo menos 3 caracteres!");
+      return;
+    }
+    localStorage.setItem('userName', userName.trim());
+    setIsEditingName(false);
+    toast.success(`Nome "${userName.trim()}" salvo com sucesso!`);
+  };
+
+  // Cancela edição
+  const handleCancelEdit = () => {
+    const savedName = localStorage.getItem('userName') || '';
+    setUserName(savedName);
+    setIsEditingName(false);
+  };
 
   // Definição completa de todas as conquistas
   const allAchievements = [
@@ -89,6 +124,60 @@ const Profile = () => {
               <p className="text-white/90 font-body">Acompanhe seu progresso e conquistas!</p>
             </div>
           </div>
+
+          {/* Seção de Edição de Nome */}
+          <div className="mt-6 max-w-md mx-auto">
+            <Card className="p-6 shadow-card border-2 border-primary/20">
+              <div className="space-y-4">
+                <h2 className="text-xl font-display font-bold text-foreground text-center">Seu Nome</h2>
+                {isEditingName ? (
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Digite seu nome"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      className="w-full font-body font-semibold text-center"
+                      maxLength={20}
+                    />
+                    <div className="flex gap-2 justify-center">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveName}
+                        className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+                      >
+                        <Save className="w-4 h-4" />
+                        Salvar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelEdit}
+                        className="flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-2xl font-display font-bold text-primary">
+                      {userName || 'Nome não definido'}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setIsEditingName(true)}
+                      className="flex items-center gap-1"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Editar
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         </div>
       </section>
 
@@ -149,12 +238,6 @@ const Profile = () => {
                   </div>
                 </div>
               )}
-
-              {/* Add Push Notification Manager */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-center">Notificações Push</h3>
-                <PushNotificationManager />
-              </div>
             </div>
           </div>
         </section>
