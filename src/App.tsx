@@ -21,12 +21,13 @@ const queryClient = new QueryClient();
 const NavigationWrapper = () => {
   const location = useLocation();
   
-  // A página Math.tsx gerencia seu próprio estado de bloqueio e renderiza a Navigation.
-  // A página Games.tsx gerencia a exibição da navegação com base no status do jogo.
-  // Se a rota for /math ou /games, a Navigation é renderizada DENTRO da página.
+  // A página Math.tsx gerencia seu próprio estado de bloqueio.
+  // Se a rota for /math, a Navigation é renderizada DENTRO de Math.tsx,
+  // que passa a prop `checkBlock`.
+  // Para todas as outras rotas, renderizamos a Navigation sem a prop `checkBlock`.
   
-  if (location.pathname.startsWith('/math') || location.pathname.startsWith('/games')) {
-    // A Navigation será renderizada dentro de Math.tsx ou Games.tsx
+  if (location.pathname.startsWith('/math')) {
+    // A Navigation será renderizada dentro de Math.tsx
     return null; 
   }
   

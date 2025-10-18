@@ -55,11 +55,9 @@ const Games = () => {
   };
 
   if (gameStatus === "playing") {
-    // Quando estiver jogando, renderiza APENAS o jogo
     return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} playerName={inputName.trim()} />;
   }
 
-  // Quando estiver no menu ou gameover, renderiza a navegação e o menu
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20 flex flex-col">
       <Navigation />
