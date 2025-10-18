@@ -42,10 +42,13 @@ export default defineConfig(({ mode }) => ({
         short_name: "Sorrisos",
         start_url: "/",
         display: "standalone",
+        display_override: ["standalone", "minimal-ui"],
         orientation: "portrait",
         background_color: "#FFF8E1",
         theme_color: "#FFB300",
         description: "Um mundo de diversão, aprendizado e alegria para as crianças no Planeta Sorrisos!",
+        dir: "ltr",
+        prefer_related_applications: false,
         icons: [
           {
             src: "/icons/mascot-panda-192.png",
@@ -58,6 +61,29 @@ export default defineConfig(({ mode }) => ({
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable"
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Começar Leitura",
+            short_name: "Leitura",
+            description: "Acesse as histórias e fábulas.",
+            url: "/reading",
+            icons: [{ src: "/icons/mascot-panda-192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Praticar Matemática",
+            short_name: "Matemática",
+            description: "Inicie um desafio de matemática.",
+            url: "/math",
+            icons: [{ src: "/icons/mascot-panda-192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Jogar Divide.io",
+            short_name: "Jogos",
+            description: "Jogue o Divide.io e suba no placar.",
+            url: "/games",
+            icons: [{ src: "/icons/mascot-panda-192.png", sizes: "192x192" }]
           }
         ],
         screenshots: [
@@ -150,6 +176,98 @@ export default defineConfig(({ mode }) => ({
             sizes: "1080x2340",
             type: "image/jpeg",
             platform: "wide",
+            label: "Opção de resetar o progresso."
+          },
+          // Adicionando as capturas de tela 'narrow' (duplicando as existentes)
+          {
+            src: "/screenshots/screenshot-00.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Tela inicial de seleção de nível."
+          },
+          {
+            src: "/screenshots/screenshot-01.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Menu de seleção de nível de leitura."
+          },
+          {
+            src: "/screenshots/screenshot-02.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Menu de categorias de histórias."
+          },
+          {
+            src: "/screenshots/screenshot-03.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Visualização de uma história com imagem e áudio."
+          },
+          {
+            src: "/screenshots/screenshot-04.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Conteúdo da história e navegação."
+          },
+          {
+            src: "/screenshots/screenshot-05.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Menu principal da área de matemática."
+          },
+          {
+            src: "/screenshots/screenshot-06.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Tela de jogo de matemática com barra de progresso."
+          },
+          {
+            src: "/screenshots/screenshot-07.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Menu principal do jogo Divide.io."
+          },
+          {
+            src: "/screenshots/screenshot-08.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Gameplay do jogo Divide.io com placar."
+          },
+          {
+            src: "/screenshots/screenshot-09.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Tela de perfil e progresso de nível."
+          },
+          {
+            src: "/screenshots/screenshot-10.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Estatísticas de leitura, exercícios e sequência de dias."
+          },
+          {
+            src: "/screenshots/screenshot-11.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
+            label: "Visualização das próximas conquistas."
+          },
+          {
+            src: "/screenshots/screenshot-12.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "narrow",
             label: "Opção de resetar o progresso."
           }
         ],
