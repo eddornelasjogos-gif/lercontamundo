@@ -51,7 +51,8 @@ import mobyDickAudio from "@/assets/audio/moby-dick.m4a";
 import guerraEPazAudio from "@/assets/audio/guerra-e-paz.m4a";
 import irmaosKaramazovAudio from "@/assets/audio/irmaos-karamazov.m4a";
 import crimeECastigoAudio from "@/assets/audio/crime-e-castigo.m4a";
-import raposaUvasImage from "@/assets/raposa-uvas.png"; // NOVO: Imagem da Raposa e as Uvas
+import raposaUvasImage from "@/assets/raposa-uvas.png";
+import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png"; // NOVO: Imagem da Galinha dos Ovos de Ouro
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -638,6 +639,17 @@ const Story = () => {
               />
             </Card>
           )}
+          
+          {/* Imagem da Galinha dos Ovos de Ouro (ID 105) */}
+          {storyId === 105 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={galinhaOvosOuroImage} 
+                alt="A Galinha dos Ovos de Ouro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
 
           {storyId === 101 && (
             <Card className="p-6 shadow-soft">
@@ -998,7 +1010,7 @@ const Story = () => {
               </div>
             </Card>
           )}
-          
+
           {storyId === 301 && (
             <Card className="p-6 shadow-soft">
               <div className="space-y-3">
