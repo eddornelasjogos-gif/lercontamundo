@@ -32,8 +32,8 @@ import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a";
 import aliBabaAudio from "@/assets/audio/ali-baba-ladroes.m4a";
 import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
 import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
-import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a"; // NOVO: Áudio de A Fada Voadora
-import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
+import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a";
+import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a"; // NOVO: Áudio de O Cavalo e o Homem
 import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
 import oPescadorEOGenioAudio from "@/assets/audio/o-pescador-e-o-genio.m4a";
 import pinocchioAudio from "@/assets/audio/pinocchio.m4a";
@@ -65,7 +65,8 @@ import simbadMarinheiroImage from "@/assets/simbad-marinheiro.png";
 import aliBabaLadroesImage from "@/assets/ali-baba-ladroes.png";
 import oRouxinolImage from "@/assets/o-rouxinol.png";
 import barbaAzulImage from "@/assets/barba-azul.png";
-import aFadaVoadoraImage from "@/assets/a-fada-voadora.png"; // NOVO: Imagem de A Fada Voadora
+import aFadaVoadoraImage from "@/assets/a-fada-voadora.png";
+import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png"; // NOVO: Imagem de O Cavalo e o Homem
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -802,6 +803,17 @@ const Story = () => {
               <img 
                 src={aFadaVoadoraImage} 
                 alt="A Fada Voadora" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de O Cavalo e o Homem (ID 218) */}
+          {storyId === 218 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={oCavaloEOHomemImage} 
+                alt="O Cavalo e o Homem" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
