@@ -62,6 +62,13 @@ export default defineConfig(({ mode }) => ({
         ],
         screenshots: [
           {
+            src: "/screenshots/screenshot-00.jpeg",
+            sizes: "1080x2340",
+            type: "image/jpeg",
+            platform: "wide",
+            label: "Tela inicial de seleção de nível."
+          },
+          {
             src: "/screenshots/screenshot-01.jpeg",
             sizes: "1080x2340",
             type: "image/jpeg",
