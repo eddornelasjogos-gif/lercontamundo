@@ -663,8 +663,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 if (cell.mass > EXPLOSION_THRESHOLD_MASS) {
                     // EXPLOSION!
                     
-                    // 1. Generate pellets from the cell's mass
-                    const cellPellets = generatePelletsFromMass(cell.mass, cell.position);
+                    // 1. Generate pellets from HALF the cell's mass
+                    const massToRedistribute = cell.mass / 2;
+                    const cellPellets = generatePelletsFromMass(massToRedistribute, cell.position);
                     gameInstance.pellets.push(...cellPellets);
                     
                     // 2. Generate pellets from the virus's mass (Virus also explodes)
@@ -957,15 +958,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     viruses.forEach(v => v.draw(ctx)); 
 
     // 4. Desenhar células dentro do vírus (camada superior, mas invisível, pois o vírus as cobriu)
-    // Na verdade, se a célula está totalmente dentro do vírus, ela não precisa ser desenhada, pois o vírus já foi desenhado por cima.
-    // Se quisermos que a célula seja *visível* dentro do vírus (como no Agar.io original, onde o vírus é semi-transparente), precisaríamos de transparência no vírus.
-    // Como o vírus é opaco, desenhar as células internas aqui não fará diferença, pois elas estão sob o vírus.
-    // Se a intenção é que elas fiquem invisíveis, a classificação acima já garante que elas não sejam desenhadas na camada 2.
-    
-    // Se a intenção é que elas fiquem invisíveis, não precisamos desenhar cellsInsideVirus.
-    // Se a intenção é que elas fiquem visíveis, o vírus precisa ser semi-transparente. Vamos manter o vírus opaco por enquanto, fazendo com que as células internas fiquem invisíveis.
-    
-    // 5. Desenhar células que estão parcialmente fora do vírus ou são maiores (já desenhadas na camada 2)
+    // Não precisamos desenhar cellsInsideVirus, pois elas devem estar invisíveis.
     
     // --- FIM: Lógica de Desenho de Camadas ---
 
