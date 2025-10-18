@@ -95,6 +95,7 @@ import mobyDickImage from "@/assets/moby-dick.png";
 import guerraEPazImage from "@/assets/guerra-e-paz.png"; 
 import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png"; 
 import crimeECastigoImage from "@/assets/crime-e-castigo.png"; 
+import brancaDeNeveImage from "@/assets/branca-de-neve.png"; // Adicionando a importação que estava faltando
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -1024,7 +1025,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
+
           {/* Imagem de Pinóquio (ID 301) */}
           {storyId === 301 && (
             <Card className="p-4 shadow-soft">
