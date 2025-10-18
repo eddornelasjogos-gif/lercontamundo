@@ -48,7 +48,8 @@ import corcundaNotreDameAudio from "@/assets/audio/corcunda-notre-dame.m4a";
 import grimmHistoriasSelecionadasAudio from "@/assets/audio/grimm-historias-selecionadas.m4a";
 import domQuixoteAudio from "@/assets/audio/dom-quixote.m4a";
 import mobyDickAudio from "@/assets/audio/moby-dick.m4a";
-import guerraEPazAudio from "@/assets/audio/guerra-e-paz.m4a"; // NOVO ÁUDIO IMPORTADO
+import guerraEPazAudio from "@/assets/audio/guerra-e-paz.m4a";
+import irmaosKaramazovAudio from "@/assets/audio/irmaos-karamazov.m4a"; // NOVO ÁUDIO IMPORTADO
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -1135,6 +1136,18 @@ const Story = () => {
                 <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
                 <audio controls preload="metadata" className="w-full">
                   <source src={guerraEPazAudio} type="audio/mp4" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+            </Card>
+          )}
+
+          {storyId === 404 && (
+            <Card className="p-6 shadow-soft">
+              <div className="space-y-3">
+                <h2 className="text-lg font-display font-bold text-foreground">Ouça a história</h2>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={irmaosKaramazovAudio} type="audio/mp4" />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
