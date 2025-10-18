@@ -99,7 +99,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     // Desenha a linha de Game Over
     ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
     ctx.lineWidth = 2;
-    const gameOverThreshold = CANVAS_HEIGHT - BUBBLE_DIAMETER * 2;
+    const gameOverThreshold = BUBBLE_DIAMETER * 2; // Linha de Game Over
     ctx.beginPath();
     ctx.moveTo(0, gameOverThreshold);
     ctx.lineTo(CANVAS_WIDTH, gameOverThreshold);
@@ -128,7 +128,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     ctx.fill();
     ctx.closePath();
 
-  }, []); // drawGame agora é estável
+  }, []);
 
   // --- Game Loop ---
   const gameLoop = useCallback((currentTime: number) => {
@@ -187,7 +187,21 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
     gameStateRef.current = newState;
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [gameLoop, isGameActive, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel, setGameState]);
+  }, [isGameActive, drawGame, handlePop, onGameOver, onGameWon, settings.mode, settings.difficulty, updateHighScore, updateMaxLevel]); // Removido gameLoop da dependência
+
+  // Inicia e limpa o loop de animação
+  useEffect(() => {
+    if (isGameActive) {
+        lastTimeRef.current = performance.now();
+        animationFrameId.current = requestAnimationFrame(gameLoop);
+    }
+    
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [isGameActive, gameLoop]); // Depende de isGameActive e gameLoop
 
   // Timer para Modo Tempo
   useEffect(() => {
@@ -226,7 +240,7 @@ const MagicBubblesGame: React.FC<MagicBubblesGameProps> = ({ settings, onGameOve
       
       {/* Canvas do Jogo */}
       <div className="relative mx-auto mt-16" style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
-        <canvas ref={canvasRef} style={{ display: 'block' }} />
+        <canvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} style={{ display: 'block' }} />
         
         {/* Lançador e Mira (Componente React sobre o Canvas) */}
         {isGameActive && gameState.nextBubble && (
