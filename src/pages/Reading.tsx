@@ -11,7 +11,7 @@ import ColorHeader from "@/components/ColorHeader";
 import LevelSelector from "@/components/LevelSelector";
 import mascotBackground from "@/assets/mascot-owl.png"; // Importando a imagem do mascote
 
-// Importações de imagens para o nível FÁCIL
+// Importações de imagens para o nível FÁCIL (104-105, 205-220)
 import raposaUvasImage from "@/assets/raposa-uvas.png";
 import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
 import principeSapoImage from "@/assets/principe-sapo.png";
@@ -31,12 +31,47 @@ import oCavaloEOHomemImage from "@/assets/o-cavalo-e-o-homem.png";
 import aLendaDaLuaImage from "@/assets/a-lenda-da-lua.png";
 import oPescadorEOGenioImage from "@/assets/o-pescador-e-o-genio.png";
 
+// Importações de imagens para o nível MÉDIO (101-103, 111-115, 201-204)
+import cigarraFormigaImage from "@/assets/a-cigarra-e-a-formiga.png";
+import lebreTartarugaImage from "@/assets/a-lebre-e-a-tartaruga.png";
+import leaoRatoImage from "@/assets/o-leao-e-o-rato.png";
+import patinhoFeioImage from "@/assets/o-patinho-feio.png";
+import joaoPeDeFeijaoImage from "@/assets/joao-e-o-pe-de-feijao.png";
+import cinderelaImage from "@/assets/cinderela.png";
+import brancaDeNeveImage from "@/assets/branca-de-neve.png";
+import flautistaHamelinImage from "@/assets/o-flautista-de-hamelin.png";
+import chapeuzinhoVermelhoImage from "@/assets/chapeuzinho-vermelho.png";
+import belaAdormecidaImage from "@/assets/a-bela-adormecida.png";
+import rapunzelImage from "@/assets/rapunzel.png";
+import pequenaSereiaImage from "@/assets/a-pequena-sereia.png";
+
+// Importações de imagens para o nível DIFÍCIL (301-310)
+import pinocchioImage from "@/assets/pinocchio.png";
+import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png";
+import robinsonCrusoeImage from "@/assets/robinson-crusoe.png";
+import ilhaDoTesouroImage from "@/assets/ilha-do-tesouro.png";
+import medicoMonstroImage from "@/assets/medico-monstro.png";
+import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png";
+import heidiImage from "@/assets/heidi.png";
+import tomSawyerImage from "@/assets/tom-sawyer.m4a"; // Usando a imagem correta
+import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png";
+import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png";
+
+// Importações de imagens para o nível MUITO DIFÍCIL (401-405)
+import domQuixoteImage from "@/assets/dom-quixote.png";
+import mobyDickImage from "@/assets/moby-dick.png";
+import guerraEPazImage from "@/assets/guerra-e-paz.png";
+import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png";
+import crimeECastigoImage from "@/assets/crime-e-castigo.png";
+
+
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 
 const STORAGE_KEY = "userDifficulty";
 
 // Mapeamento de IDs de histórias para caminhos de imagem
 const STORY_IMAGE_MAP: Record<number, string> = {
+    // Nível Fácil (104-105, 205-220)
     104: raposaUvasImage,
     105: galinhaOvosOuroImage,
     205: principeSapoImage,
@@ -55,6 +90,39 @@ const STORY_IMAGE_MAP: Record<number, string> = {
     218: oCavaloEOHomemImage,
     219: aLendaDaLuaImage,
     220: oPescadorEOGenioImage,
+    
+    // Nível Médio (101-103, 111-115, 201-204)
+    101: cigarraFormigaImage,
+    102: lebreTartarugaImage,
+    103: leaoRatoImage,
+    111: patinhoFeioImage,
+    112: joaoPeDeFeijaoImage,
+    113: cinderelaImage,
+    114: brancaDeNeveImage,
+    115: flautistaHamelinImage,
+    201: chapeuzinhoVermelhoImage,
+    202: belaAdormecidaImage,
+    203: rapunzelImage,
+    204: pequenaSereiaImage,
+    
+    // Nível Difícil (301-310)
+    301: pinocchioImage,
+    302: alicePaisMaravilhasImage,
+    303: robinsonCrusoeImage,
+    304: ilhaDoTesouroImage,
+    305: medicoMonstroImage,
+    306: voltaAoMundo80DiasImage,
+    307: heidiImage,
+    308: tomSawyerImage,
+    309: corcundaNotreDameImage,
+    310: grimmHistoriasSelecionadasImage,
+    
+    // Nível Muito Difícil (401-405)
+    401: domQuixoteImage,
+    402: mobyDickImage,
+    403: guerraEPazImage,
+    404: irmaosKaramazovImage,
+    405: crimeECastigoImage,
 };
 
 const Reading = () => {
@@ -233,7 +301,7 @@ const Reading = () => {
                   const storyImage = STORY_IMAGE_MAP[story.id];
                   
                   // Estilo de fundo aprimorado: aplica a imagem e um gradiente de sobreposição
-                  const backgroundStyle = userDifficulty === 'easy' && storyImage
+                  const backgroundStyle = storyImage
                     ? {
                         backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url(${storyImage})`,
                         backgroundSize: 'cover',

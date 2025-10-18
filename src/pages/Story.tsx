@@ -87,7 +87,7 @@ import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png";
 import medicoMonstroImage from "@/assets/medico-monstro.png";
 import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png";
 import heidiImage from "@/assets/heidi.png";
-import tomSawyerImage from "@/assets/tom-sawyer.png"; 
+import tomSawyerImage from "@/assets/tom-sawyer.png"; // CORRIGIDO: Importação da imagem
 import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png"; 
 import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png"; 
 import domQuixoteImage from "@/assets/dom-quixote.png"; 
@@ -783,6 +783,17 @@ const Story = () => {
             </Card>
           )}
           
+          {/* Imagem de Branca de Neve (ID 114) */}
+          {storyId === 114 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={brancaDeNeveImage} 
+                alt="Branca de Neve" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
           {/* Imagem de O Flautista de Hamelin (ID 115) */}
           {storyId === 115 && (
             <Card className="p-4 shadow-soft">
@@ -1079,8 +1090,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Heidi (ID 307) */}
+
           {storyId === 307 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1090,8 +1100,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de A História de Tom Sawyer (ID 308) */}
+
           {storyId === 308 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1101,8 +1110,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de O Corcunda de Notre-Dame (ID 309) */}
+
           {storyId === 309 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1112,8 +1120,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Grimm: Histórias Selecionadas (ID 310) */}
+
           {storyId === 310 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1123,8 +1130,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Dom Quixote (ID 401) */}
+
           {storyId === 401 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1134,8 +1140,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Moby Dick (ID 402) */}
+
           {storyId === 402 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1145,8 +1150,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Guerra e Paz (ID 403) */}
+
           {storyId === 403 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1156,8 +1160,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Os Irmãos Karamázov (ID 404) */}
+
           {storyId === 404 && (
             <Card className="p-4 shadow-soft">
               <img 
@@ -1167,8 +1170,7 @@ const Story = () => {
               />
             </Card>
           )}
-          
-          {/* Imagem de Crime e Castigo (ID 405) */}
+
           {storyId === 405 && (
             <Card className="p-4 shadow-soft">
               <img 
