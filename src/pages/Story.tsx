@@ -28,7 +28,7 @@ import magicoDeOzAudio from "@/assets/audio/magico-de-oz.m4a";
 import pequenoPolegarAudio from "@/assets/audio/pequeno-polegar.m4a";
 import tresPorquinhosAudio from "@/assets/audio/tres-porquinhos.m4a";
 import pedroLoboAudio from "@/assets/audio/pedro-lobo.m4a";
-import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a"; // NOVO: Áudio de Simbad
+import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a";
 import aliBabaAudio from "@/assets/audio/ali-baba-ladroes.m4a";
 import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
 import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
@@ -61,7 +61,8 @@ import magicoDeOzImage from "@/assets/magico-de-oz.png";
 import pequenoPolegarImage from "@/assets/pequeno-polegar.png";
 import tresPorquinhosImage from "@/assets/tres-porquinhos.png";
 import pedroLoboImage from "@/assets/pedro-e-o-lobo.png";
-import simbadMarinheiroImage from "@/assets/simbad-marinheiro.png"; // NOVO: Imagem de Simbad
+import simbadMarinheiroImage from "@/assets/simbad-marinheiro.png";
+import aliBabaLadroesImage from "@/assets/ali-baba-ladroes.png"; // NOVO: Imagem de Ali Babá
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -754,6 +755,17 @@ const Story = () => {
               <img 
                 src={simbadMarinheiroImage} 
                 alt="Simbad, o Marinheiro" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Ali Babá e os Quarenta Ladrões (ID 214) */}
+          {storyId === 214 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={aliBabaLadroesImage} 
+                alt="Ali Babá e os Quarenta Ladrões" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
