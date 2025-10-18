@@ -12,29 +12,48 @@ import { Input } from "@/components/ui/input";
 import { Mascot } from "@/components/Mascot";
 import { useNavigate } from "react-router-dom";
 import MathGame from "@/components/math/MathGame";
-import { DifficultyCard } from "@/components/DifficultyCard";
+import LevelSelector from "@/components/LevelSelector"; // Importando LevelSelector
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 type MathStatus = "menu" | "playing";
 
 const STORAGE_KEY_DIFFICULTY = "mathDifficulty";
 const STORAGE_KEY_PLAYER_NAME = "mathPlayerName";
+const GLOBAL_DIFFICULTY_KEY = "userDifficulty"; // Chave global usada no Index e Reading
+
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "Fácil",
+  medium: "Médio",
+  hard: "Difícil",
+  "very-hard": "Muito Difícil",
+};
 
 const Math = () => {
   const { progress } = useProgress();
   const navigate = useNavigate();
 
-  const initialDifficulty = (localStorage.getItem(STORAGE_KEY_DIFFICULTY) as Difficulty) || "easy";
+  // 1. Ler a dificuldade inicial da chave global (definida no Index/Reading)
+  const initialDifficulty = (localStorage.getItem(GLOBAL_DIFFICULTY_KEY) as Difficulty) || "easy";
   const initialPlayerName = localStorage.getItem(STORAGE_KEY_PLAYER_NAME) || "Aluno(a)";
   
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(initialDifficulty);
   const [playerName, setPlayerName] = useState<string>(initialPlayerName);
   const [mathStatus, setMathStatus] = useState<MathStatus>("menu");
 
+  // 2. Sincronizar a dificuldade selecionada com a chave global
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_DIFFICULTY, selectedDifficulty);
+    localStorage.setItem(GLOBAL_DIFFICULTY_KEY, selectedDifficulty);
     localStorage.setItem(STORAGE_KEY_PLAYER_NAME, playerName);
   }, [selectedDifficulty, playerName]);
+  
+  // 3. Atualizar o estado local se a chave global mudar (ex: se o usuário voltar do Index)
+  useEffect(() => {
+    const currentGlobalDifficulty = (localStorage.getItem(GLOBAL_DIFFICULTY_KEY) as Difficulty) || "easy";
+    if (currentGlobalDifficulty !== selectedDifficulty) {
+        setSelectedDifficulty(currentGlobalDifficulty);
+    }
+  }, []);
+
 
   const handleStartGame = () => {
     if (playerName.trim() === "") {
@@ -44,44 +63,9 @@ const Math = () => {
     setMathStatus("playing");
   };
   
-  const difficulties = [
-    {
-      id: "easy",
-      title: "Fácil",
-      description: "Soma e Subtração (até 100)",
-      ageRange: "7-8 anos",
-      icon: Star,
-      color: "border-success hover:border-success",
-      background: "bg-gradient-to-br from-emerald-300/50 via-emerald-200/50 to-emerald-100/50",
-    },
-    {
-      id: "medium",
-      title: "Médio",
-      description: "Multiplicação e Divisão (inteiros)",
-      ageRange: "9-10 anos",
-      icon: Trophy,
-      color: "border-secondary hover:border-secondary",
-      background: "bg-gradient-to-br from-sky-300/50 via-sky-200/50 to-sky-100/50",
-    },
-    {
-      id: "hard",
-      title: "Difícil",
-      description: "Multiplicação e Divisão (decimais)",
-      ageRange: "11-12 anos",
-      icon: Calculator,
-      color: "border-accent hover:border-accent",
-      background: "bg-gradient-to-br from-cyan-300/50 via-teal-200/50 to-emerald-100/50",
-    },
-    {
-      id: "very-hard",
-      title: "Muito Difícil",
-      description: "Números grandes e Equações (com 'x')",
-      ageRange: "13-14 anos",
-      icon: CheckCircle,
-      color: "border-primary hover:border-primary",
-      background: "bg-gradient-to-br from-violet-300/50 via-fuchsia-200/50 to-pink-100/50",
-    },
-  ];
+  const handleDifficultyChange = (d: Difficulty) => {
+    setSelectedDifficulty(d);
+  };
 
   if (mathStatus === "playing") {
     return (
@@ -115,19 +99,22 @@ const Math = () => {
               <img src={mathImage} alt="Matemática" className="w-20 h-20" />
               <ColorHeader
                 title="Área de Matemática"
-                subtitle="Resolva desafios e torne-se um mestre dos números!"
+                subtitle={`Nível selecionado: ${DIFFICULTY_LABELS[selectedDifficulty]}`}
                 gradientFrom="#93c5fd"
                 gradientTo="#f472b6"
               />
             </div>
-            <Button 
-                variant="secondary" 
-                onClick={() => navigate('/math/reports')}
-                className="shadow-soft"
-            >
-                <BarChart3 className="w-5 h-5 mr-2" />
-                Relatórios
-            </Button>
+            <div className="flex flex-col items-center gap-3">
+                <LevelSelector value={selectedDifficulty} onChange={handleDifficultyChange} />
+                <Button 
+                    variant="secondary" 
+                    onClick={() => navigate('/math/reports')}
+                    className="shadow-soft"
+                >
+                    <BarChart3 className="w-5 h-5 mr-2" />
+                    Relatórios
+                </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -143,20 +130,8 @@ const Math = () => {
           <div className="relative z-10 space-y-8 max-w-4xl mx-auto">
             
             <div className="text-center space-y-4">
-                <Mascot message="Escolha seu nível e vamos começar a calcular!" className="mx-auto" />
-                <h2 className="text-3xl font-display font-bold text-foreground">Selecione o Desafio</h2>
-            </div>
-            
-            {/* Seleção de Nível */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {difficulties.map((d) => (
-                    <DifficultyCard
-                        key={d.id}
-                        {...d}
-                        onClick={() => setSelectedDifficulty(d.id as Difficulty)}
-                        className={selectedDifficulty === d.id ? "border-4 border-primary shadow-glow" : ""}
-                    />
-                ))}
+                <Mascot message={`Pronto para o desafio ${DIFFICULTY_LABELS[selectedDifficulty]}? Digite seu nome e comece!`} className="mx-auto" />
+                <h2 className="text-3xl font-display font-bold text-foreground">Iniciar Desafio</h2>
             </div>
             
             {/* Input de Nome e Botão Iniciar */}
@@ -175,7 +150,7 @@ const Math = () => {
                         disabled={playerName.trim() === ""}
                         className="w-full sm:w-auto gradient-primary shadow-soft"
                     >
-                        Começar Nível {difficulties.find(d => d.id === selectedDifficulty)?.title || 'Fácil'}
+                        Começar Nível {DIFFICULTY_LABELS[selectedDifficulty]}
                     </Button>
                 </div>
             </Card>
