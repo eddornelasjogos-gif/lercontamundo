@@ -87,14 +87,14 @@ import alicePaisMaravilhasImage from "@/assets/alice-pais-maravilhas.png";
 import medicoMonstroImage from "@/assets/medico-monstro.png";
 import voltaAoMundo80DiasImage from "@/assets/volta-ao-mundo-80-dias.png";
 import heidiImage from "@/assets/heidi.png";
-import tomSawyerImage from "@/assets/tom-sawyer.png"; // NOVO
-import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png"; // NOVO
-import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png"; // NOVO
-import domQuixoteImage from "@/assets/dom-quixote.png"; // NOVO
-import mobyDickImage from "@/assets/moby-dick.png"; // NOVO
-import guerraEPazImage from "@/assets/guerra-e-paz.png"; // NOVO
-import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png"; // NOVO
-import crimeECastigoImage from "@/assets/crime-e-castigo.png"; // JÁ EXISTE
+import tomSawyerImage from "@/assets/tom-sawyer.png"; 
+import corcundaNotreDameImage from "@/assets/corcunda-notre-dame.png"; 
+import grimmHistoriasSelecionadasImage from "@/assets/grimm-historias-selecionadas.png"; 
+import domQuixoteImage from "@/assets/dom-quixote.png"; 
+import mobyDickImage from "@/assets/moby-dick.png"; 
+import guerraEPazImage from "@/assets/guerra-e-paz.png"; 
+import irmaosKaramazovImage from "@/assets/irmaos-karamazov.png"; 
+import crimeECastigoImage from "@/assets/crime-e-castigo.png"; 
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -590,6 +590,11 @@ const Story = () => {
   const currentStoryMetadata = STORY_METADATA_BY_DIFFICULTY[userDifficulty].find(
     (meta) => meta.id === storyId
   );
+  
+  // Lista de todas as categorias para o nível atual, na ordem em que aparecem
+  const allCategoriesInLevel = useMemo(() => {
+    return Array.from(new Set(STORY_METADATA_BY_DIFFICULTY[userDifficulty].map(s => s.category)));
+  }, [userDifficulty]);
 
   const storiesInCurrentCategory = useMemo(() => {
     if (!currentStoryMetadata) return [];
@@ -601,11 +606,23 @@ const Story = () => {
   const currentStoryIndex = storiesInCurrentCategory.findIndex(
     (meta) => meta.id === storyId
   );
-
+  
+  const isLastStoryInCategory = currentStoryIndex === storiesInCurrentCategory.length - 1;
+  
+  const currentCategoryIndex = allCategoriesInLevel.indexOf(currentStoryMetadata?.category || '');
+  const nextCategoryName = allCategoriesInLevel[currentCategoryIndex + 1];
+  
   const nextStoryMetadata =
     currentStoryIndex !== -1 && currentStoryIndex < storiesInCurrentCategory.length - 1
       ? storiesInCurrentCategory[currentStoryIndex + 1]
       : undefined;
+      
+  const nextCategoryFirstStory = nextCategoryName
+    ? STORY_METADATA_BY_DIFFICULTY[userDifficulty].find(s => s.category === nextCategoryName)
+    : undefined;
+
+  const isLastStoryInLevel = isLastStoryInCategory && !nextCategoryName;
+
 
   useEffect(() => {
     if (!story) {
@@ -631,25 +648,32 @@ const Story = () => {
     } else {
       toast("História já concluída.");
     }
-    navigate("/reading");
-  };
-
-  const handleNextStory = () => {
-    if (!isCompleted) {
-      completeStory(storyId, story.xp);
-      toast.success(`🎉 Você ganhou ${story.xp} XP por ler "${story.title}"!`);
-    }
     
-    if (nextStoryMetadata) {
-      navigate(`/reading/${nextStoryMetadata.id}`);
+    if (isLastStoryInLevel) {
+        toast.success(`🏆 Parabéns! Você concluiu todas as leituras do Nível ${userDifficulty.toUpperCase()}!`);
+        navigate("/reading");
+    } else if (nextCategoryFirstStory) {
+        // Vai para a primeira história da próxima categoria
+        navigate(`/reading/${nextCategoryFirstStory.id}`);
+    } else if (nextStoryMetadata) {
+        // Vai para a próxima história na categoria atual
+        navigate(`/reading/${nextStoryMetadata.id}`);
     } else {
-      // Se for a última história, volta para a lista de leitura
-      navigate("/reading");
+        // Se for a última história da última categoria, mas não a última do nível (o que não deve acontecer com a lógica acima, mas como fallback)
+        navigate("/reading");
     }
   };
 
-  const buttonText = nextStoryMetadata ? "Próxima História" : "Concluir Leitura";
-  const buttonAction = nextStoryMetadata ? handleNextStory : handleComplete;
+  let buttonText = "Concluir Leitura";
+  if (nextStoryMetadata) {
+    buttonText = "Próxima História";
+  } else if (nextCategoryFirstStory) {
+    buttonText = `Próxima Categoria: ${nextCategoryFirstStory.category}`;
+  } else if (isLastStoryInLevel) {
+    buttonText = `Concluir Nível ${userDifficulty.toUpperCase()}`;
+  }
+  
+  const buttonAction = handleComplete;
   const buttonVariant = isCompleted ? "outline" : "gradient";
 
   return (
