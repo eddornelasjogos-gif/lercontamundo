@@ -2,17 +2,26 @@ import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, User, Clock, CheckCircle, XCircle, TrendingUp, RefreshCw } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type MathSession = Tables<'math_sessions'>;
+// Definindo a interface localmente, já que não estamos mais usando os tipos do Supabase
+interface MathReportEntry {
+    id: string;
+    playerName: string;
+    difficulty: string;
+    created_at: string;
+    totalQuestions: number;
+    correctAnswers: number;
+    time_spent_seconds: number;
+    performance: Record<string, { correct: number; total: number; time: number }>;
+}
+
+const LOCAL_STORAGE_REPORTS_KEY = 'math_reports';
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   easy: "Fácil",
@@ -29,36 +38,42 @@ const OPERATION_LABELS: Record<string, string> = {
     equation: "Equação",
 };
 
-const fetchMathReports = async (): Promise<MathSession[]> => {
-  const { data, error } = await supabase
-    .from('math_sessions')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data || [];
+const fetchMathReportsLocally = (): MathReportEntry[] => {
+    try {
+        const stored = localStorage.getItem(LOCAL_STORAGE_REPORTS_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        console.error("Erro ao carregar relatórios do localStorage", e);
+        return [];
+    }
 };
 
 const MathReports = () => {
   const navigate = useNavigate();
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<MathReportEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const { data: sessions, isLoading, error, refetch } = useQuery<MathSession[], Error>({
-    queryKey: ['mathReports'],
-    queryFn: fetchMathReports,
-  });
+  const refetch = useCallback(() => {
+    setIsLoading(true);
+    const data = fetchMathReportsLocally();
+    setSessions(data);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   
-  const playerNames = Array.from(new Set(sessions?.map(s => s.player_name) || []));
+  const playerNames = Array.from(new Set(sessions.map(s => s.playerName) || []));
   
-  const filteredSessions = sessions?.filter(s => selectedPlayer === null || s.player_name === selectedPlayer) || [];
+  const filteredSessions = sessions.filter(s => selectedPlayer === null || s.playerName === selectedPlayer);
   
-  const getPerformanceData = (sessions: MathSession[]) => {
+  const getPerformanceData = (sessions: MathReportEntry[]) => {
     const aggregated: Record<string, { correct: number; total: number }> = {};
     
     sessions.forEach(session => {
-        const performance = session.performance_data as Record<string, { correct: number; total: number }>;
+        const performance = session.performance as Record<string, { correct: number; total: number }>;
         if (performance) {
             Object.entries(performance).forEach(([op, data]) => {
                 if (data.total > 0) {
@@ -81,7 +96,7 @@ const MathReports = () => {
   
   const performanceData = getPerformanceData(filteredSessions);
   
-  const getLevelAccuracyData = (sessions: MathSession[]) => {
+  const getLevelAccuracyData = (sessions: MathReportEntry[]) => {
     const levels: Record<string, { correct: number; total: number }> = {};
     
     sessions.forEach(session => {
@@ -89,8 +104,8 @@ const MathReports = () => {
         if (!levels[level]) {
             levels[level] = { correct: 0, total: 0 };
         }
-        levels[level].correct += session.correct_answers;
-        levels[level].total += session.total_questions;
+        levels[level].correct += session.correctAnswers;
+        levels[level].total += session.totalQuestions;
     });
     
     return Object.entries(levels).map(([level, data]) => ({
@@ -100,10 +115,6 @@ const MathReports = () => {
   };
   
   const levelAccuracyData = getLevelAccuracyData(filteredSessions);
-
-  if (error) {
-    toast.error("Erro ao carregar relatórios: " + error.message);
-  }
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20">
@@ -115,7 +126,7 @@ const MathReports = () => {
             <BarChart3 className="w-12 h-12 text-primary fill-primary/20" />
             <div className="text-left">
               <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">Relatórios de Matemática</h1>
-              <p className="text-sm md:text-base text-muted-foreground">Acompanhe o desempenho dos alunos.</p>
+              <p className="text-sm md:text-base text-muted-foreground">Acompanhe o desempenho dos alunos (Dados salvos localmente).</p>
             </div>
           </div>
         </div>
@@ -207,7 +218,7 @@ const MathReports = () => {
                             <div className="flex justify-between items-center flex-wrap gap-2">
                                 <div className="flex items-center gap-2">
                                     <User className="w-5 h-5 text-muted-foreground" />
-                                    <span className="font-display font-bold text-lg">{session.player_name}</span>
+                                    <span className="font-display font-bold text-lg">{session.playerName}</span>
                                 </div>
                                 <div className="text-sm text-muted-foreground">
                                     {new Date(session.created_at).toLocaleDateString('pt-BR')} - {new Date(session.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -220,7 +231,7 @@ const MathReports = () => {
                                 </div>
                                 <div>
                                     <p className="text-xs text-muted-foreground">Acertos</p>
-                                    <p className="font-semibold text-success">{session.correct_answers} / {session.total_questions}</p>
+                                    <p className="font-semibold text-success">{session.correctAnswers} / {session.totalQuestions}</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-muted-foreground">Tempo Total</p>

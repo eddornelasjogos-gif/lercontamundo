@@ -4,15 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Trophy, Clock, CheckCircle, XCircle, Star } from "lucide-react";
 import { Difficulty, OperationType } from "@/utils/math-generator";
 import { Mascot } from "@/components/Mascot";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface SessionData {
   totalQuestions: number;
   correctAnswers: number;
   totalTimeSeconds: number;
   performance: Record<OperationType, { correct: number; total: number; time: number }>;
+}
+
+interface MathReportEntry extends SessionData {
+    id: string;
+    playerName: string;
+    difficulty: Difficulty;
+    created_at: string;
 }
 
 interface ResultScreenProps {
@@ -37,7 +44,10 @@ const OPERATION_LABELS: Record<OperationType, string> = {
     equation: "Equação",
 };
 
+const LOCAL_STORAGE_REPORTS_KEY = 'math_reports';
+
 const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, session, onRestart }) => {
+  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   
@@ -60,31 +70,38 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
   useEffect(() => {
     if (isSaved) return;
     
-    const saveSession = async () => {
+    const saveSessionLocally = () => {
       setIsSaving(true);
-      
-      const { error } = await supabase
-        .from('math_sessions')
-        .insert({
-          player_name: playerName,
-          difficulty: difficulty,
-          total_questions: session.totalQuestions,
-          correct_answers: session.correctAnswers,
-          time_spent_seconds: session.totalTimeSeconds,
-          performance_data: session.performance,
-        });
+      try {
+        const existingReportsString = localStorage.getItem(LOCAL_STORAGE_REPORTS_KEY);
+        const existingReports: MathReportEntry[] = existingReportsString ? JSON.parse(existingReportsString) : [];
         
-      if (error) {
-        console.error("Erro ao salvar sessão:", error);
-        toast.error("Erro ao salvar o relatório. Tente novamente.");
-      } else {
+        const newReport: MathReportEntry = {
+            id: Date.now().toString(), // Usar timestamp como ID único
+            playerName: playerName,
+            difficulty: difficulty,
+            created_at: new Date().toISOString(),
+            ...session,
+        };
+        
+        existingReports.unshift(newReport); // Adiciona no início para mostrar o mais recente primeiro
+        
+        // Limita o número de relatórios salvos (ex: 50)
+        const updatedReports = existingReports.slice(0, 50); 
+        
+        localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(updatedReports));
+        
         setIsSaved(true);
-        toast.success("Relatório de desempenho salvo com sucesso!");
+        toast.success("Relatório de desempenho salvo com sucesso no navegador!");
+      } catch (error) {
+        console.error("Erro ao salvar sessão no localStorage:", error);
+        toast.error("Erro ao salvar o relatório. Tente novamente.");
+      } finally {
+        setIsSaving(false);
       }
-      setIsSaving(false);
     };
     
-    saveSession();
+    saveSessionLocally();
   }, [session, difficulty, playerName, isSaved]);
 
   const getRecommendation = () => {
@@ -151,7 +168,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
         <Button size="lg" onClick={onRestart} className="w-full gradient-primary">
           Jogar Novamente
         </Button>
-        <Button variant="outline" onClick={() => onRestart()} className="w-full">
+        <Button variant="outline" onClick={() => navigate('/math')} className="w-full">
           Voltar para Seleção de Nível
         </Button>
         <Button variant="ghost" onClick={() => navigate('/math/reports')} disabled={isSaving} className="w-full text-sm text-muted-foreground">
