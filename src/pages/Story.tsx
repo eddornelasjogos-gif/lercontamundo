@@ -30,8 +30,8 @@ import tresPorquinhosAudio from "@/assets/audio/tres-porquinhos.m4a";
 import pedroLoboAudio from "@/assets/audio/pedro-lobo.m4a";
 import simbadMarinheiroAudio from "@/assets/audio/simbad-marinheiro.m4a";
 import aliBabaAudio from "@/assets/audio/ali-baba-ladroes.m4a";
-import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a"; // NOVO: Áudio de O Rouxinol
-import barbaAzulAudio from "@/assets/audio/barba-azul.m4a";
+import oRouxinolAudio from "@/assets/audio/o-rouxinol.m4a";
+import barbaAzulAudio from "@/assets/audio/barba-azul.m4a"; // NOVO: Áudio de Barba Azul
 import aFadaVoadoraAudio from "@/assets/audio/a-fada-voadora.m4a";
 import oCavaloEOHomemAudio from "@/assets/audio/o-cavalo-e-o-homem.m4a";
 import aLendaDaLuaAudio from "@/assets/audio/a-lenda-da-lua.m4a";
@@ -63,7 +63,8 @@ import tresPorquinhosImage from "@/assets/tres-porquinhos.png";
 import pedroLoboImage from "@/assets/pedro-e-o-lobo.png";
 import simbadMarinheiroImage from "@/assets/simbad-marinheiro.png";
 import aliBabaLadroesImage from "@/assets/ali-baba-ladroes.png";
-import oRouxinolImage from "@/assets/o-rouxinol.png"; // NOVO: Imagem de O Rouxinol
+import oRouxinolImage from "@/assets/o-rouxinol.png";
+import barbaAzulImage from "@/assets/barba-azul.png"; // NOVO: Imagem de Barba Azul
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -372,7 +373,7 @@ const STORY_CONTENT: Record<
     title: "Barba Azul (resumo)",
     category: "Contos",
     xp: 65,
-    text:
+        text:
       "Barba Azul era um homem rico e poderoso, mas temido por sua barba azul. Ele se casou com uma jovem, e logo após o casamento, precisou viajar. Deu à esposa as chaves do castelo, permitindo que ela abrisse todos os cômodos, exceto um pequeno quarto secreto, cuja chave era pequena e dourada.\n\nA curiosidade da esposa foi maior que a obediência. Ela abriu o quarto proibido e descobriu os corpos das esposas anteriores de Barba Azul. Horrorizada, deixou cair a chave no sangue, manchando-a permanentemente.\n\nBarba Azul voltou, descobriu a mancha na chave e soube da desobediência. Quando ele estava prestes a matá-la, os irmãos da esposa chegaram e a salvaram. A história é um conto de advertência sobre a curiosidade perigosa e a importância de confiar nos instintos, mas também sobre a tirania e a busca por justiça.",
   },
   217: {
@@ -778,6 +779,17 @@ const Story = () => {
               <img 
                 src={oRouxinolImage} 
                 alt="O Rouxinol" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem de Barba Azul (ID 216) */}
+          {storyId === 216 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={barbaAzulImage} 
+                alt="Barba Azul" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
