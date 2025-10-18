@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, Clock, CheckCircle, XCircle, Star } from "lucide-react";
+import { Trophy, Clock, CheckCircle, XCircle, Star, Save } from "lucide-react";
 import { Difficulty, OperationType } from "@/utils/math-generator";
 import { Mascot } from "@/components/Mascot";
 import { toast } from "sonner";
@@ -67,42 +67,46 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
   
   const averageTime = session.totalTimeSeconds / session.totalQuestions;
 
-  useEffect(() => {
-    if (isSaved) return;
+  const handleSaveAndFinish = useCallback(() => {
+    if (isSaved) {
+        navigate('/math/reports');
+        return;
+    }
     
-    const saveSessionLocally = () => {
-      setIsSaving(true);
-      try {
-        const existingReportsString = localStorage.getItem(LOCAL_STORAGE_REPORTS_KEY);
-        const existingReports: MathReportEntry[] = existingReportsString ? JSON.parse(existingReportsString) : [];
-        
-        const newReport: MathReportEntry = {
-            id: Date.now().toString(), // Usar timestamp como ID único
-            playerName: playerName,
-            difficulty: difficulty,
-            created_at: new Date().toISOString(),
-            ...session,
-        };
-        
-        existingReports.unshift(newReport); // Adiciona no início para mostrar o mais recente primeiro
-        
-        // Limita o número de relatórios salvos (ex: 50)
-        const updatedReports = existingReports.slice(0, 50); 
-        
-        localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(updatedReports));
-        
-        setIsSaved(true);
-        toast.success("Relatório de desempenho salvo com sucesso no navegador!");
-      } catch (error) {
-        console.error("Erro ao salvar sessão no localStorage:", error);
-        toast.error("Erro ao salvar o relatório. Tente novamente.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
-    
-    saveSessionLocally();
-  }, [session, difficulty, playerName, isSaved]);
+    setIsSaving(true);
+    try {
+      const existingReportsString = localStorage.getItem(LOCAL_STORAGE_REPORTS_KEY);
+      const existingReports: MathReportEntry[] = existingReportsString ? JSON.parse(existingReportsString) : [];
+      
+      const newReport: MathReportEntry = {
+          id: Date.now().toString(), // Usar timestamp como ID único
+          playerName: playerName,
+          difficulty: difficulty,
+          created_at: new Date().toISOString(),
+          ...session,
+      };
+      
+      existingReports.unshift(newReport); // Adiciona no início para mostrar o mais recente primeiro
+      
+      // Limita o número de relatórios salvos (ex: 50)
+      const updatedReports = existingReports.slice(0, 50); 
+      
+      localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(updatedReports));
+      
+      setIsSaved(true);
+      toast.success("Relatório de desempenho salvo com sucesso!");
+      
+      // Navega para a tela de relatórios após salvar
+      navigate('/math/reports');
+      
+    } catch (error) {
+      console.error("Erro ao salvar sessão no localStorage:", error);
+      toast.error("Erro ao salvar o relatório. Tente novamente.");
+    } finally {
+      setIsSaving(false);
+    }
+  }, [session, difficulty, playerName, isSaved, navigate]);
+
 
   const getRecommendation = () => {
     let weakestOperation: OperationType | null = null;
@@ -168,11 +172,17 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ difficulty, playerName, ses
         <Button size="lg" onClick={onRestart} className="w-full gradient-primary">
           Jogar Novamente
         </Button>
+        <Button 
+            variant="secondary" 
+            onClick={handleSaveAndFinish} 
+            disabled={isSaving} 
+            className="w-full shadow-soft"
+        >
+            <Save className={cn("w-5 h-5 mr-2", isSaving && "animate-spin")} />
+            {isSaving ? "Salvando Desempenho..." : "Salvar Desempenho e Ver Relatórios"}
+        </Button>
         <Button variant="outline" onClick={() => navigate('/math')} className="w-full">
           Voltar para Seleção de Nível
-        </Button>
-        <Button variant="ghost" onClick={() => navigate('/math/reports')} disabled={isSaving} className="w-full text-sm text-muted-foreground">
-          {isSaving ? "Salvando Relatório..." : "Ver Relatórios de Desempenho"}
         </Button>
       </div>
     </Card>
