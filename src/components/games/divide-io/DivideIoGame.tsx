@@ -35,6 +35,9 @@ const VIRUS_COUNT = 8;
 const VIRUS_COLOR = '#FF4136'; // Red color
 const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33; // Cell must be 1.33x mass of virus to explode it
 
+// Distância mínima de segurança para o respawn do vírus (Raio do Vírus + Raio Máximo de Célula Inicial + Margem)
+const MIN_VIRUS_RESPAWN_DISTANCE = VIRUS_RADIUS + 100; 
+
 // Ajuste de Impulso para Divisão
 const EJECTION_IMPULSE = 200; // Aumentado de 100 para 200
 const EJECTION_OFFSET = 15; // Aumentado para garantir separação
@@ -421,6 +424,60 @@ const generateBotNames = (count: number) => {
         }
     }
     return uniqueBotNames.slice(0, count);
+};
+
+// Função para encontrar uma posição segura para o vírus
+const findSafeVirusPosition = (allCells: Cell[], viruses: Virus[]): Vector => {
+    let safePosition: Vector | null = null;
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    while (safePosition === null && attempts < maxAttempts) {
+        attempts++;
+        
+        // Gera uma posição aleatória dentro dos limites do mundo
+        const x = Math.random() * (WORLD_SIZE - 2 * VIRUS_RADIUS) + VIRUS_RADIUS;
+        const y = Math.random() * (WORLD_SIZE - 2 * VIRUS_RADIUS) + VIRUS_RADIUS;
+        const potentialPosition = new Vector(x, y);
+        
+        let isSafe = true;
+
+        // 1. Verifica proximidade com outras células (Player e Bots)
+        for (const cell of allCells) {
+            const distance = potentialPosition.subtract(cell.position).magnitude();
+            // Se a distância for menor que a soma dos raios + margem de segurança
+            if (distance < cell.radius + VIRUS_RADIUS + MIN_VIRUS_RESPAWN_DISTANCE) {
+                isSafe = false;
+                break;
+            }
+        }
+        
+        // 2. Verifica proximidade com outros vírus (para evitar sobreposição)
+        if (isSafe) {
+            for (const virus of viruses) {
+                const distance = potentialPosition.subtract(virus.position).magnitude();
+                if (distance < VIRUS_RADIUS * 2.5) { // 2.5x o raio para dar espaço
+                    isSafe = false;
+                    break;
+                }
+            }
+        }
+
+        if (isSafe) {
+            safePosition = potentialPosition;
+        }
+    }
+
+    // Se falhar em encontrar uma posição segura após muitas tentativas, retorna uma posição aleatória (fallback)
+    if (safePosition === null) {
+        console.warn("Failed to find a safe virus spawn position, using random fallback.");
+        return new Vector(
+            Math.random() * WORLD_SIZE,
+            Math.random() * WORLD_SIZE
+        );
+    }
+    
+    return safePosition;
 };
 
 
@@ -826,9 +883,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // Respawn Viruses
     while (viruses.length < VIRUS_COUNT) {
+        // Usa a função de posição segura
+        const safePos = findSafeVirusPosition(allCells, viruses);
+        
         viruses.push(new Virus(
-            Math.random() * WORLD_SIZE,
-            Math.random() * WORLD_SIZE,
+            safePos.x,
+            safePos.y,
             viruses.length + 1 // Simple ID assignment
         ));
     }
@@ -1034,9 +1094,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // Initialize Viruses
     gameInstance.viruses = Array.from({ length: VIRUS_COUNT }, (_, i) => {
+        // Usa a função de posição segura para a inicialização
+        const safePos = findSafeVirusPosition(gameInstance.playerCells, gameInstance.viruses);
         return new Virus(
-            Math.random() * WORLD_SIZE,
-            Math.random() * WORLD_SIZE,
+            safePos.x,
+            safePos.y,
             i + 1
         );
     });
