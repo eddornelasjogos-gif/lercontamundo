@@ -1,4 +1,5 @@
-// src/pages/Profile.tsx
+"use client";
+
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { useProgress } from "@/contexts/ProgressContext";
 import { toast } from "sonner";
 import { Mascot } from "@/components/Mascot";
+import PushNotificationManager from "@/components/PushNotificationManager"; // Import the new component
 
 const Profile = () => {
   const { progress, resetProgress } = useProgress();
@@ -147,6 +149,12 @@ const Profile = () => {
                   </div>
                 </div>
               )}
+
+              {/* Add Push Notification Manager */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-center">Notificações Push</h3>
+                <PushNotificationManager />
+              </div>
             </div>
           </div>
         </section>
