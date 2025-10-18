@@ -57,7 +57,8 @@ import principeSapoImage from "@/assets/principe-sapo.png";
 import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png";
 import rainhaDaNeveImage from "@/assets/rainha-da-neve.png";
 import gataBorralheiraImage from "@/assets/gata-borralheira.png";
-import magicoDeOzImage from "@/assets/magico-de-oz.png"; // NOVO: Imagem do Mágico de Oz
+import magicoDeOzImage from "@/assets/magico-de-oz.png";
+import pequenoPolegarImage from "@/assets/pequeno-polegar.png"; // NOVO: Imagem do Pequeno Polegar
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -706,6 +707,17 @@ const Story = () => {
               <img 
                 src={magicoDeOzImage} 
                 alt="O Mágico de Oz" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem do Pequeno Polegar (ID 210) */}
+          {storyId === 210 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={pequenoPolegarImage} 
+                alt="O Pequeno Polegar" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
