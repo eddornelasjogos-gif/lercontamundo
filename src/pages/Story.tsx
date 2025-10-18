@@ -55,7 +55,8 @@ import raposaUvasImage from "@/assets/raposa-uvas.png";
 import galinhaOvosOuroImage from "@/assets/galinha-ovos-ouro.png";
 import principeSapoImage from "@/assets/principe-sapo.png";
 import rumpelstiltskinImage from "@/assets/rumpelstiltskin.png";
-import rainhaDaNeveImage from "@/assets/rainha-da-neve.png"; // NOVO: Imagem da Rainha da Neve
+import rainhaDaNeveImage from "@/assets/rainha-da-neve.png";
+import gataBorralheiraImage from "@/assets/gata-borralheira.png"; // NOVO: Imagem da Gata Borralheira
 
 type Difficulty = "easy" | "medium" | "hard" | "very-hard";
 const STORAGE_KEY = "userDifficulty";
@@ -682,6 +683,17 @@ const Story = () => {
               <img 
                 src={rainhaDaNeveImage} 
                 alt="A Rainha da Neve" 
+                className="w-full h-auto rounded-xl object-cover"
+              />
+            </Card>
+          )}
+          
+          {/* Imagem da Gata Borralheira (ID 208) */}
+          {storyId === 208 && (
+            <Card className="p-4 shadow-soft">
+              <img 
+                src={gataBorralheiraImage} 
+                alt="A Gata Borralheira" 
                 className="w-full h-auto rounded-xl object-cover"
               />
             </Card>
