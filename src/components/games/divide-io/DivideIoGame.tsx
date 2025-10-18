@@ -516,14 +516,21 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   const handleSplit = useCallback(() => {
     const newCells: Cell[] = [];
-    const cellsToSplit = [...gameInstance.playerCells];
+    // CRUCIAL: Cria uma cópia das células do jogador ANTES de qualquer divisão
+    const cellsToSplit = [...gameInstance.playerCells]; 
+    
     cellsToSplit.forEach(cell => {
-      const newCell = cell.split(new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y), getNextCellId());
-      if (newCell) {
-        newCells.push(newCell);
-        playSplit(); // Toca SFX de divisão
+      // Verifica se a célula ainda existe no array principal (para evitar bugs se a célula foi comida no mesmo frame, embora improvável)
+      if (gameInstance.playerCells.includes(cell as Player)) {
+        const newCell = cell.split(new Vector(joystickDirectionRef.current.x, joystickDirectionRef.current.y), getNextCellId());
+        if (newCell) {
+          newCells.push(newCell);
+          playSplit(); // Toca SFX de divisão
+        }
       }
     });
+    
+    // Adiciona todas as novas células de uma vez
     gameInstance.playerCells.push(...(newCells as Player[]));
   }, [gameInstance, playSplit]);
 
