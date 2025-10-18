@@ -37,7 +37,10 @@ const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName }) => {
   const navigate = useNavigate();
   const { progress, addXP } = useProgress();
   
-  const questions = useMemo(() => generateMathQuestions(difficulty), [difficulty]);
+  // Usamos um contador para forçar a regeneração das perguntas quando o jogo é reiniciado
+  const [gameKey, setGameKey] = useState(0); 
+  
+  const questions = useMemo(() => generateMathQuestions(difficulty), [difficulty, gameKey]);
   const totalQuestions = questions.length;
 
   const [session, setSession] = useState<SessionProgress>(() => ({
@@ -50,9 +53,29 @@ const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName }) => {
   }));
   
   const [gameStatus, setGameStatus] = useState<'playing' | 'finished'>('playing');
-  const [startTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState(Date.now());
+
+  // Resetar o estado da sessão quando as perguntas mudam (ou seja, quando gameKey muda)
+  useEffect(() => {
+    setSession({
+        currentQuestionIndex: 0,
+        correctAnswers: 0,
+        totalTimeSeconds: 0,
+        questions,
+        performance: INITIAL_PERFORMANCE,
+        usedHelp: false,
+    });
+    setGameStatus('playing');
+    setStartTime(Date.now());
+  }, [questions]);
+
 
   const currentQuestion = session.questions[session.currentQuestionIndex];
+
+  const handleRestart = () => {
+    // Força a regeneração das perguntas e o reset do estado
+    setGameKey(prev => prev + 1);
+  };
 
   const handleAnswer = (isCorrect: boolean, timeTaken: number, usedHelp: boolean) => {
     const question = session.questions[session.currentQuestionIndex];
@@ -120,7 +143,7 @@ const MathGame: React.FC<MathGameProps> = ({ difficulty, playerName }) => {
             totalTimeSeconds: finalTime,
             totalQuestions: totalQuestions,
         }}
-        onRestart={() => navigate('/math')}
+        onRestart={handleRestart} // Passa a função de reinício
       />
     );
   }
