@@ -253,7 +253,7 @@ const botLogic = {
         // Calcula o centro de massa do bot
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
         // Corrigido: Usar botCells.length para calcular avgRadius
-        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length;
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
         let bestTarget: Pellet | Cell | null = null;
