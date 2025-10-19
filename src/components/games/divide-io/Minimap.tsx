@@ -18,13 +18,11 @@ interface MinimapProps {
 
 const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBots, className }) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const imgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const img = new Image();
     img.src = heroBgImage;
     img.onload = () => {
-      imgRef.current = img;
       setIsImageLoaded(true);
     };
   }, []);
@@ -43,40 +41,20 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
   return (
     <div
       className={cn(
-        "fixed top-16 left-4 z-40 p-2 bg-white/70 backdrop-blur-sm rounded-xl shadow-lg border-2 border-primary/30",
+        "fixed top-16 left-4 z-40 p-2 shadow-lg border-2 border-primary/30 overflow-hidden",
         className
       )}
-      style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
+      style={{ 
+        width: MINIMAP_SIZE, 
+        height: MINIMAP_SIZE,
+        borderRadius: '50%', // Makes the container perfectly circular
+        backgroundImage: isImageLoaded ? `url(${heroBgImage})` : 'none',
+        backgroundSize: 'cover', // Ensures the image covers the entire circular area
+        backgroundPosition: 'center', // Centers the image
+        backgroundRepeat: 'no-repeat'
+      }}
     >
       <svg width={MINIMAP_SIZE} height={MINIMAP_SIZE} viewBox={`0 0 ${MINIMAP_SIZE} ${MINIMAP_SIZE}`}>
-        <defs>
-          {/* Pattern for background image */}
-          <pattern
-            id="bgPattern"
-            patternUnits="userSpaceOnUse"
-            width={MINIMAP_SIZE}
-            height={MINIMAP_SIZE}
-            preserveAspectRatio="none"
-          >
-            <image
-              href={heroBgImage}
-              width={MINIMAP_SIZE}
-              height={MINIMAP_SIZE}
-              opacity="0.6"
-            />
-          </pattern>
-        </defs>
-        
-        {/* Background image using pattern */}
-        {isImageLoaded && (
-          <circle 
-            cx={MINIMAP_SIZE / 2} 
-            cy={MINIMAP_SIZE / 2} 
-            r={MINIMAP_SIZE / 2} 
-            fill="url(#bgPattern)"
-          />
-        )}
-        
         {/* Fallback para cor de fundo se a imagem não carregar */}
         {!isImageLoaded && (
           <circle 
