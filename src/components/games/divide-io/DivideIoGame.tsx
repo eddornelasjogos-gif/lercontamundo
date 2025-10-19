@@ -9,6 +9,9 @@ import { BOT_NAMES } from './BotNames';
 import { useGameAudio } from '@/hooks/useGameAudio';
 import heroBgImage from '@/assets/hero-bg.jpg';
 import { useIsMobile } from '@/hooks/use-mobile'; // Importando o hook
+import PauseMenu from './PauseMenu'; // Importando o novo componente
+import { Button } from '@/components/ui/button';
+import { Pause } from 'lucide-react';
 
 type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
@@ -35,8 +38,6 @@ const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5;
 const MASS_TO_RADIUS_RATIO = 4;
-
-// Virus constants REMOVED
 
 // Ajuste de Impulso para Divisão (REDUCED for slower gameplay)
 const EJECTION_IMPULSE = 250; // REDUCED: from 400 to 250
@@ -252,8 +253,6 @@ class Player extends Cell {
     }
 }
 
-// Virus class REMOVED
-
 // Lógica de Bot
 const botLogic = {
     target: new Map<string, Vector | null>(),
@@ -457,6 +456,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const isMobile = useIsMobile(); // Usando o hook para detectar dispositivo
   
   const [isPlaying, setIsPlaying] = React.useState(true);
+  const [isPaused, setIsPaused] = React.useState(false); // Novo estado de pausa
   const { playCollect, playSplit } = useGameAudio(isPlaying); 
   
   const initialBotCount = difficultySettings[difficulty].botCount;
@@ -486,16 +486,42 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const keyboardDirectionRef = useRef({ x: 0, y: 0 });
   const isKeyboardActiveRef = useRef(false);
 
+  // --- Handlers de Pausa/Reinício ---
+  
+  const handlePause = useCallback(() => {
+    setIsPaused(true);
+  }, []);
+  
+  const handleResume = useCallback(() => {
+    setIsPaused(false);
+  }, []);
+  
+  const handleRestart = useCallback(() => {
+    // Força o reset do jogo (re-executa o useEffect de inicialização)
+    setIsPaused(false);
+    // Simula a desmontagem/montagem do componente para reiniciar o estado
+    // Isso é feito forçando uma nova renderização com uma chave, mas aqui vamos usar a função de game over para voltar ao menu e reiniciar
+    onGameOver(gameInstance.maxScore); // Isso leva ao menu de Game Over/Restart
+  }, [onGameOver, gameInstance.maxScore]);
+  
+  const handleExit = useCallback(() => {
+    // Volta para a tela de seleção de jogos (Games.tsx)
+    onGameOver(gameInstance.maxScore);
+  }, [onGameOver, gameInstance.maxScore]);
+
+
   // --- Handlers de Movimento ---
   
   // Usado pelo VirtualJoystick (Mobile)
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
+    if (isPaused) return;
     movementDirectionRef.current = direction;
     isKeyboardActiveRef.current = false; // Joystick takes precedence over keyboard/mouse state
-  }, []);
+  }, [isPaused]);
   
   // Usado pelo Mouse (Desktop)
   const handleMouseMove = useCallback((event: MouseEvent) => {
+    if (isPaused) return;
     // Se o teclado estiver ativo, ignoramos o mouse para movimento
     if (!canvasRef.current || isKeyboardActiveRef.current) return; 
     
@@ -519,11 +545,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     } else {
         movementDirectionRef.current = { x: 0, y: 0 };
     }
-  }, [gameInstance]);
+  }, [gameInstance, isPaused]);
   
   // --- Handler de Divisão ---
 
   const handleSplit = useCallback(() => {
+    if (isPaused) return;
     const newCells: Player[] = [];
     const cellsToSplit = [...gameInstance.playerCells]; 
     
@@ -538,7 +565,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     });
     
     gameInstance.playerCells.push(...newCells);
-  }, [gameInstance, playSplit]);
+  }, [gameInstance, playSplit, isPaused]);
 
   // Efeito para escutar a tecla Espaço (PC) e o movimento do mouse/teclado
   useEffect(() => {
@@ -546,6 +573,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (!canvas) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsPaused(p => !p);
+        return;
+      }
+      
+      if (isPaused) return;
+
       if (isPlaying && event.code === 'Space') {
         event.preventDefault();
         handleSplit();
@@ -597,6 +631,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     };
     
     const handleKeyUp = (event: KeyboardEvent) => {
+        if (isPaused) return;
         if (isMobile) return; // Keyboard movement only for desktop
 
         let x = keyboardDirectionRef.current.x;
@@ -658,7 +693,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isPlaying, handleSplit, isMobile, handleMouseMove]);
+  }, [isPlaying, handleSplit, isMobile, handleMouseMove, isPaused]);
 
   // Variável para armazenar o zoom fixo calculado
   const fixedZoomRef = useRef<number>(1);
@@ -667,6 +702,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) {
+        animationFrameId.current = requestAnimationFrame(gameLoop);
+        return;
+    }
+    
+    if (isPaused) {
+        // Se estiver pausado, apenas desenha o frame atual e espera
         animationFrameId.current = requestAnimationFrame(gameLoop);
         return;
     }
@@ -840,7 +881,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         allCells = [...playerCells, ...botCells];
 
         // --- 4. Detecção de Colisão com Vírus (REMOVIDA) ---
-        // Lógica de vírus removida.
         
         allCells = [...playerCells, ...botCells];
 
@@ -943,7 +983,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
         
         // --- 8. Respawn de Vírus (REMOVIDA) ---
-        // Lógica de respawn de vírus removida.
         
         // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
         
@@ -1122,20 +1161,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         // --- Lógica de Desenho de Camadas ---
         
-        const cellsInsideVirus: Cell[] = [];
         const cellsOutsideVirus: Cell[] = [];
         
         allCells.forEach(cell => {
-            // Lógica de vírus removida
             cellsOutsideVirus.push(cell);
         });
         
         cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
             c.draw(ctx, c instanceof Player);
         });
-
-        // Otimização de Renderização de Vírus (REMOVIDA)
-        // viruses.forEach(v => { ... }); 
         
         // --- FIM: Lógica de Desenho de Camadas ---
 
@@ -1187,7 +1221,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // Always schedule the next frame
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile]);
+  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile, isPaused]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1274,6 +1308,17 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: isMobile ? 'none' : 'auto' }}>
       <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
       
+      {/* Botão de Pausa (sempre visível) */}
+      <Button 
+        variant="secondary" 
+        size="icon" 
+        onClick={handlePause} 
+        className="fixed top-4 left-4 z-50 shadow-lg"
+        disabled={!isPlaying || isPaused}
+      >
+        <Pause className="w-5 h-5" />
+      </Button>
+
       {/* Controles visíveis apenas em dispositivos móveis */}
       {isMobile && (
         <>
@@ -1283,6 +1328,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       )}
       
       <Minimap {...minimapData} />
+      
+      {isPaused && (
+        <PauseMenu 
+          onResume={handleResume}
+          onRestart={handleRestart}
+          onExit={handleExit}
+        />
+      )}
     </div>
   );
 };
