@@ -1,10 +1,10 @@
-import { Cell } from "@/components/games/divide-io/DivideIoGame"; // Assumindo que Cell, Player e Pellet são exportados
-import { Player } from "@/components/games/divide-io/DivideIoGame";
-import { Pellet } from "@/components/games/divide-io/DivideIoGame";
+import { Cell } from "@/components/games/divide-io/Cell";
+import { Player } from "@/components/games/divide-io/Player";
+import { Pellet } from "@/components/games/divide-io/Pellet";
 
 const SESSION_STORAGE_KEY = 'divide-io-temp-state';
 
-export interface SavedCellData { // Exporting SavedCellData
+export interface SavedCellData {
   x: number;
   y: number;
   mass: number;
@@ -19,7 +19,7 @@ interface SavedPelletData {
   color: string;
 }
 
-export interface SavedGameState { // Exporting SavedGameState
+export interface SavedGameState {
   playerCells: SavedCellData[];
   botCells: SavedCellData[];
   pellets: SavedPelletData[];
