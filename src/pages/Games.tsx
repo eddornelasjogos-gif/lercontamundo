@@ -52,7 +52,15 @@ const Games = () => {
         return;
     }
     
-    // Fim de Jogo (Morte ou Saída)
+    if (score >= 200000) {
+        // Vitória: atualiza leaderboard e volta para menu sem mostrar tela de gameover
+        updateHighScore(score);
+        updateLeaderboard(inputName.trim(), score);
+        setGameStatus("menu");
+        return;
+    }
+    
+    // Fim de Jogo (Morte ou Saída normal)
     setLastScore(score);
     updateHighScore(score);
     updateLeaderboard(inputName.trim(), score);
