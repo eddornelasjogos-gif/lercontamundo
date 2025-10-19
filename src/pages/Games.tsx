@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 type GameStatus = "menu" | "playing" | "gameover";
-type Difficulty = "easy" | "medium" | "hard";
+type Difficulty = "very-easy" | "easy" | "medium" | "hard";
 
 const Games = () => {
   const [gameStatus, setGameStatus] = useState<GameStatus>("menu");
@@ -20,7 +20,7 @@ const Games = () => {
     playerName, 
     leaderboard, 
     setDifficulty, 
-    updateHighScore, 
+    updateHighScore,
     setPlayerName,
     updateLeaderboard
   } = useDivideIoProgress();
@@ -64,7 +64,7 @@ const Games = () => {
       <Navigation />
       <div className="flex-grow flex items-center justify-center">
         <div className="container mx-auto px-4 py-8">
-          <Card className="max-w-2xl mx-auto p-6 md:p-10 shadow-glow border-2 border-primary/20 bg-white/50 backdrop-blur-lg animate-scale-in">
+          <Card className="max-w-2xl mx-auto p-6 md:p-10 shadow-glow border-2 border-primary/20 bg-white/80 backdrop-blur-lg animate-scale-in">
             <div className="text-center space-y-6">
               <div className="flex justify-center items-center gap-4">
                 <Gamepad2 className="w-12 h-12 text-primary" />
@@ -81,12 +81,6 @@ const Games = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-center gap-2 text-lg font-semibold text-foreground">
-                <Trophy className="w-6 h-6 text-amber-500" />
-                <span>Recorde Pessoal: {highScore}</span>
-              </div>
-              
-              {/* Input de Nome */}
               <div className="space-y-2">
                 <div className="flex items-center justify-center gap-2">
                     <User className="w-5 h-5 text-muted-foreground" />
@@ -105,13 +99,13 @@ const Games = () => {
               <div className="space-y-3">
                 <h3 className="text-lg font-display font-semibold text-foreground">Escolha a Dificuldade</h3>
                 <div className="flex justify-center gap-3">
-                  {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
+                  {(['very-easy', 'easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
                     <Button
                       key={d}
                       variant={currentDifficulty === d ? "gradient" : "outline"}
                       onClick={() => setCurrentDifficulty(d)}
                     >
-                      {d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
+                      {d === 'very-easy' ? 'Muito Fácil' : d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
                     </Button>
                   ))}
                 </div>

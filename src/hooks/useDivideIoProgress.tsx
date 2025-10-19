@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 const STORAGE_KEY = 'divide-io-progress';
 
-type Difficulty = 'easy' | 'medium' | 'hard';
+type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
 interface LeaderboardEntry {
   name: string;
@@ -67,20 +67,13 @@ export const useDivideIoProgress = () => {
     setProgress((prev) => {
       const newEntry: LeaderboardEntry = { name, score };
       
-      // Combina o novo score com o leaderboard existente
-      let newLeaderboard = [...prev.leaderboard, newEntry];
+      // Remove entradas antigas do mesmo nome
+      let newLeaderboard = prev.leaderboard.filter(entry => entry.name !== name);
       
-      // Remove duplicatas (mantendo o score mais alto para o mesmo nome)
-      const uniqueScores = new Map<string, number>();
-      newLeaderboard.forEach(entry => {
-        if (!uniqueScores.has(entry.name) || entry.score > uniqueScores.get(entry.name)!) {
-          uniqueScores.set(entry.name, entry.score);
-        }
-      });
+      // Adiciona a nova entrada
+      newLeaderboard = [...newLeaderboard, newEntry];
       
-      newLeaderboard = Array.from(uniqueScores, ([name, score]) => ({ name, score }));
-      
-      // Ordena e mantém apenas o top 10
+      // Ordena por score (maior primeiro) e mantém apenas o top 10
       newLeaderboard.sort((a, b) => b.score - a.score);
       newLeaderboard = newLeaderboard.slice(0, 10);
       

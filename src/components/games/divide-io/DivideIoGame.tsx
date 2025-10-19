@@ -8,7 +8,7 @@ import { useGameAudio } from '@/hooks/useGameAudio';
 import heroBgImage from '@/assets/hero-bg.jpg';
 import { useIsMobile } from '@/hooks/use-mobile'; // Importando o hook
 
-type Difficulty = 'easy' | 'medium' | 'hard';
+type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
 interface DivideIoGameProps {
   difficulty: Difficulty;
@@ -17,6 +17,7 @@ interface DivideIoGameProps {
 }
 
 const difficultySettings = {
+  'very-easy': { botCount: 10, botAggression: 0.1, botSplitChance: 0.0005 },
   easy: { botCount: 18, botAggression: 0.2, botSplitChance: 0.001 },
   medium: { botCount: 18, botAggression: 0.5, botSplitChance: 0.002 },
   hard: { botCount: 18, botAggression: 0.8, botSplitChance: 0.005 },
