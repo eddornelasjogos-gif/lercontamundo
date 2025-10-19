@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Gamepad2, Trophy, User } from "lucide-react";
@@ -98,12 +100,13 @@ const Games = () => {
 
               <div className="space-y-3">
                 <h3 className="text-lg font-display font-semibold text-foreground">Escolha a Dificuldade</h3>
-                <div className="flex justify-center gap-3">
+                <div className="grid grid-cols-2 gap-3 justify-items-center">
                   {(['very-easy', 'easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
                     <Button
                       key={d}
                       variant={currentDifficulty === d ? "gradient" : "outline"}
                       onClick={() => setCurrentDifficulty(d)}
+                      className="w-full max-w-xs font-display font-semibold"
                     >
                       {d === 'very-easy' ? 'Muito Fácil' : d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
                     </Button>
