@@ -15,7 +15,7 @@ const PauseMenu: React.FC<PauseMenuProps> = ({ onResume, onRestart, onExit }) =>
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <Card className="max-w-md w-full p-8 shadow-glow border-2 border-primary/30 bg-white/95 animate-scale-in space-y-6 text-center">
         
-        <Mascot message="Jogo Pausado!" className="mx-auto" />
+        <Mascot message="Jogo Pausado!" className="mx-auto mb-4" />
         
         <h2 className="text-3xl font-display font-bold text-foreground">
           O que deseja fazer?
@@ -24,7 +24,7 @@ const PauseMenu: React.FC<PauseMenuProps> = ({ onResume, onRestart, onExit }) =>
         <div className="space-y-4">
           <Button 
             size="lg" 
-            onClick={onResume} 
+            onClick={onResume} // Chamando onResume
             className="w-full gradient-primary shadow-soft"
           >
             <Play className="w-5 h-5 mr-2" />

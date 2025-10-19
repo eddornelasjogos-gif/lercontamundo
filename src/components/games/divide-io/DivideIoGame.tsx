@@ -489,14 +489,17 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   // --- Handlers de Pausa/Reinício ---
   
   const handlePause = useCallback(() => {
+    console.log("Game Paused");
     setIsPaused(true);
   }, []);
   
   const handleResume = useCallback(() => {
+    console.log("Game Resumed");
     setIsPaused(false);
   }, []);
   
   const handleRestart = useCallback(() => {
+    console.log("Game Restarted (Calling onGameOver to reset state)");
     // Força o reset do jogo (re-executa o useEffect de inicialização)
     setIsPaused(false);
     // Simula a desmontagem/montagem do componente para reiniciar o estado
@@ -505,6 +508,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   }, [onGameOver, gameInstance.maxScore]);
   
   const handleExit = useCallback(() => {
+    console.log("Game Exited (Calling onGameOver to return to menu)");
     // Volta para a tela de seleção de jogos (Games.tsx)
     onGameOver(gameInstance.maxScore);
   }, [onGameOver, gameInstance.maxScore]);
@@ -1124,7 +1128,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             ctx.fillStyle = '#f0f0f0';
             ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
         }
-        // --- FIM: Desenho do Fundo do Mundo ---
+        // --- FIM: Desenho do Mundo ---
 
         // Draw World Grid (circular pattern)
         ctx.strokeStyle = '#eee';
