@@ -781,6 +781,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     botGroups.forEach((cells, botName) => {
         const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
         const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+        // FIXED: Calculate centerOfMass for this specific bot group
+        const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
         
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
