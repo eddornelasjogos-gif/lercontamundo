@@ -1273,7 +1273,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         variant="secondary" 
         size="icon" 
         onClick={handlePause} 
-        className="fixed top-4 left-4 z-[100] shadow-lg"
+        className="fixed bottom-4 left-4 z-[100] shadow-lg"
         disabled={!isPlaying || isPaused}
       >
         <Pause className="w-5 h-5" />
