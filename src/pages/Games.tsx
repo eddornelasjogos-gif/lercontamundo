@@ -1,4 +1,3 @@
-playing) when receiving the restart signal (-1) to ensure DivideIoGame remounts.">
 "use client";
 
 import { useState } from "react";
