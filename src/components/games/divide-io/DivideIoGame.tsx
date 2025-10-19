@@ -271,8 +271,8 @@ const botLogic = {
     explorationTarget: new Map<string, Vector | null>(),
     decisionTimer: new Map<string, number>(),
     
-    // CORRIGIDO: Usar 'botCells' em vez de 'cells'
     findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
+        // CORRIGIDO: Usar botCells
         const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
         const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length; 
         const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
@@ -480,11 +480,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   }, []);
   
   const handleRestart = useCallback(() => {
-    console.log("Game Restarted - Clearing state and returning to menu for full reset.");
+    console.log("Game Restarted - Clearing state and forcing remount.");
     // 1. Limpa o estado salvo
     clearGameState();
-    // 2. Volta ao menu (Games.tsx) para reiniciar o componente com estado limpo
-    onGameOver(0); // Passa 0 para forçar o reset completo na próxima jogada
+    // 2. Sinaliza para Games.tsx que deve forçar um reset completo (usando -1)
+    onGameOver(-1); 
   }, [onGameOver]);
   
   const handleExit = useCallback(() => {
@@ -701,7 +701,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     try {
         let allCells: Cell[] = [...playerCells, ...botCells];
 
-        // CORRIGIDO: Define settings no escopo do loop
         const settings = difficultySettings[difficulty];
 
         // --- 1. Lógica do Jogador ---
@@ -755,7 +754,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     const dist = centerOfMass.subtract(p.position).magnitude();
                     return dist < avgRadius * 15;
                 });
-                // CORRIGIDO: Passar 'cells' como primeiro argumento para findBestTarget
                 botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
                 decisionTimer = 30;
             }
@@ -783,7 +781,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
                 }
                 
-                // CORRIGIDO: Usar 'settings'
                 if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
                     const newCell = cell.split(targetDirection, getNextCellId());
                     if (newCell) {
@@ -1208,12 +1205,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             return bot;
         });
         
-        // Pellets precisam ser recriados com a posição correta
-        gameInstance.pellets = savedState.pellets.map(p => {
-            const pellet = new Pellet(p.color);
-            pellet.position = new Vector(p.x, p.y);
-            return pellet;
-        });
+        gameInstance.pellets = savedState.pellets.map(p => new Pellet(p.color, p.x, p.y));
         
         gameInstance.camera = savedState.camera;
         gameInstance.score = savedState.score;

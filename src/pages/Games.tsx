@@ -1,3 +1,4 @@
+playing) when receiving the restart signal (-1) to ensure DivideIoGame remounts.">
 "use client";
 
 import { useState } from "react";
@@ -42,11 +43,13 @@ const Games = () => {
   };
 
   // Esta função é chamada pelo DivideIoGame quando o jogo termina (morte) ou quando o usuário
-  // clica em 'Reiniciar' (score 0) ou 'Voltar ao Menu' (score > 0, mas não morte)
+  // clica em 'Reiniciar' (score -1) ou 'Voltar ao Menu' (score > 0, mas não morte)
   const handleGameOver = (score: number) => {
-    if (score === 0) {
-        // Sinal de Reinício (vindo de handleRestart no DivideIoGame)
-        setGameStatus("playing");
+    if (score === -1) {
+        // Sinal de Reinício Forçado (vindo de handleRestart no DivideIoGame)
+        // Forçamos a transição para 'menu' e depois para 'playing' para garantir a remontagem
+        setGameStatus("menu");
+        setTimeout(() => setGameStatus("playing"), 0);
         return;
     }
     
