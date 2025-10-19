@@ -49,36 +49,52 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
       style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
     >
       <svg width={MINIMAP_SIZE} height={MINIMAP_SIZE} viewBox={`0 0 ${MINIMAP_SIZE} ${MINIMAP_SIZE}`}>
-        
-        {/* UPDATED: Desenha a imagem de fundo circular */}
-        {isImageLoaded && (
-            <circle 
-                cx={MINIMAP_SIZE / 2} 
-                cy={MINIMAP_SIZE / 2} 
-                r={MINIMAP_SIZE / 2} 
-                fill="url(#bgGradient)" 
-                opacity="0.6"
+        <defs>
+          {/* Pattern for background image */}
+          <pattern
+            id="bgPattern"
+            patternUnits="userSpaceOnUse"
+            width={MINIMAP_SIZE}
+            height={MINIMAP_SIZE}
+            preserveAspectRatio="none"
+          >
+            <image
+              href={heroBgImage}
+              width={MINIMAP_SIZE}
+              height={MINIMAP_SIZE}
+              opacity="0.6"
             />
+          </pattern>
+        </defs>
+        
+        {/* Background image using pattern */}
+        {isImageLoaded && (
+          <circle 
+            cx={MINIMAP_SIZE / 2} 
+            cy={MINIMAP_SIZE / 2} 
+            r={MINIMAP_SIZE / 2} 
+            fill="url(#bgPattern)"
+          />
         )}
         
         {/* Fallback para cor de fundo se a imagem não carregar */}
         {!isImageLoaded && (
-            <circle 
-                cx={MINIMAP_SIZE / 2} 
-                cy={MINIMAP_SIZE / 2} 
-                r={MINIMAP_SIZE / 2} 
-                fill="#f0f0f0" 
-            />
-        )}
-        
-        {/* UPDATED: Borda circular do minimapa */}
-        <circle 
+          <circle 
             cx={MINIMAP_SIZE / 2} 
             cy={MINIMAP_SIZE / 2} 
             r={MINIMAP_SIZE / 2} 
-            fill="none" 
-            stroke="#333" 
-            strokeWidth="2" 
+            fill="#f0f0f0" 
+          />
+        )}
+        
+        {/* Borda circular do minimapa */}
+        <circle 
+          cx={MINIMAP_SIZE / 2} 
+          cy={MINIMAP_SIZE / 2} 
+          r={MINIMAP_SIZE / 2} 
+          fill="none" 
+          stroke="#333" 
+          strokeWidth="2" 
         />
         
         {/* Desenha todos os bots visíveis (apenas se dentro dos limites circulares) */}
