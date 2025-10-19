@@ -16,9 +16,9 @@ import { Pause } from 'lucide-react';
 import { saveGameState, loadGameState, clearGameState } from '@/utils/divide-io-storage';
 import type { SavedGameState } from '@/utils/divide-io-storage'; // Import the type
 
-// Importações das classes de seus novos arquivos
+// Importações das classes de seus respectivos arquivos
 import { Vector } from './Vector';
-import { Cell, getRandomColor } from './Cell'; // Import getRandomColor from Cell
+import { Cell, getRandomColor } from './Cell';
 import { Player } from './Player';
 import { Bot } from './Bot';
 import { Pellet } from './Pellet';
