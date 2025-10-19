@@ -10,6 +10,8 @@ const getRandomColor = () => {
   return color;
 };
 
+export { getRandomColor };
+
 export class Bot extends Cell {
   constructor(x: number, y: number, mass: number, name: string, id: number) {
     super(x, y, getRandomColor(), mass, name, id, true);

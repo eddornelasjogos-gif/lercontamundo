@@ -19,6 +19,7 @@ import { Cell } from './Cell';
 import { Player } from './Player';
 import { Bot } from './Bot';
 import { Pellet } from './Pellet';
+import { getRandomColor } from './Bot';
 
 type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
