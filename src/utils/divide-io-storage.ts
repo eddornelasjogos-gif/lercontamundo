@@ -1,6 +1,6 @@
-import { Cell } from "@/components/games/divide-io/Cell";
-import { Player } from "@/components/games/divide-io/Player";
-import { Pellet } from "@/components/games/divide-io/Pellet";
+import { Cell } from "@/components/games/divide-io/DivideIoGame"; // Assumindo que Cell, Player e Pellet são exportados
+import { Player } from "@/components/games/divide-io/DivideIoGame";
+import { Pellet } from "@/components/games/divide-io/DivideIoGame";
 
 const SESSION_STORAGE_KEY = 'divide-io-temp-state';
 
