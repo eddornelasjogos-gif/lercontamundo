@@ -33,13 +33,23 @@ const Profile = () => {
 
   // Salva o nome no localStorage e atualiza estado
   const handleSaveName = () => {
-    if (userName.trim().length < 3) {
-      toast.error("O nome deve ter pelo menos 3 caracteres!");
+    const trimmedName = userName.trim();
+    
+    if (trimmedName.length === 0) {
+      toast.error("O nome não pode ser vazio!");
       return;
     }
-    localStorage.setItem('userName', userName.trim());
+    
+    // O limite de 12 caracteres é imposto pelo maxLength no Input, mas garantimos aqui também
+    if (trimmedName.length > 12) {
+        toast.error("O nome deve ter no máximo 12 caracteres!");
+        return;
+    }
+    
+    localStorage.setItem('userName', trimmedName);
+    setUserName(trimmedName); // Atualiza o estado com o nome trimado
     setIsEditingName(false);
-    toast.success(`Nome "${userName.trim()}" salvo com sucesso!`);
+    toast.success(`Nome "${trimmedName}" salvo com sucesso!`);
   };
 
   // Cancela edição
@@ -137,13 +147,14 @@ const Profile = () => {
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       className="w-full font-body font-semibold text-center"
-                      maxLength={20}
+                      maxLength={12}
                     />
                     <div className="flex gap-2 justify-center">
                       <Button
                         size="sm"
                         onClick={handleSaveName}
                         className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+                        disabled={userName.trim().length === 0 || userName.length > 12}
                       >
                         <Save className="w-4 h-4" />
                         Salvar
