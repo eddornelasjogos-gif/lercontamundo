@@ -1218,9 +1218,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             camera.y += (centerY - camera.y) * 0.05;
             
             // UPDATED: Less aggressive zoom calculation for better visibility when growing
-            // Aumentando o multiplicador de 10 para 50 para um zoom muito mais distante.
+            // We use the square root of the radius to make the zoom-out much slower as the cell grows.
             const radiusFactor = Math.sqrt(avgRadius);
-            camera.zoom = Math.max(0.3, 50 / radiusFactor); 
+            camera.zoom = Math.max(0.3, 10 / radiusFactor); 
         }
         
         // Calcula a área de visão (viewport)
