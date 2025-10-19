@@ -1470,9 +1470,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const zoomX = canvas.width / WORLD_SIZE;
     const zoomY = canvas.height / WORLD_SIZE;
     
-    // Calcula o zoom mínimo (para caber o mundo inteiro) e aplica o fator de 1.5 (50% a mais)
+    // Calcula o zoom mínimo (para caber o mundo inteiro) e aplica o fator de 2.25 (150% a mais do que 1.5)
     const minZoom = Math.min(zoomX, zoomY);
-    fixedZoomRef.current = minZoom * 1.5; 
+    fixedZoomRef.current = minZoom * 2.25; 
     
     gameInstance.camera.zoom = fixedZoomRef.current; // Define o zoom inicial
 
