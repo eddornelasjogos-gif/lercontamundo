@@ -489,11 +489,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   
   const handleExit = useCallback(() => {
     console.log("Game Exited - Clearing state and returning to menu.");
-    // 1. Limpa o estado salvo
+    // 1. Limpa o estado salvo (posição, tamanho, etc.) para não guardar informações desnecessárias
     clearGameState();
-    // 2. Volta para a tela de seleção de jogos (Games.tsx)
-    onGameOver(gameInstance.maxScore);
-  }, [onGameOver, gameInstance.maxScore]);
+    // 2. Volta para a tela de seleção de jogos (Games.tsx) sem mostrar tela de game over
+    onGameOver(0); // Usar 0 para indicar saída limpa, sem atualizar leaderboard
+  }, [onGameOver]);
 
 
   // --- Handlers de Movimento e Split (mantidos) ---
