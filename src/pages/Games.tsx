@@ -1,4 +1,3 @@
-0) and update the player name input state.">
 "use client";
 
 import { useState } from "react";

@@ -271,10 +271,11 @@ const botLogic = {
     explorationTarget: new Map<string, Vector | null>(),
     decisionTimer: new Map<string, number>(),
     
+    // CORRIGIDO: Usar 'botCells' em vez de 'cells'
     findBestTarget(botCells: Cell[], pellets: Pellet[], otherCells: Cell[], aggression: number, botName: string) {
-        const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
-        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length; 
-        const center = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+        const totalMass = botCells.reduce((sum, c) => sum + c.mass, 0);
+        const avgRadius = botCells.reduce((sum, c) => sum + c.radius, 0) / botCells.length; 
+        const center = botCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
 
         let bestTarget: Pellet | Cell | null = null;
         let minTargetDist = Infinity;
@@ -669,7 +670,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isPlaying, handleSplit, isMobile, handleMouseMove, isPaused, handlePause]); // Adicionado handlePause como dependência
+  }, [isPlaying, handleSplit, isMobile, handleMouseMove, isPaused, handlePause]);
 
   // Variável para armazenar o zoom fixo calculado
   const fixedZoomRef = useRef<number>(1);
@@ -697,458 +698,468 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       return;
     }
 
-    // ... (Restante da lógica do gameLoop, mantida) ...
-    // --- 1. Lógica do Jogador ---
-    const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
-    
-    const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
-    const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
+    try {
+        let allCells: Cell[] = [...playerCells, ...botCells];
 
-    playerCells.forEach(playerCell => {
-        const acceleration = 0.3;
-        const force = playerDirection.multiply(acceleration);
-        playerCell.velocity = playerCell.velocity.add(force);
+        // CORRIGIDO: Define settings no escopo do loop
+        const settings = difficultySettings[difficulty];
 
-        const maxSpeed = 50 / (playerCell.radius * 0.1 + 10); 
-        if (playerCell.velocity.magnitude() > maxSpeed) {
-            playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
-        }
+        // --- 1. Lógica do Jogador ---
+        const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
         
-        if (playerCells.length > 1) {
-            const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
-            
-            const mergeProgress = 1 - (playerCell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
-            const attractionFactor = Math.max(0, mergeProgress);
-            
-            const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius) * attractionFactor; 
-            playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
-        }
-    });
+        const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+        const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
+        const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
 
-    // --- 2. Lógica dos Bots ---
-    
-    const botGroups = new Map<string, Cell[]>();
-    botCells.forEach(cell => {
-        if (!botGroups.has(cell.name)) {
-            botGroups.set(cell.name, []);
-        }
-        botGroups.get(cell.name)!.push(cell);
-    });
-    
-    let allCells: Cell[] = [...playerCells, ...botCells];
-    const newBotCells: Cell[] = [];
-
-    botGroups.forEach((cells, botName) => {
-        const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
-        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
-        const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
-        
-        let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
-        if (decisionTimer <= 0) {
-            const visiblePellets = pellets.filter(p => {
-                const dist = centerOfMass.subtract(p.position).magnitude();
-                return dist < avgRadius * 15;
-            });
-            botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
-            decisionTimer = 30;
-        }
-        botLogic.decisionTimer.set(botName, decisionTimer - 1);
-
-        const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
-        
-        cells.forEach(cell => {
+        playerCells.forEach(playerCell => {
             const acceleration = 0.3;
-            const force = targetDirection.multiply(acceleration);
-            cell.velocity = cell.velocity.add(force);
-            
-            const maxSpeed = 50 / (cell.radius * 0.1 + 10); 
-            if (cell.velocity.magnitude() > maxSpeed) {
-                cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
+            const force = playerDirection.multiply(acceleration);
+            playerCell.velocity = playerCell.velocity.add(force);
+
+            const maxSpeed = 50 / (playerCell.radius * 0.1 + 10); 
+            if (playerCell.velocity.magnitude() > maxSpeed) {
+                playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
             }
             
-            if (cells.length > 1) {
-                const attractionVector = centerOfMass.subtract(cell.position).normalize();
+            if (playerCells.length > 1) {
+                const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
                 
-                const mergeProgress = 1 - (cell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
-                const attractionFactor = Math.max(0, mergeProgress); 
+                const mergeProgress = 1 - (playerCell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+                const attractionFactor = Math.max(0, mergeProgress);
                 
-                const attractionForce = 0.5 * (avgRadius / cell.radius) * attractionFactor; 
-                cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
+                const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius) * attractionFactor; 
+                playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
             }
-            
-            if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
-                const newCell = cell.split(targetDirection, getNextCellId());
-                if (newCell) {
-                    newBotCells.push(newCell);
-                }
+        });
+
+        // --- 2. Lógica dos Bots ---
+        
+        const botGroups = new Map<string, Cell[]>();
+        botCells.forEach(cell => {
+            if (!botGroups.has(cell.name)) {
+                botGroups.set(cell.name, []);
             }
-            
-            cell.update();
+            botGroups.get(cell.name)!.push(cell);
         });
         
-        for (let i = cells.length - 1; i >= 0; i--) {
-            for (let j = i - 1; j >= 0; j--) {
-                const cellA = cells[i];
-                const cellB = cells[j];
+        const newBotCells: Cell[] = [];
+
+        botGroups.forEach((cells, botName) => {
+            const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
+            const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+            const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+            
+            let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
+            if (decisionTimer <= 0) {
+                const visiblePellets = pellets.filter(p => {
+                    const dist = centerOfMass.subtract(p.position).magnitude();
+                    return dist < avgRadius * 15;
+                });
+                // CORRIGIDO: Passar 'cells' como primeiro argumento para findBestTarget
+                botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
+                decisionTimer = 30;
+            }
+            botLogic.decisionTimer.set(botName, decisionTimer - 1);
+
+            const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
+            
+            cells.forEach(cell => {
+                const acceleration = 0.3;
+                const force = targetDirection.multiply(acceleration);
+                cell.velocity = cell.velocity.add(force);
                 
-                if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-                    const dist = cellA.position.subtract(cellB.position).magnitude();
-                    if (dist < cellA.radius + cellB.radius) { 
-                        const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-                        const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-                        
-                        bigger.mass += smaller.mass;
-                        bigger.radius = bigger.calculateRadius();
-                        
-                        const smallerIndex = botCells.indexOf(smaller);
-                        if (smallerIndex > -1) {
-                            botCells.splice(smallerIndex, 1);
-                            cells.splice(cells.indexOf(smaller), 1);
-                            if (smallerIndex <= i) i--;
-                            if (smallerIndex <= j) j--;
+                const maxSpeed = 50 / (cell.radius * 0.1 + 10); 
+                if (cell.velocity.magnitude() > maxSpeed) {
+                    cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
+                }
+                
+                if (cells.length > 1) {
+                    const attractionVector = centerOfMass.subtract(cell.position).normalize();
+                    
+                    const mergeProgress = 1 - (cell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+                    const attractionFactor = Math.max(0, mergeProgress); 
+                    
+                    const attractionForce = 0.5 * (avgRadius / cell.radius) * attractionFactor; 
+                    cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
+                }
+                
+                // CORRIGIDO: Usar 'settings'
+                if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
+                    const newCell = cell.split(targetDirection, getNextCellId());
+                    if (newCell) {
+                        newBotCells.push(newCell);
+                    }
+                }
+                
+                cell.update();
+            });
+            
+            for (let i = cells.length - 1; i >= 0; i--) {
+                for (let j = i - 1; j >= 0; j--) {
+                    const cellA = cells[i];
+                    const cellB = cells[j];
+                    
+                    if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+                        const dist = cellA.position.subtract(cellB.position).magnitude();
+                        if (dist < cellA.radius + cellB.radius) { 
+                            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+                            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+                            
+                            bigger.mass += smaller.mass;
+                            bigger.radius = bigger.calculateRadius();
+                            
+                            const smallerIndex = botCells.indexOf(smaller);
+                            if (smallerIndex > -1) {
+                                botCells.splice(smallerIndex, 1);
+                                cells.splice(cells.indexOf(smaller), 1);
+                                if (smallerIndex <= i) i--;
+                                if (smallerIndex <= j) j--;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-    
-    gameInstance.botCells.push(...newBotCells);
-    
-    // --- 3. Atualização e Fusão do Jogador ---
-    playerCells.forEach(cell => cell.update());
-
-    for (let i = playerCells.length - 1; i >= 0; i--) {
-      for (let j = i - 1; j >= 0; j--) {
-        const cellA = playerCells[i];
-        const cellB = playerCells[j];
+        });
         
-        if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-          const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < cellA.radius + cellB.radius) { 
-            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-            bigger.mass += smaller.mass;
-            bigger.radius = bigger.calculateRadius();
+        gameInstance.botCells.push(...newBotCells);
+        
+        // --- 3. Atualização e Fusão do Jogador ---
+        playerCells.forEach(cell => cell.update());
+
+        for (let i = playerCells.length - 1; i >= 0; i--) {
+          for (let j = i - 1; j >= 0; j--) {
+            const cellA = playerCells[i];
+            const cellB = playerCells[j];
             
-            const smallerIndex = playerCells.indexOf(smaller);
-            if (smallerIndex > -1) {
-                playerCells.splice(smallerIndex, 1);
-                if (smallerIndex <= i) i--;
-                if (smallerIndex <= j) j--;
+            if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+              const dist = cellA.position.subtract(cellB.position).magnitude();
+              if (dist < cellA.radius + cellB.radius) { 
+                const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+                const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+                bigger.mass += smaller.mass;
+                bigger.radius = bigger.calculateRadius();
+                
+                const smallerIndex = playerCells.indexOf(smaller);
+                if (smallerIndex > -1) {
+                    playerCells.splice(smallerIndex, 1);
+                    if (smallerIndex <= i) i--;
+                    if (smallerIndex <= j) j--;
+                }
+              }
             }
           }
         }
-      }
-    }
 
-    allCells = [...playerCells, ...botCells];
+        allCells = [...playerCells, ...botCells];
 
-    // --- 5. Detecção de Colisão (Comer) ---
-    
-    for (let i = allCells.length - 1; i >= 0; i--) {
-        for (let j = i - 1; j >= 0; j--) {
-            const cellA = allCells[i];
-            const cellB = allCells[j];
-            if (!cellA || !cellB) continue;
+        // --- 5. Detecção de Colisão (Comer) ---
+        
+        for (let i = allCells.length - 1; i >= 0; i--) {
+            for (let j = i - 1; j >= 0; j--) {
+                const cellA = allCells[i];
+                const cellB = allCells[j];
+                if (!cellA || !cellB) continue;
 
-            const distVec = cellA.position.subtract(cellB.position);
-            const distance = distVec.magnitude();
+                const distVec = cellA.position.subtract(cellB.position);
+                const distance = distVec.magnitude();
 
-            if (distance < Math.max(cellA.radius, cellB.radius)) {
-                let predator, prey;
-                if (cellA.mass > cellB.mass * 1.15) {
-                    predator = cellA;
-                    prey = cellB;
-                } else if (cellB.mass > cellA.mass * 1.15) {
-                    predator = cellB;
-                    prey = cellA;
-                } else {
-                    continue;
-                }
-                
-                if (predator.name === prey.name) continue;
-
-                const deathDistance = predator.radius - prey.radius * 0.3;
-                if (distance < deathDistance) {
-                    predator.mass += prey.mass;
-                    predator.radius = predator.calculateRadius();
-                    
-                    if (predator instanceof Player || !predator.isBot) {
-                        playCollect();
+                if (distance < Math.max(cellA.radius, cellB.radius)) {
+                    let predator, prey;
+                    if (cellA.mass > cellB.mass * 1.15) {
+                        predator = cellA;
+                        prey = cellB;
+                    } else if (cellB.mass > cellA.mass * 1.15) {
+                        predator = cellB;
+                        prey = cellA;
+                    } else {
+                        continue;
                     }
                     
-                    const preyIndexInPlayer = playerCells.indexOf(prey as Player);
-                    if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
+                    if (predator.name === prey.name) continue;
 
-                    const preyIndexInBots = botCells.indexOf(prey);
-                    if (preyIndexInBots > -1) {
-                        botCells.splice(preyIndexInBots, 1);
-                        if (prey.isBot) {
-                            botNamesRef.current.push(prey.name);
+                    const deathDistance = predator.radius - prey.radius * 0.3;
+                    if (distance < deathDistance) {
+                        predator.mass += prey.mass;
+                        predator.radius = predator.calculateRadius();
+                        
+                        if (predator instanceof Player || !predator.isBot) {
+                            playCollect();
                         }
+                        
+                        const preyIndexInPlayer = playerCells.indexOf(prey as Player);
+                        if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
+
+                        const preyIndexInBots = botCells.indexOf(prey);
+                        if (preyIndexInBots > -1) {
+                            botCells.splice(preyIndexInBots, 1);
+                            if (prey.isBot) {
+                                botNamesRef.current.push(prey.name);
+                            }
+                        }
+                        
+                        allCells.splice(allCells.indexOf(prey), 1);
+                        if (allCells.indexOf(predator) < i) i--;
+                        if (allCells.indexOf(predator) < j) j--;
                     }
-                    
-                    allCells.splice(allCells.indexOf(prey), 1);
-                    if (allCells.indexOf(predator) < i) i--;
-                    if (allCells.indexOf(predator) < j) j--;
                 }
             }
         }
-    }
-    
-    // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
-    const totalBotCells = botCells.length;
-    if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
-        const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
         
-        const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
-        cellsToRemove.forEach(cell => {
-            const index = botCells.indexOf(cell);
-            if (index > -1) {
-                botCells.splice(index, 1);
-                botNamesRef.current.push(cell.name);
+        // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
+        const totalBotCells = botCells.length;
+        if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
+            const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
+            
+            const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
+            cellsToRemove.forEach(cell => {
+                const index = botCells.indexOf(cell);
+                if (index > -1) {
+                    botCells.splice(index, 1);
+                    botNamesRef.current.push(cell.name);
+                }
+            });
+            
+            console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
+        }
+        
+        // --- 7. Respawn de Bots ---
+        while (botCells.length < initialBotCount) {
+            const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
+            
+            let angle = Math.random() * Math.PI * 2;
+            let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+            const newPosition = new Vector(
+              WORLD_CENTER_X + Math.cos(angle) * distance,
+              WORLD_CENTER_Y + Math.sin(angle) * distance
+            );
+            
+            const initialBotMass = Math.random() * 1000 + 250; 
+            
+            const newBot = new Cell(
+                newPosition.x,
+                newPosition.y,
+                getRandomColor(),
+                initialBotMass,
+                newBotName,
+                getNextCellId(),
+                true
+            );
+            botCells.push(newBot);
+        }
+        
+        // 9. Atualização de Câmera e Score
+        const initialMassForScore = MIN_CELL_RADIUS * MIN_CELL_RADIUS / 2; 
+        const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
+        
+        gameInstance.score = currentScore;
+        if (currentScore > gameInstance.maxScore) {
+            gameInstance.maxScore = currentScore;
+        }
+
+        let centerX = WORLD_CENTER_X;
+        let centerY = WORLD_CENTER_Y;
+        let avgRadius = MIN_CELL_RADIUS;
+
+        if (playerCells.length > 0) {
+            centerX = playerCenterOfMass.x;
+            centerY = playerCenterOfMass.y;
+            avgRadius = avgPlayerRadius;
+            
+            camera.x += (centerX - camera.x) * 0.05;
+            camera.y += (centerY - camera.y) * 0.05;
+            
+            camera.zoom = fixedZoomRef.current; 
+        }
+        
+        const viewportWidth = canvas.width / camera.zoom;
+        const viewportHeight = canvas.height / camera.zoom;
+        const viewLeft = camera.x - viewportWidth / 2;
+        const viewTop = camera.y - viewportHeight / 2;
+        const viewRight = camera.x + viewportWidth / 2;
+        const viewBottom = camera.y + viewportHeight / 2;
+
+        // Colisão de Pellets (Otimizado)
+        for (let i = pellets.length - 1; i >= 0; i--) {
+            const pellet = pellets[i];
+            
+            if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
+                pellet.position.y < viewTop || pellet.position.y > viewBottom) {
+                continue;
+            }
+            
+            for (const cell of allCells) {
+                if (!pellet) continue;
+                const dist = cell.position.subtract(pellet.position).magnitude();
+                if (dist < cell.radius) {
+                    cell.mass += 10;
+                    cell.radius = cell.calculateRadius();
+                    pellets.splice(i, 1);
+                    
+                    if (cell instanceof Player || !cell.isBot) {
+                        playCollect();
+                    }
+                    break; 
+                }
+            }
+        }
+        
+        // Respawn de Pellets
+        if (pellets.length < PELLET_COUNT) {
+          let angle = Math.random() * Math.PI * 2;
+          let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+          const newPellet = new Pellet(getRandomColor());
+          newPellet.position = new Vector(
+            WORLD_CENTER_X + Math.cos(angle) * distance,
+            WORLD_CENTER_Y + Math.sin(angle) * distance
+          );
+          pellets.push(newPellet);
+        }
+
+        // Prepare minimap data
+        const visibleBots = botCells
+            .map(bot => ({
+                x: bot.position.x,
+                y: bot.position.y,
+                mass: bot.mass,
+                color: bot.color,
+                radius: bot.radius,
+            }));
+
+        setMinimapData({
+            playerCenter: { x: centerX, y: centerY },
+            playerRadius: avgRadius, 
+            visibleBots: visibleBots,
+        });
+        
+        // --- 10. Leaderboard Logic ---
+        
+        const botMassMap = new Map<string, number>();
+        botCells.forEach(bot => {
+            botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
+        });
+        
+        const botEntries = Array.from(botMassMap.entries()).map(([name, mass]) => ({
+            name: name,
+            mass: mass,
+            isPlayer: false,
+            id: 0, 
+        }));
+        
+        const playerEntry = {
+            name: playerName,
+            mass: totalPlayerMass,
+            isPlayer: true,
+            id: 0, 
+        };
+        
+        const leaderboardData = [...botEntries, playerEntry]
+            .sort((a, b) => b.mass - a.mass)
+            .slice(0, 5); 
+
+
+        // Drawing
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(camera.zoom, camera.zoom);
+        ctx.translate(-camera.x, -camera.y);
+        
+        if (bgImgRef.current) {
+            const img = bgImgRef.current;
+            const opacity = 0.4;
+            
+            ctx.globalAlpha = opacity;
+            ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
+            ctx.globalAlpha = 1.0;
+        } else {
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+        }
+
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        for (let r = 50; r <= WORLD_RADIUS; r += 50) {
+            ctx.beginPath();
+            ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, r, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+            ctx.beginPath();
+            ctx.moveTo(WORLD_CENTER_X, WORLD_CENTER_Y);
+            ctx.lineTo(
+                WORLD_CENTER_X + Math.cos(angle) * WORLD_RADIUS,
+                WORLD_CENTER_Y + Math.sin(angle) * WORLD_RADIUS
+            );
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 20; 
+        ctx.beginPath();
+        ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, WORLD_RADIUS, 0, Math.PI * 2);
+        ctx.stroke();
+
+        pellets.forEach(p => {
+            if (p.position.x >= viewLeft && p.position.x <= viewRight &&
+                p.position.y >= viewTop && p.position.y <= viewBottom) {
+                p.draw(ctx);
             }
         });
         
-        console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
-    }
-    
-    // --- 7. Respawn de Bots ---
-    while (botCells.length < initialBotCount) {
-        const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
+        const cellsOutsideVirus: Cell[] = [];
         
-        let angle = Math.random() * Math.PI * 2;
-        let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
-        const newPosition = new Vector(
-          WORLD_CENTER_X + Math.cos(angle) * distance,
-          WORLD_CENTER_Y + Math.sin(angle) * distance
-        );
+        allCells.forEach(cell => {
+            cellsOutsideVirus.push(cell);
+        });
         
-        const initialBotMass = Math.random() * 1000 + 250; 
+        cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
+            c.draw(ctx, c instanceof Player);
+        });
         
-        const newBot = new Cell(
-            newPosition.x,
-            newPosition.y,
-            getRandomColor(),
-            initialBotMass,
-            newBotName,
-            getNextCellId(),
-            true
-        );
-        botCells.push(newBot);
-    }
-    
-    // 9. Atualização de Câmera e Score
-    const initialMassForScore = MIN_CELL_RADIUS * MIN_CELL_RADIUS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
-    
-    gameInstance.score = currentScore;
-    if (currentScore > gameInstance.maxScore) {
-        gameInstance.maxScore = currentScore;
-    }
+        ctx.restore();
 
-    let centerX = WORLD_CENTER_X;
-    let centerY = WORLD_CENTER_Y;
-    let avgRadius = MIN_CELL_RADIUS;
-
-    if (playerCells.length > 0) {
-        centerX = playerCenterOfMass.x;
-        centerY = playerCenterOfMass.y;
-        avgRadius = avgPlayerRadius;
-        
-        camera.x += (centerX - camera.x) * 0.05;
-        camera.y += (centerY - camera.y) * 0.05;
-        
-        camera.zoom = fixedZoomRef.current; 
-    }
-    
-    const viewportWidth = canvas.width / camera.zoom;
-    const viewportHeight = canvas.height / camera.zoom;
-    const viewLeft = camera.x - viewportWidth / 2;
-    const viewTop = camera.y - viewportHeight / 2;
-    const viewRight = camera.x + viewportWidth / 2;
-    const viewBottom = camera.y + viewportHeight / 2;
-
-    // Colisão de Pellets (Otimizado)
-    for (let i = pellets.length - 1; i >= 0; i--) {
-        const pellet = pellets[i];
-        
-        if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
-            pellet.position.y < viewTop || pellet.position.y > viewBottom) {
-            continue;
-        }
-        
-        for (const cell of allCells) {
-            if (!pellet) continue;
-            const dist = cell.position.subtract(pellet.position).magnitude();
-            if (dist < cell.radius) {
-                cell.mass += 10;
-                cell.radius = cell.calculateRadius();
-                pellets.splice(i, 1);
-                
-                if (cell instanceof Player || !cell.isBot) {
-                    playCollect();
-                }
-                break; 
-            }
-        }
-    }
-    
-    // Respawn de Pellets
-    if (pellets.length < PELLET_COUNT) {
-      let angle = Math.random() * Math.PI * 2;
-      let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
-      const newPellet = new Pellet(getRandomColor());
-      newPellet.position = new Vector(
-        WORLD_CENTER_X + Math.cos(angle) * distance,
-        WORLD_CENTER_Y + Math.sin(angle) * distance
-      );
-      pellets.push(newPellet);
-    }
-
-    // Prepare minimap data
-    const visibleBots = botCells
-        .map(bot => ({
-            x: bot.position.x,
-            y: bot.position.y,
-            mass: bot.mass,
-            color: bot.color,
-            radius: bot.radius,
-        }));
-
-    setMinimapData({
-        playerCenter: { x: centerX, y: centerY },
-        playerRadius: avgRadius, 
-        visibleBots: visibleBots,
-    });
-    
-    // --- 10. Leaderboard Logic ---
-    
-    const botMassMap = new Map<string, number>();
-    botCells.forEach(bot => {
-        botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
-    });
-    
-    const botEntries = Array.from(botMassMap.entries()).map(([name, mass]) => ({
-        name: name,
-        mass: mass,
-        isPlayer: false,
-        id: 0, 
-    }));
-    
-    const playerEntry = {
-        name: playerName,
-        mass: totalPlayerMass,
-        isPlayer: true,
-        id: 0, 
-    };
-    
-    const leaderboardData = [...botEntries, playerEntry]
-        .sort((a, b) => b.mass - a.mass)
-        .slice(0, 5); 
-
-
-    // Drawing
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.scale(camera.zoom, camera.zoom);
-    ctx.translate(-camera.x, -camera.y);
-    
-    if (bgImgRef.current) {
-        const img = bgImgRef.current;
-        const opacity = 0.4;
-        
-        ctx.globalAlpha = opacity;
-        ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
-        ctx.globalAlpha = 1.0;
-    } else {
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-    }
-
-    ctx.strokeStyle = '#eee';
-    ctx.lineWidth = 1;
-    for (let r = 50; r <= WORLD_RADIUS; r += 50) {
-        ctx.beginPath();
-        ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, r, 0, Math.PI * 2);
-        ctx.stroke();
-    }
-    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
-        ctx.beginPath();
-        ctx.moveTo(WORLD_CENTER_X, WORLD_CENTER_Y);
-        ctx.lineTo(
-            WORLD_CENTER_X + Math.cos(angle) * WORLD_RADIUS,
-            WORLD_CENTER_Y + Math.sin(angle) * WORLD_RADIUS
-        );
-        ctx.stroke();
-    }
-
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 20; 
-    ctx.beginPath();
-    ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, WORLD_RADIUS, 0, Math.PI * 2);
-    ctx.stroke();
-
-    pellets.forEach(p => {
-        if (p.position.x >= viewLeft && p.position.x <= viewRight &&
-            p.position.y >= viewTop && p.position.y <= viewBottom) {
-            p.draw(ctx);
-        }
-    });
-    
-    const cellsOutsideVirus: Cell[] = [];
-    
-    allCells.forEach(cell => {
-        cellsOutsideVirus.push(cell);
-    });
-    
-    cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
-        c.draw(ctx, c instanceof Player);
-    });
-    
-    ctx.restore();
-
-    // Draw UI elements (Score and Leaderboard)
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px Quicksand';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
-    
-    ctx.textAlign = 'right';
-    ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
-    
-    const leaderboardWidth = 180; 
-    const leaderboardX = canvas.width - leaderboardWidth - 20;
-    const lineHeight = 20; 
-    const leaderboardY = 50; 
-    const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
-    ctx.strokeStyle = '#ccc';
-    ctx.strokeRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
-
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 16px Quicksand';
-    ctx.textAlign = 'left';
-    ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
-    
-    ctx.font = '14px Quicksand';
-    leaderboardData.forEach((entry, index) => {
-        const y = leaderboardY + 40 + index * lineHeight; 
-        ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
-        
-        const nameDisplay = entry.name.length > 10 ? entry.name.substring(0, 8) + '...' : entry.name;
+        // Draw UI elements (Score and Leaderboard)
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 20px Quicksand';
         ctx.textAlign = 'left';
-        ctx.fillText(`${index + 1}. ${nameDisplay}`, leaderboardX + 10, y);
+        ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
         
         ctx.textAlign = 'right';
-        ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
-    });
+        ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
+        
+        const leaderboardWidth = 180; 
+        const leaderboardX = canvas.width - leaderboardWidth - 20;
+        const lineHeight = 20; 
+        const leaderboardY = 50; 
+        const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
 
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
+        ctx.strokeStyle = '#ccc';
+        ctx.strokeRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
+
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 16px Quicksand';
+        ctx.textAlign = 'left';
+        ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
+        
+        ctx.font = '14px Quicksand';
+        leaderboardData.forEach((entry, index) => {
+            const y = leaderboardY + 40 + index * lineHeight; 
+            ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
+            
+            const nameDisplay = entry.name.length > 10 ? entry.name.substring(0, 8) + '...' : entry.name;
+            ctx.textAlign = 'left';
+            ctx.fillText(`${index + 1}. ${nameDisplay}`, leaderboardX + 10, y);
+            
+            ctx.textAlign = 'right';
+            ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
+        });
+
+    } catch (error) {
+        console.error('Error in game loop:', error);
+        // Continue the game loop despite the error
+    }
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
   }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile, isPaused]);
@@ -1186,6 +1197,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         console.log("Loading saved game state...");
         
         gameInstance.playerCells = savedState.playerCells.map(c => {
+            // Ao carregar, precisamos recriar as instâncias de Player/Cell
             const player = new Player(c.x, c.y, c.color, c.mass, c.name);
             player.id = getNextCellId(); // Garante ID único
             return player;
@@ -1196,14 +1208,19 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             return bot;
         });
         
-        gameInstance.pellets = savedState.pellets.map(p => new Pellet(p.color, p.x, p.y));
+        // Pellets precisam ser recriados com a posição correta
+        gameInstance.pellets = savedState.pellets.map(p => {
+            const pellet = new Pellet(p.color);
+            pellet.position = new Vector(p.x, p.y);
+            return pellet;
+        });
         
         gameInstance.camera = savedState.camera;
         gameInstance.score = savedState.score;
         gameInstance.maxScore = savedState.maxScore;
         
-        // Limpa o estado salvo após o carregamento para evitar carregamento acidental
-        clearGameState(); 
+        // Não limpamos o estado aqui, pois o jogo pode ter sido pausado e o usuário pode querer reiniciar.
+        // O estado é limpo apenas ao morrer, reiniciar ou sair.
         
     } else {
         console.log("Starting new game state...");
