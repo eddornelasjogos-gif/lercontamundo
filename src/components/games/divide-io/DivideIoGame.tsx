@@ -584,7 +584,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     botCells: [] as Cell[], 
     pellets: [] as Pellet[],
     viruses: [] as Virus[],
-    // Definimos o zoom inicial como 1 (sem zoom) e ele será ajustado no useEffect
+    // O zoom inicial será definido no useEffect
     camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 1 }, 
     score: 0,
     maxScore: 0, 
@@ -1221,8 +1221,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             camera.x += (centerX - camera.x) * 0.05;
             camera.y += (centerY - camera.y) * 0.05;
             
-            // REMOVIDO: Lógica de zoom dinâmico. O zoom agora é fixo (fixedZoomRef.current)
-            camera.zoom = fixedZoomRef.current;
+            // ZOOM FIXO: Usa o valor calculado no useEffect
+            camera.zoom = fixedZoomRef.current; 
         }
         
         // Calcula a área de visão (viewport)
@@ -1469,7 +1469,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     // 1. Calcula o zoom fixo para caber o mundo inteiro na tela
     const zoomX = canvas.width / WORLD_SIZE;
     const zoomY = canvas.height / WORLD_SIZE;
-    fixedZoomRef.current = Math.min(zoomX, zoomY);
+    
+    // Calcula o zoom mínimo (para caber o mundo inteiro) e aplica o fator de 1.5 (50% a mais)
+    const minZoom = Math.min(zoomX, zoomY);
+    fixedZoomRef.current = minZoom * 1.5; 
+    
     gameInstance.camera.zoom = fixedZoomRef.current; // Define o zoom inicial
 
     // Carrega a imagem de fundo
