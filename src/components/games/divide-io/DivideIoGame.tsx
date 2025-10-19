@@ -239,7 +239,7 @@ class Player extends Cell {
     }
 }
 
-// Virus class (stationary, consumed when touched)
+// Virus class (stationary, consumed when eaten)
 class Virus {
   public position: Vector;
   public radius: number;
@@ -1248,28 +1248,48 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     // Drawing - OPTIMIZED: only draw visible elements
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // FIXED: Draw tiled background to fill entire canvas
+    if (bgImgRef.current) {
+        const img = bgImgRef.current;
+        
+        // Create pattern that repeats the image
+        const pattern = ctx.createPattern(img, 'repeat');
+        if (pattern) {
+            // Save current context state
+            ctx.save();
+            
+            // Calculate how many tiles fit in the canvas
+            const tileWidth = img.width;
+            const tileHeight = img.height;
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            
+            // Draw the pattern to fill the entire canvas
+            ctx.fillStyle = pattern;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Restore context state
+            ctx.restore();
+        } else {
+            // Fallback: draw single image scaled to canvas size
+            ctx.save();
+            ctx.scale(canvas.width / WORLD_SIZE, canvas.height / WORLD_SIZE);
+            ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
+            ctx.restore();
+        }
+    } else {
+        // Fallback: solid color background
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Apply game world transformations
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
     
-    // --- Desenho do Fundo do Mundo ---
-    
-    // 1. Desenha a imagem de fundo com opacidade
-    if (bgImgRef.current) {
-        const img = bgImgRef.current;
-        const opacity = 0.4;
-        
-        ctx.globalAlpha = opacity;
-        ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
-        ctx.globalAlpha = 1.0;
-    } else {
-        // Fallback para cor de fundo se a imagem não carregar
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-    }
-    // --- FIM: Desenho do Fundo do Mundo ---
-
     // Draw World Grid (simplified for performance)
     ctx.strokeStyle = '#eee';
     ctx.lineWidth = 1;
