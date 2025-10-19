@@ -1,17 +1,16 @@
-import { Vector } from "@/components/games/divide-io/Vector";
 import { Cell } from "@/components/games/divide-io/Cell";
 import { Player } from "@/components/games/divide-io/Player";
-import { Bot } from "@/components/games/divide-io/Bot";
 import { Pellet } from "@/components/games/divide-io/Pellet";
 
 const SESSION_STORAGE_KEY = 'divide-io-temp-state';
 
-interface SavedCellData {
+export interface SavedCellData { // Exporting SavedCellData
   x: number;
   y: number;
   mass: number;
   color: string;
   name: string;
+  id: number;
 }
 
 interface SavedPelletData {
@@ -20,7 +19,7 @@ interface SavedPelletData {
   color: string;
 }
 
-interface SavedGameState {
+export interface SavedGameState { // Exporting SavedGameState
   playerCells: SavedCellData[];
   botCells: SavedCellData[];
   pellets: SavedPelletData[];
@@ -34,7 +33,7 @@ interface SavedGameState {
  */
 export const saveGameState = (
   playerCells: Player[], 
-  botCells: Bot[], 
+  botCells: Cell[], 
   pellets: Pellet[], 
   camera: { x: number; y: number; zoom: number }, 
   score: number, 
@@ -47,6 +46,7 @@ export const saveGameState = (
       mass: c.mass,
       color: c.color,
       name: c.name,
+      id: c.id,
     })),
     botCells: botCells.map(c => ({
       x: c.position.x,
@@ -54,6 +54,7 @@ export const saveGameState = (
       mass: c.mass,
       color: c.color,
       name: c.name,
+      id: c.id,
     })),
     pellets: pellets.map(p => ({
       x: p.x,

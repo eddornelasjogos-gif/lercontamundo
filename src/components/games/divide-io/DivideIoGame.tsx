@@ -18,7 +18,7 @@ import type { SavedGameState } from '@/utils/divide-io-storage'; // Import the t
 
 // Importações das classes de seus novos arquivos
 import { Vector } from './Vector';
-import { Cell, getRandomColor } from './Cell';
+import { Cell, getRandomColor } from './Cell'; // Import getRandomColor from Cell
 import { Player } from './Player';
 import { Bot } from './Bot';
 import { Pellet } from './Pellet';
