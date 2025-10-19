@@ -1,3 +1,4 @@
+0) and update the player name input state.">
 "use client";
 
 import { useState } from "react";
@@ -15,7 +16,6 @@ type GameStatus = "menu" | "playing" | "gameover";
 type Difficulty = "very-easy" | "easy" | "medium" | "hard";
 
 const Games = () => {
-  const [gameStatus, setGameStatus] = useState<GameStatus>("menu");
   const { 
     highScore, 
     lastDifficulty, 
@@ -27,9 +27,10 @@ const Games = () => {
     updateLeaderboard
   } = useDivideIoProgress();
   
+  const [gameStatus, setGameStatus] = useState<GameStatus>("menu");
   const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>(lastDifficulty);
   const [lastScore, setLastScore] = useState(0);
-  const [inputName, setInputName] = useState(playerName);
+  const [inputName, setInputName] = useState(playerName); // Usa o nome salvo como estado inicial
 
   const handlePlay = () => {
     if (inputName.trim() === "") {
@@ -41,7 +42,16 @@ const Games = () => {
     setGameStatus("playing");
   };
 
+  // Esta função é chamada pelo DivideIoGame quando o jogo termina (morte) ou quando o usuário
+  // clica em 'Reiniciar' (score 0) ou 'Voltar ao Menu' (score > 0, mas não morte)
   const handleGameOver = (score: number) => {
+    if (score === 0) {
+        // Sinal de Reinício (vindo de handleRestart no DivideIoGame)
+        setGameStatus("playing");
+        return;
+    }
+    
+    // Fim de Jogo (Morte ou Saída)
     setLastScore(score);
     updateHighScore(score);
     updateLeaderboard(inputName.trim(), score);
@@ -49,6 +59,7 @@ const Games = () => {
   };
 
   const handlePlayAgain = () => {
+    // Ao jogar novamente, o estado do jogo deve ser limpo pelo DivideIoGame
     setGameStatus("playing");
   };
 
@@ -57,7 +68,8 @@ const Games = () => {
   };
 
   if (gameStatus === "playing") {
-    // Retorna apenas o jogo para ocupar a tela inteira, sem a navegação
+    // O DivideIoGame agora gerencia o estado de pausa/retomada internamente.
+    // Se ele for montado, ele tentará carregar o estado salvo ou iniciar um novo.
     return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} playerName={inputName.trim()} />;
   }
 
