@@ -584,7 +584,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     botCells: [] as Cell[], 
     pellets: [] as Pellet[],
     viruses: [] as Virus[],
-    camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 0.5 }, // Zoom inicial ajustado para 0.5
+    // Definimos o zoom inicial como 1 (sem zoom) e ele será ajustado no useEffect
+    camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 1 }, 
     score: 0,
     maxScore: 0, 
     mousePosition: new Vector(0, 0), // Posição do mouse na tela
@@ -767,6 +768,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [isPlaying, handleSplit, isMobile, handleMouseMove]);
+
+  // Variável para armazenar o zoom fixo calculado
+  const fixedZoomRef = useRef<number>(1);
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
@@ -1217,11 +1221,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             camera.x += (centerX - camera.x) * 0.05;
             camera.y += (centerY - camera.y) * 0.05;
             
-            // UPDATED: Less aggressive zoom calculation for better visibility when growing
-            // Aumentando o multiplicador de 10 para 50 para um zoom muito mais distante.
-            const radiusFactor = Math.sqrt(avgRadius);
-            // O zoom mínimo é 0.5 para garantir que a visão inicial seja ampla.
-            camera.zoom = Math.max(0.5, 50 / radiusFactor); 
+            // REMOVIDO: Lógica de zoom dinâmico. O zoom agora é fixo (fixedZoomRef.current)
+            camera.zoom = fixedZoomRef.current;
         }
         
         // Calcula a área de visão (viewport)
@@ -1465,6 +1466,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
+    // 1. Calcula o zoom fixo para caber o mundo inteiro na tela
+    const zoomX = canvas.width / WORLD_SIZE;
+    const zoomY = canvas.height / WORLD_SIZE;
+    fixedZoomRef.current = Math.min(zoomX, zoomY);
+    gameInstance.camera.zoom = fixedZoomRef.current; // Define o zoom inicial
+
     // Carrega a imagem de fundo
     if (!bgImgRef.current) {
         const img = new Image();
