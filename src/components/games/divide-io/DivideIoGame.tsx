@@ -584,7 +584,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     botCells: [] as Cell[], 
     pellets: [] as Pellet[],
     viruses: [] as Virus[],
-    camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 1 },
+    camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 0.5 }, // Zoom inicial ajustado para 0.5
     score: 0,
     maxScore: 0, 
     mousePosition: new Vector(0, 0), // Posição do mouse na tela
@@ -1218,9 +1218,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             camera.y += (centerY - camera.y) * 0.05;
             
             // UPDATED: Less aggressive zoom calculation for better visibility when growing
-            // We use the square root of the radius to make the zoom-out much slower as the cell grows.
+            // Aumentando o multiplicador de 10 para 50 para um zoom muito mais distante.
             const radiusFactor = Math.sqrt(avgRadius);
-            camera.zoom = Math.max(0.3, 10 / radiusFactor); 
+            // O zoom mínimo é 0.5 para garantir que a visão inicial seja ampla.
+            camera.zoom = Math.max(0.5, 50 / radiusFactor); 
         }
         
         // Calcula a área de visão (viewport)
