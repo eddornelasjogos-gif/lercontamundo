@@ -748,7 +748,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
-        const maxSpeed = 50 / (playerCell.radius * 0.2 + 10); 
+        const maxSpeed = 50 / (playerCell.radius * 0.1 + 10); 
         if (playerCell.velocity.magnitude() > maxSpeed) {
             playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
         }
@@ -803,7 +803,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             const force = targetDirection.multiply(acceleration);
             cell.velocity = cell.velocity.add(force);
             
-            const maxSpeed = 50 / (cell.radius * 0.2 + 10); 
+            const maxSpeed = 50 / (cell.radius * 0.1 + 10); 
             if (cell.velocity.magnitude() > maxSpeed) {
                 cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
             }
