@@ -1039,13 +1039,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         
                         break; // Only one split per virus per frame
                     } else {
-                        // UPDATED: For smaller cells, repel them "behind" the virus
-                        // Calculate direction away from virus
-                        const repelDirection = distVec.normalize();
-                        const repelDistance = virus.radius + cell.radius + 10; // Small buffer
+                        // UPDATED: For smaller cells, hide behind the virus (opposite side from approach)
+                        // distVec = cell.position - virus.position (direction from virus to cell)
+                        const approachDirection = distVec.normalize(); // Direction from virus to cell (approach direction)
+                        const behindDirection = approachDirection.multiply(-1); // Opposite direction (behind the virus)
                         
-                        // Move cell to a position behind the virus (opposite to approach direction)
-                        const behindPosition = virus.position.add(repelDirection.multiply(virus.radius + cell.radius + repelDistance));
+                        const bufferDistance = virus.radius + cell.radius + 10; // Small buffer to avoid overlap
+                        const behindPosition = virus.position.add(behindDirection.multiply(bufferDistance));
                         
                         // UPDATED: Ensure the position is within circular bounds
                         const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
@@ -1056,9 +1056,9 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                           behindPosition.y = center.y + directionToCenter.y * (WORLD_RADIUS - cell.radius);
                         }
                         
-                        // Apply repulsion velocity
+                        // Apply velocity to push the cell away from the virus towards the behind position
                         cell.position = behindPosition;
-                        cell.velocity = repelDirection.multiply(VIRUS_REPEL_FORCE);
+                        cell.velocity = behindDirection.multiply(VIRUS_REPEL_FORCE);
                         cell.mergeCooldown = MERGE_COOLDOWN_FRAMES / 2; // Short cooldown to prevent immediate re-collision
                         
                         // No virus consumption for small cells
