@@ -745,7 +745,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     playerCells.forEach(playerCell => {
         // 1a. Movimento do Jogador (Input)
-        const acceleration = 1;
+        const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
         const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
@@ -782,8 +782,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
         const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
         
-        const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
-
         let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
         if (decisionTimer <= 0) {
             // Passa apenas os pellets visíveis para a lógica do bot para otimizar
@@ -800,7 +798,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         cells.forEach(cell => {
             // 2a. Movimento Coordenado
-            const acceleration = 1;
+            const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
             const force = targetDirection.multiply(acceleration);
             cell.velocity = cell.velocity.add(force);
             
