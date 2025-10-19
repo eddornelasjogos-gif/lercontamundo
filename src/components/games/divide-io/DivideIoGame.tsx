@@ -1,4 +1,3 @@
-virus.mass). Smaller cells are repelled and moved to a position behind the virus. Very-easy difficulty now has 18 bots like easy. Virus is consumed only when splitting a large cell.">
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
