@@ -132,7 +132,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   // Game loop
   useEffect(() => {
-    if (isPaused || showVictory) return;
+    if (isPaused || showVictory || playerCells.length === 0) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
