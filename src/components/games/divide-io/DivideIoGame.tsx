@@ -5,6 +5,7 @@ import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
 import SplitButton from './SplitButton';
 import Minimap from './Minimap';
+import VictoryMenu from './VictoryMenu';
 import { BOT_NAMES } from './BotNames';
 import { useGameAudio } from '@/hooks/useGameAudio';
 import heroBgImage from '@/assets/hero-bg.jpg';
@@ -39,6 +40,7 @@ const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5;
 const MASS_TO_RADIUS_RATIO = 4;
+const VICTORY_SCORE = 200000; // Pontuação para vitória
 
 const EJECTION_IMPULSE = 250;
 const EJECTION_OFFSET = 30;
@@ -429,6 +431,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   
   const [isPlaying, setIsPlaying] = React.useState(true);
   const [isPaused, setIsPaused] = React.useState(false);
+  const [showVictory, setShowVictory] = React.useState(false);
   const { playCollect, playSplit } = useGameAudio(isPlaying); 
   
   const initialBotCount = difficultySettings[difficulty].botCount;
@@ -495,17 +498,39 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     onGameOver(0); // Usar 0 para indicar saída limpa, sem atualizar leaderboard
   }, [onGameOver]);
 
+  // --- Handlers de Vitória ---
+  
+  const handleVictoryRestart = useCallback(() => {
+    console.log("Victory Restart - Clearing state and forcing remount with zero score.");
+    // 1. Limpa o estado salvo
+    clearGameState();
+    // 2. Zera o score no gameInstance
+    gameInstance.score = 0;
+    gameInstance.maxScore = highScore; // Mantém o recorde anterior
+    // 3. Sinaliza para Games.tsx que deve forçar um reset completo (usando -1)
+    onGameOver(-1); 
+    setShowVictory(false);
+  }, [onGameOver, highScore, gameInstance]);
+  
+  const handleVictoryMenu = useCallback(() => {
+    console.log("Victory Menu - Clearing state and returning to menu.");
+    // 1. Limpa o estado salvo
+    clearGameState();
+    // 2. Volta para a tela de seleção de jogos (Games.tsx) sem mostrar tela de game over
+    onGameOver(VICTORY_SCORE); // Usar pontuação de vitória para indicar sucesso
+    setShowVictory(false);
+  }, [onGameOver]);
 
   // --- Handlers de Movimento e Split (mantidos) ---
   
   const handleJoystickMove = useCallback((direction: { x: number; y: number }) => {
-    if (isPaused) return;
+    if (isPaused || showVictory) return;
     movementDirectionRef.current = direction;
     isKeyboardActiveRef.current = false;
-  }, [isPaused]);
+  }, [isPaused, showVictory]);
   
   const handleMouseMove = useCallback((event: MouseEvent) => {
-    if (isPaused) return;
+    if (isPaused || showVictory) return;
     if (!canvasRef.current || isKeyboardActiveRef.current) return; 
     
     gameInstance.mousePosition.x = event.clientX;
@@ -525,10 +550,10 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     } else {
         movementDirectionRef.current = { x: 0, y: 0 };
     }
-  }, [gameInstance, isPaused]);
+  }, [gameInstance, isPaused, showVictory]);
   
   const handleSplit = useCallback(() => {
-    if (isPaused) return;
+    if (isPaused || showVictory) return;
     const newCells: Player[] = [];
     const cellsToSplit = [...gameInstance.playerCells]; 
     
@@ -543,7 +568,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     });
     
     gameInstance.playerCells.push(...newCells);
-  }, [gameInstance, playSplit, isPaused]);
+  }, [gameInstance, playSplit, isPaused, showVictory]);
 
   // Efeito para escutar a tecla Espaço (PC) e o movimento do mouse/teclado
   useEffect(() => {
@@ -561,7 +586,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         return;
       }
       
-      if (isPaused) return;
+      if (isPaused || showVictory) return;
 
       if (isPlaying && event.code === 'Space') {
         event.preventDefault();
@@ -612,7 +637,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     };
     
     const handleKeyUp = (event: KeyboardEvent) => {
-        if (isPaused) return;
+        if (isPaused || showVictory) return;
         if (isMobile) return;
 
         let x = keyboardDirectionRef.current.x;
@@ -670,7 +695,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isPlaying, handleSplit, isMobile, handleMouseMove, isPaused, handlePause]);
+  }, [isPlaying, handleSplit, isMobile, handleMouseMove, isPaused, showVictory, handlePause]);
 
   // Variável para armazenar o zoom fixo calculado
   const fixedZoomRef = useRef<number>(1);
@@ -683,7 +708,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         return;
     }
     
-    if (isPaused) {
+    if (isPaused || showVictory) {
         animationFrameId.current = requestAnimationFrame(gameLoop);
         return;
     }
@@ -953,6 +978,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             gameInstance.maxScore = currentScore;
         }
 
+        // --- 11. Verificação de Vitória ---
+        if (currentScore >= VICTORY_SCORE && !showVictory) {
+            setShowVictory(true);
+            setIsPaused(true); // Pausa o jogo ao vencer
+            clearGameState(); // Limpa o estado salvo ao vencer
+        }
+
         let centerX = WORLD_CENTER_X;
         let centerY = WORLD_CENTER_Y;
         let avgRadius = MIN_CELL_RADIUS;
@@ -1159,7 +1191,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     }
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
-  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile, isPaused]);
+  }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile, isPaused, showVictory]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1254,6 +1286,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     }
     
     setIsPlaying(true); 
+    setShowVictory(false); // Garante que não mostre vitória ao carregar
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
 
@@ -1274,13 +1307,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         size="icon" 
         onClick={handlePause} 
         className="fixed bottom-4 left-4 z-[100] shadow-lg"
-        disabled={!isPlaying || isPaused}
+        disabled={!isPlaying || isPaused || showVictory}
       >
         <Pause className="w-5 h-5" />
       </Button>
 
-      {/* Controles visíveis apenas em dispositivos móveis E QUANDO NÃO ESTIVER PAUSADO */}
-      {isMobile && !isPaused && (
+      {/* Controles visíveis apenas em dispositivos móveis E QUANDO NÃO ESTIVER PAUSADO OU EM VITÓRIA */}
+      {isMobile && !isPaused && !showVictory && (
         // Wrapper para garantir que o joystick não bloqueie o botão de pausa (z-index 100)
         <div className="fixed inset-0 z-50"> 
           <VirtualJoystick onMove={handleJoystickMove} />
@@ -1290,11 +1323,18 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       
       <Minimap {...minimapData} />
       
-      {isPaused && (
+      {isPaused && !showVictory && (
         <PauseMenu 
           onResume={handleResume}
           onRestart={handleRestart}
           onExit={handleExit}
+        />
+      )}
+      
+      {showVictory && (
+        <VictoryMenu 
+          onRestart={handleVictoryRestart}
+          onMenu={handleVictoryMenu}
         />
       )}
     </div>
