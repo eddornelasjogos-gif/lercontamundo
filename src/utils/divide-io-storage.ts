@@ -52,8 +52,8 @@ export const saveGameState = (
       name: c.name,
     })),
     pellets: pellets.map(p => ({
-      x: p.position.x,
-      y: p.position.y,
+      x: p.x,
+      y: p.y,
       color: p.color,
     })),
     camera,

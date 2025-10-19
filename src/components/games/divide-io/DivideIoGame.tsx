@@ -11,7 +11,6 @@ import { BOT_NAMES } from './BotNames';
 import { useGameAudio } from '@/hooks/useGameAudio';
 import heroBgImage from '@/assets/hero-bg.jpg';
 import { useIsMobile } from '@/hooks/use-mobile';
-import PauseMenu from './PauseMenu';
 import { Button } from '@/components/ui/button';
 import { Pause } from 'lucide-react';
 import { saveGameState, loadGameState, clearGameState } from '@/utils/divide-io-storage'; // Importando utilitários
@@ -238,8 +237,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const [nextCellId, setNextCellId] = useState(1);
   const [gameStartTime, setGameStartTime] = useState(Date.now());
   const [totalBotCells, setTotalBotCells] = useState(0);
-  const [isMobile] = useIsMobile();
-  const { playCollect, playSplit } = useGameAudio(gameStatus !== 'paused' && !showVictory);
+  const isMobile = useIsMobile();
+  const { playCollect, playSplit } = useGameAudio(!isPaused && !showVictory);
 
   const settings = difficultySettings[difficulty];
   const botAggression = settings.botAggression;
@@ -300,7 +299,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   // Game loop
   useEffect(() => {
-    if (gameStatus === 'paused' || showVictory) return;
+    if (isPaused || showVictory) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -381,7 +380,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
         // Player splits
         if (player.mass >= MIN_SPLIT_MASS && player.mergeCooldown === 0) {
-          const splitCell = player.split(movementDirectionRef.current, nextCellId);
+          const direction = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
+          const splitCell = player.split(direction, nextCellId);
           if (splitCell) {
             setPlayerCells(prev => [...prev, splitCell as Player]);
             setNextCellId(prev => prev + 1);
@@ -482,7 +482,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
       // Check victory condition
       if (score >= VICTORY_SCORE) {
-        setPaused(true);
+        setIsPaused(true);
         setShowVictory(true);
         clearGameState(); // Limpa o estado temporário
         return;
@@ -490,7 +490,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
       // Check if player is dead (all player cells eaten)
       if (newPlayerCells.length === 0) {
-        setPaused(true);
+        setIsPaused(true);
         onGameOver(score);
         return;
       }
@@ -505,7 +505,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [playerCells, botCells, pellets, score, nextCellId, totalBotCells, botAggression, botSplitChance, maxBotCells, isPaused, showVictory, onGameOver, playerName, gameStatus]);
+  }, [playerCells, botCells, pellets, score, nextCellId, totalBotCells, botAggression, botSplitChance, maxBotCells, isPaused, showVictory, onGameOver, playerName]);
 
   // Handle pause/unpause
   const togglePause = () => {
@@ -546,7 +546,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (rect) {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const direction = new Vector(x - canvas.width / 2, y - canvas.height / 2);
+      const direction = new Vector(x - rect.width / 2, y - rect.height / 2);
       movementDirectionRef.current = direction.normalize();
     }
   }, [isDragging]);
@@ -554,7 +554,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const handleMouseDown = useCallback((e: MouseEvent) => {
     setIsDragging(true);
     handleMouseMove(e);
-  }, []);
+  }, [handleMouseMove]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -602,6 +602,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       <VictoryScreen 
         onRestart={handleVictoryRestart}
         onMenu={handleVictoryMenu}
+        difficulty={difficulty}
       />
     );
   }
@@ -653,7 +654,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             if (playerCells.length > 0) {
               const mainCell = playerCells[0];
               if (mainCell.mergeCooldown === 0) {
-                const splitCell = mainCell.split(movementDirectionRef.current, nextCellId);
+                const direction = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
+                const splitCell = mainCell.split(direction, nextCellId);
                 if (splitCell) {
                   setPlayerCells(prev => [...prev, splitCell as Player]);
                   setNextCellId(prev => prev + 1);
@@ -671,7 +673,13 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             playerRadius={playerCells[0].radius}
             visibleBots={botCells.filter(bot => 
               bot.position.subtract(playerCells[0].position).magnitude() < 800
-            )}
+            ).map(bot => ({
+              x: bot.position.x,
+              y: bot.position.y,
+              mass: bot.mass,
+              color: bot.color,
+              radius: bot.radius
+            }))}
           />
         )}
       </div>
