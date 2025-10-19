@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
@@ -43,15 +45,15 @@ const VIRUS_COLOR = '#FF4136';
 // Distância mínima de segurança para o respawn do vírus
 const MIN_VIRUS_RESPAWN_DISTANCE = VIRUS_RADIUS + 100; 
 
-// Ajuste de Impulso para Divisão
-const EJECTION_IMPULSE = 400;
+// Ajuste de Impulso para Divisão (REDUCED for slower gameplay)
+const EJECTION_IMPULSE = 250; // REDUCED: from 400 to 250
 const EJECTION_OFFSET = 30;
 
-// Ejection speed for split cells from virus
-const VIRUS_SPLIT_EJECTION_SPEED = 200;
+// Ejection speed for split cells from virus (REDUCED)
+const VIRUS_SPLIT_EJECTION_SPEED = 150; // REDUCED: from 200 to 150
 
-// Repulsion force for small cells
-const VIRUS_REPEL_FORCE = 300;
+// Repulsion force for small cells (REDUCED)
+const VIRUS_REPEL_FORCE = 200; // REDUCED: from 300 to 200
 
 // Safety limit for total bot cells to prevent performance issues
 const MAX_TOTAL_BOT_CELLS = 100;
@@ -121,8 +123,8 @@ class Cell {
     if (this.mergeCooldown > 0) {
       this.mergeCooldown--;
     }
-    // Apply friction to slow down over time
-    this.velocity = this.velocity.multiply(0.95);
+    // Apply friction to slow down over time (INCREASED friction for slower gameplay)
+    this.velocity = this.velocity.multiply(0.92); // INCREASED: from 0.95 to 0.92
     this.position = this.position.add(this.velocity);
     
     // UPDATED: Circular boundary clamping
@@ -796,8 +798,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
 
         playerCells.forEach(playerCell => {
-            // 1a. Movimento do Jogador (Input)
-            const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
+            // 1a. Movimento do Jogador (Input) (REDUCED acceleration for slower gameplay)
+            const acceleration = 0.3; // REDUCED: from 0.5 to 0.3
             const force = playerDirection.multiply(acceleration);
             playerCell.velocity = playerCell.velocity.add(force);
 
@@ -851,8 +853,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
             
             cells.forEach(cell => {
-                // 2a. Movimento Coordenado
-                const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
+                // 2a. Movimento Coordenado (REDUCED acceleration for slower gameplay)
+                const acceleration = 0.3; // REDUCED: from 0.5 to 0.3
                 const force = targetDirection.multiply(acceleration);
                 cell.velocity = cell.velocity.add(force);
                 
