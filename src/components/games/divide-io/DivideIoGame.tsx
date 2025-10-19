@@ -158,7 +158,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
       // Update bot cells
       botCells.forEach(bot => {
-        bot.update(playerCells[0]?.position || new Vector(0, 0), playerCells[0]?.radius || 0, botAggression);
+        bot.update(playerCells[0]?.position, playerCells[0]?.radius, botAggression);
         // Draw bot cells
         ctx.save();
         ctx.translate(canvas.width / 2 - bot.position.x, canvas.height / 2 - bot.position.y);

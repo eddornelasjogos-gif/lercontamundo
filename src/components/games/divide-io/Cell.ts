@@ -24,7 +24,7 @@ export class Cell {
     return Math.sqrt(this.mass / Math.PI) * 4; // Assuming MASS_TO_RADIUS_RATIO = 4
   }
 
-  update() {
+  update(playerPosition?: Vector, playerRadius?: number, botAggression?: number) {
     if (this.mergeCooldown > 0) {
       this.mergeCooldown--;
     }
