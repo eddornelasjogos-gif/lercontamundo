@@ -1,3 +1,4 @@
+threshold) explode when touching a virus, generating pellets from the cell only. The virus remains intact. Adjusted the threshold calculation for better gameplay balance.">
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
@@ -904,17 +905,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             if (distance < cell.radius + virus.radius) {
                 
                 if (cell.mass > EXPLOSION_THRESHOLD_MASS) {
-                    // EXPLOSION!
+                    // FIXED: Explode the large cell when it touches the virus
+                    // The virus remains intact
                     
+                    // Generate pellets from the cell's mass
                     const massToRedistribute = cell.mass / 2;
                     const cellPellets = generatePelletsFromMass(massToRedistribute, cell.position);
                     gameInstance.pellets.push(...cellPellets);
                     
-                    const virusPellets = generatePelletsFromMass(virus.mass, virus.position);
-                    gameInstance.pellets.push(...virusPellets);
-                    
-                    // Remove cell and virus
-                    
+                    // Remove the cell (player or bot)
                     const cellIndexInPlayer = playerCells.indexOf(cell as Player);
                     if (cellIndexInPlayer > -1) {
                         playerCells.splice(cellIndexInPlayer, 1);
@@ -926,7 +925,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         }
                     }
                     
-                    viruses.splice(v, 1);
+                    // The virus stays, but we can add a slight push effect if desired
+                    // For now, just continue with the virus intact
                     
                     if (playerCells.length === 0) {
                         setIsPlaying(false);
@@ -934,7 +934,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         return;
                     }
                     
-                    break; 
+                    break; // Only one explosion per virus per frame
                 }
             }
         }
