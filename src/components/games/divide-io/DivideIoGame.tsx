@@ -24,7 +24,7 @@ const difficultySettings = {
 };
 
 const WORLD_SIZE = 3000;
-const PELLET_COUNT = 1800;
+const PELLET_COUNT = 800; // REDUCED: from 1800 to 800 to improve performance
 const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
@@ -733,606 +733,613 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     if (playerCells.length === 0) {
       setIsPlaying(false);
       onGameOver(gameInstance.maxScore);
+      animationFrameId.current = requestAnimationFrame(gameLoop); // Continue loop even if game over
       return;
     }
 
-    let allCells: Cell[] = [...playerCells, ...botCells];
+    try {
+        let allCells: Cell[] = [...playerCells, ...botCells];
 
-    const settings = difficultySettings[difficulty];
+        const settings = difficultySettings[difficulty];
 
-    // --- 1. Lógica do Jogador ---
-    const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
-    
-    const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-    const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
-    const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
-
-    playerCells.forEach(playerCell => {
-        // 1a. Movimento do Jogador (Input)
-        const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
-        const force = playerDirection.multiply(acceleration);
-        playerCell.velocity = playerCell.velocity.add(force);
-
-        const maxSpeed = 50 / (playerCell.radius * 0.1 + 10); 
-        if (playerCell.velocity.magnitude() > maxSpeed) {
-            playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
-        }
+        // --- 1. Lógica do Jogador ---
+        const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
         
-        // 1b. Força de Atração (para fusão automática)
-        if (playerCells.length > 1) {
-            const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
-            
-            const mergeProgress = 1 - (playerCell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
-            const attractionFactor = Math.max(0, mergeProgress);
-            
-            const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius) * attractionFactor; 
-            playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
-        }
-    });
+        const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
+        const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
+        const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
 
-    // --- 2. Lógica dos Bots ---
-    
-    const botGroups = new Map<string, Cell[]>();
-    botCells.forEach(cell => {
-        if (!botGroups.has(cell.name)) {
-            botGroups.set(cell.name, []);
-        }
-        botGroups.get(cell.name)!.push(cell);
-    });
-    
-    const newBotCells: Cell[] = [];
-
-    botGroups.forEach((cells, botName) => {
-        const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
-        const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
-        // FIXED: Calculate centerOfMass for this specific bot group
-        const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
-        
-        let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
-        if (decisionTimer <= 0) {
-            // Passa apenas os pellets visíveis para a lógica do bot para otimizar
-            const visiblePellets = pellets.filter(p => {
-                const dist = centerOfMass.subtract(p.position).magnitude();
-                return dist < avgRadius * 15; // Percepção do bot
-            });
-            botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
-            decisionTimer = 30;
-        }
-        botLogic.decisionTimer.set(botName, decisionTimer - 1);
-
-        const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
-        
-        cells.forEach(cell => {
-            // 2a. Movimento Coordenado
+        playerCells.forEach(playerCell => {
+            // 1a. Movimento do Jogador (Input)
             const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
-            const force = targetDirection.multiply(acceleration);
-            cell.velocity = cell.velocity.add(force);
-            
-            const maxSpeed = 50 / (cell.radius * 0.1 + 10); 
-            if (cell.velocity.magnitude() > maxSpeed) {
-                cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
+            const force = playerDirection.multiply(acceleration);
+            playerCell.velocity = playerCell.velocity.add(force);
+
+            const maxSpeed = 50 / (playerCell.radius * 0.1 + 10); 
+            if (playerCell.velocity.magnitude() > maxSpeed) {
+                playerCell.velocity = playerCell.velocity.normalize().multiply(maxSpeed);
             }
             
-            // 2b. Força de Atração (para fusão)
-            if (cells.length > 1) {
-                const attractionVector = centerOfMass.subtract(cell.position).normalize();
+            // 1b. Força de Atração (para fusão automática)
+            if (playerCells.length > 1) {
+                const attractionVector = playerCenterOfMass.subtract(playerCell.position).normalize();
                 
-                const mergeProgress = 1 - (cell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
-                const attractionFactor = Math.max(0, mergeProgress); 
+                const mergeProgress = 1 - (playerCell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+                const attractionFactor = Math.max(0, mergeProgress);
                 
-                const attractionForce = 0.5 * (avgRadius / cell.radius) * attractionFactor; 
-                cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
+                const attractionForce = 0.5 * (avgPlayerRadius / playerCell.radius) * attractionFactor; 
+                playerCell.velocity = playerCell.velocity.add(attractionVector.multiply(attractionForce));
             }
-            
-            // 2c. Lógica de Divisão
-            if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
-                const newCell = cell.split(targetDirection, getNextCellId());
-                if (newCell) {
-                    newBotCells.push(newCell);
-                }
+        });
+
+        // --- 2. Lógica dos Bots ---
+        
+        const botGroups = new Map<string, Cell[]>();
+        botCells.forEach(cell => {
+            if (!botGroups.has(cell.name)) {
+                botGroups.set(cell.name, []);
             }
-            
-            cell.update();
+            botGroups.get(cell.name)!.push(cell);
         });
         
-        // 2d. Fusão de Células de Bot
-        for (let i = cells.length - 1; i >= 0; i--) {
-            for (let j = i - 1; j >= 0; j--) {
-                const cellA = cells[i];
-                const cellB = cells[j];
+        const newBotCells: Cell[] = [];
+
+        botGroups.forEach((cells, botName) => {
+            const totalMass = cells.reduce((sum, c) => sum + c.mass, 0);
+            const avgRadius = cells.reduce((sum, c) => sum + c.radius, 0) / cells.length;
+            // FIXED: Calculate centerOfMass for this specific bot group
+            const centerOfMass = cells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalMass);
+            
+            let decisionTimer = botLogic.decisionTimer.get(botName) || 0;
+            if (decisionTimer <= 0) {
+                // Passa apenas os pellets visíveis para a lógica do bot para otimizar
+                const visiblePellets = pellets.filter(p => {
+                    const dist = centerOfMass.subtract(p.position).magnitude();
+                    return dist < avgRadius * 15; // Percepção do bot
+                });
+                botLogic.findBestTarget(cells, visiblePellets, allCells.filter(c => c.name !== botName), settings.botAggression, botName);
+                decisionTimer = 30;
+            }
+            botLogic.decisionTimer.set(botName, decisionTimer - 1);
+
+            const targetDirection = botLogic.getMovementDirection(botName, centerOfMass);
+            
+            cells.forEach(cell => {
+                // 2a. Movimento Coordenado
+                const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
+                const force = targetDirection.multiply(acceleration);
+                cell.velocity = cell.velocity.add(force);
                 
-                if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-                    const dist = cellA.position.subtract(cellB.position).magnitude();
-                    if (dist < cellA.radius + cellB.radius) { 
-                        const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-                        const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-                        
-                        bigger.mass += smaller.mass;
-                        bigger.radius = bigger.calculateRadius();
-                        
-                        const smallerIndex = botCells.indexOf(smaller);
-                        if (smallerIndex > -1) {
-                            botCells.splice(smallerIndex, 1);
-                            cells.splice(cells.indexOf(smaller), 1);
-                            if (smallerIndex <= i) i--;
-                            if (smallerIndex <= j) j--;
+                const maxSpeed = 50 / (cell.radius * 0.1 + 10); 
+                if (cell.velocity.magnitude() > maxSpeed) {
+                    cell.velocity = cell.velocity.normalize().multiply(maxSpeed);
+                }
+                
+                // 2b. Força de Atração (para fusão)
+                if (cells.length > 1) {
+                    const attractionVector = centerOfMass.subtract(cell.position).normalize();
+                    
+                    const mergeProgress = 1 - (cell.mergeCooldown / MERGE_COOLDOWN_FRAMES);
+                    const attractionFactor = Math.max(0, mergeProgress); 
+                    
+                    const attractionForce = 0.5 * (avgRadius / cell.radius) * attractionFactor; 
+                    cell.velocity = cell.velocity.add(attractionVector.multiply(attractionForce));
+                }
+                
+                // 2c. Lógica de Divisão
+                if (totalMass > MIN_SPLIT_MASS * 2 && cells.length === 1 && Math.random() < settings.botSplitChance) {
+                    const newCell = cell.split(targetDirection, getNextCellId());
+                    if (newCell) {
+                        newBotCells.push(newCell);
+                    }
+                }
+                
+                cell.update();
+            });
+            
+            // 2d. Fusão de Células de Bot
+            for (let i = cells.length - 1; i >= 0; i--) {
+                for (let j = i - 1; j >= 0; j--) {
+                    const cellA = cells[i];
+                    const cellB = cells[j];
+                    
+                    if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+                        const dist = cellA.position.subtract(cellB.position).magnitude();
+                        if (dist < cellA.radius + cellB.radius) { 
+                            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+                            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+                            
+                            bigger.mass += smaller.mass;
+                            bigger.radius = bigger.calculateRadius();
+                            
+                            const smallerIndex = botCells.indexOf(smaller);
+                            if (smallerIndex > -1) {
+                                botCells.splice(smallerIndex, 1);
+                                cells.splice(cells.indexOf(smaller), 1);
+                                if (smallerIndex <= i) i--;
+                                if (smallerIndex <= j) j--;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-    
-    gameInstance.botCells.push(...newBotCells);
-    
-    // --- 3. Atualização e Fusão do Jogador ---
-    playerCells.forEach(cell => cell.update());
-
-    for (let i = playerCells.length - 1; i >= 0; i--) {
-      for (let j = i - 1; j >= 0; j--) {
-        const cellA = playerCells[i];
-        const cellB = playerCells[j];
+        });
         
-        if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-          const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < cellA.radius + cellB.radius) { 
-            const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-            const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-            bigger.mass += smaller.mass;
-            bigger.radius = bigger.calculateRadius();
+        gameInstance.botCells.push(...newBotCells);
+        
+        // --- 3. Atualização e Fusão do Jogador ---
+        playerCells.forEach(cell => cell.update());
+
+        for (let i = playerCells.length - 1; i >= 0; i--) {
+          for (let j = i - 1; j >= 0; j--) {
+            const cellA = playerCells[i];
+            const cellB = playerCells[j];
             
-            const smallerIndex = playerCells.indexOf(smaller);
-            if (smallerIndex > -1) {
-                playerCells.splice(smallerIndex, 1);
-                if (smallerIndex <= i) i--;
-                if (smallerIndex <= j) j--;
+            if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
+              const dist = cellA.position.subtract(cellB.position).magnitude();
+              if (dist < cellA.radius + cellB.radius) { 
+                const bigger = cellA.mass > cellB.mass ? cellA : cellB;
+                const smaller = cellA.mass > cellB.mass ? cellB : cellA;
+                bigger.mass += smaller.mass;
+                bigger.radius = bigger.calculateRadius();
+                
+                const smallerIndex = playerCells.indexOf(smaller);
+                if (smallerIndex > -1) {
+                    playerCells.splice(smallerIndex, 1);
+                    if (smallerIndex <= i) i--;
+                    if (smallerIndex <= j) j--;
+                }
+              }
             }
           }
         }
-      }
-    }
 
-    allCells = [...playerCells, ...botCells];
+        allCells = [...playerCells, ...botCells];
 
-    // --- 4. Detecção de Colisão com Vírus (Split on Contact) ---
-    
-    for (let v = viruses.length - 1; v >= 0; v--) {
-        const virus = viruses[v];
+        // --- 4. Detecção de Colisão com Vírus (Split on Contact) ---
         
-        for (let c = allCells.length - 1; c >= 0; c--) {
-            const cell = allCells[c];
+        for (let v = viruses.length - 1; v >= 0; v--) {
+            const virus = viruses[v];
             
-            const distVec = cell.position.subtract(virus.position);
-            const distance = distVec.magnitude();
-            
-            if (distance < cell.radius + virus.radius) {
-                // Virus is consumed and removed
-                viruses.splice(v, 1);
+            for (let c = allCells.length - 1; c >= 0; c--) {
+                const cell = allCells[c];
                 
-                // Split the cell into 4 smaller cells
-                const splitMass = cell.mass / 4;
-                const awayDirection = distVec.normalize(); // Direction away from virus center
+                const distVec = cell.position.subtract(virus.position);
+                const distance = distVec.magnitude();
                 
-                for (let k = 0; k < 4; k++) {
-                    const angle = (k * Math.PI / 2); // 0°, 90°, 180°, 270°
-                    const perpendicular = new Vector(
-                        Math.cos(angle) * 50,
-                        Math.sin(angle) * 50
-                    );
+                if (distance < cell.radius + virus.radius) {
+                    // Virus is consumed and removed
+                    viruses.splice(v, 1);
                     
-                    // Position the new cells around the virus position
-                    const offsetX = Math.cos(angle) * 50;
-                    const offsetY = Math.sin(angle) * 50;
-                    const newPosition = virus.position.add(new Vector(offsetX, offsetY));
+                    // Split the cell into 4 smaller cells
+                    const splitMass = cell.mass / 4;
+                    const awayDirection = distVec.normalize(); // Direction away from virus center
                     
-                    // Ensure boundary clamping for new cells
-                    newPosition.x = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.x));
-                    newPosition.y = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.y));
-                    
-                    let newCell: Cell;
-                    if (cell instanceof Player) {
-                        newCell = new Player(
-                            newPosition.x,
-                            newPosition.y,
-                            cell.color,
-                            splitMass,
-                            cell.name
+                    for (let k = 0; k < 4; k++) {
+                        const angle = (k * Math.PI / 2); // 0°, 90°, 180°, 270°
+                        const perpendicular = new Vector(
+                            Math.cos(angle) * 50,
+                            Math.sin(angle) * 50
                         );
-                        // Add to player cells
-                        gameInstance.playerCells.push(newCell as Player);
+                        
+                        // Position the new cells around the virus position
+                        const offsetX = Math.cos(angle) * 50;
+                        const offsetY = Math.sin(angle) * 50;
+                        const newPosition = virus.position.add(new Vector(offsetX, offsetY));
+                        
+                        // Ensure boundary clamping for new cells
+                        newPosition.x = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.x));
+                        newPosition.y = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.y));
+                        
+                        let newCell: Cell;
+                        if (cell instanceof Player) {
+                            newCell = new Player(
+                                newPosition.x,
+                                newPosition.y,
+                                cell.color,
+                                splitMass,
+                                cell.name
+                            );
+                            // Add to player cells
+                            gameInstance.playerCells.push(newCell as Player);
+                        } else {
+                            newCell = new Cell(
+                                newPosition.x,
+                                newPosition.y,
+                                cell.color,
+                                splitMass,
+                                cell.name,
+                                getNextCellId(),
+                                cell.isBot
+                            );
+                            // Add to bot cells
+                            gameInstance.botCells.push(newCell);
+                        }
+                        
+                        // Apply ejection velocity away from virus
+                        const ejectionDir = awayDirection.multiply(VIRUS_SPLIT_EJECTION_SPEED);
+                        newCell.velocity = new Vector(
+                            ejectionDir.x + perpendicular.x,
+                            ejectionDir.y + perpendicular.y
+                        );
+                        newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
+                    }
+                    
+                    // Remove the original cell
+                    const cellIndexInPlayer = playerCells.indexOf(cell as Player);
+                    if (cellIndexInPlayer > -1) {
+                        playerCells.splice(cellIndexInPlayer, 1);
                     } else {
-                        newCell = new Cell(
-                            newPosition.x,
-                            newPosition.y,
-                            cell.color,
-                            splitMass,
-                            cell.name,
-                            getNextCellId(),
-                            cell.isBot
-                        );
-                        // Add to bot cells
-                        gameInstance.botCells.push(newCell);
-                    }
-                    
-                    // Apply ejection velocity away from virus
-                    const ejectionDir = awayDirection.multiply(VIRUS_SPLIT_EJECTION_SPEED);
-                    newCell.velocity = new Vector(
-                        ejectionDir.x + perpendicular.x,
-                        ejectionDir.y + perpendicular.y
-                    );
-                    newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-                }
-                
-                // Remove the original cell
-                const cellIndexInPlayer = playerCells.indexOf(cell as Player);
-                if (cellIndexInPlayer > -1) {
-                    playerCells.splice(cellIndexInPlayer, 1);
-                } else {
-                    const cellIndexInBots = botCells.indexOf(cell);
-                    if (cellIndexInBots > -1) {
-                        botCells.splice(cellIndexInBots, 1);
-                        botNamesRef.current.push(cell.name);
-                    }
-                }
-                
-                // Check if player has no cells left
-                if (playerCells.length === 0) {
-                    setIsPlaying(false);
-                    onGameOver(gameInstance.maxScore); 
-                    return;
-                }
-                
-                break; // Only one split per virus per frame
-            }
-        }
-    }
-    
-    allCells = [...playerCells, ...botCells];
-
-    // --- 5. Detecção de Colisão (Comer) ---
-    
-    for (let i = allCells.length - 1; i >= 0; i--) {
-        for (let j = i - 1; j >= 0; j--) {
-            const cellA = allCells[i];
-            const cellB = allCells[j];
-            if (!cellA || !cellB) continue;
-
-            const distVec = cellA.position.subtract(cellB.position);
-            const distance = distVec.magnitude();
-
-            if (distance < Math.max(cellA.radius, cellB.radius)) {
-                let predator, prey;
-                if (cellA.mass > cellB.mass * 1.15) {
-                    predator = cellA;
-                    prey = cellB;
-                } else if (cellB.mass > cellA.mass * 1.15) {
-                    predator = cellB;
-                    prey = cellA; // FIXED: was incorrectly set to cellB
-                } else {
-                    continue;
-                }
-                
-                if (predator.name === prey.name) continue;
-
-                let isPreyImmune = false;
-                for (const virus of viruses) {
-                    const distToVirus = prey.position.subtract(virus.position).magnitude();
-                    
-                    if (distToVirus + prey.radius < virus.radius && prey.mass <= VIRUS_MASS) {
-                        isPreyImmune = true;
-                        break;
-                    }
-                }
-                
-                if (isPreyImmune) {
-                    continue;
-                }
-
-                const deathDistance = predator.radius - prey.radius * 0.3;
-                if (distance < deathDistance) {
-                    predator.mass += prey.mass;
-                    predator.radius = predator.calculateRadius();
-                    
-                    if (predator instanceof Player || !predator.isBot) {
-                        playCollect();
-                    }
-                    
-                    const preyIndexInPlayer = playerCells.indexOf(prey as Player);
-                    if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
-
-                    const preyIndexInBots = botCells.indexOf(prey);
-                    if (preyIndexInBots > -1) {
-                        botCells.splice(preyIndexInBots, 1);
-                        if (prey.isBot) {
-                            botNamesRef.current.push(prey.name);
+                        const cellIndexInBots = botCells.indexOf(cell);
+                        if (cellIndexInBots > -1) {
+                            botCells.splice(cellIndexInBots, 1);
+                            botNamesRef.current.push(cell.name);
                         }
                     }
                     
-                    allCells.splice(allCells.indexOf(prey), 1);
-                    if (allCells.indexOf(predator) < i) i--;
-                    if (allCells.indexOf(predator) < j) j--;
+                    // Check if player has no cells left
+                    if (playerCells.length === 0) {
+                        setIsPlaying(false);
+                        onGameOver(gameInstance.maxScore); 
+                        break; // Exit inner loop
+                    }
+                    
+                    break; // Only one split per virus per frame
                 }
             }
         }
-    }
-    
-    // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
-    const totalBotCells = botCells.length;
-    if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
-        // Sort bot cells by mass (smallest first)
-        const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
         
-        // Remove the smallest cells until we're under the limit
-        const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
-        cellsToRemove.forEach(cell => {
-            const index = botCells.indexOf(cell);
-            if (index > -1) {
-                botCells.splice(index, 1);
-                botNamesRef.current.push(cell.name); // Return name to pool
+        allCells = [...playerCells, ...botCells];
+
+        // --- 5. Detecção de Colisão (Comer) ---
+        
+        for (let i = allCells.length - 1; i >= 0; i--) {
+            for (let j = i - 1; j >= 0; j--) {
+                const cellA = allCells[i];
+                const cellB = allCells[j];
+                if (!cellA || !cellB) continue;
+
+                const distVec = cellA.position.subtract(cellB.position);
+                const distance = distVec.magnitude();
+
+                if (distance < Math.max(cellA.radius, cellB.radius)) {
+                    let predator, prey;
+                    if (cellA.mass > cellB.mass * 1.15) {
+                        predator = cellA;
+                        prey = cellB;
+                    } else if (cellB.mass > cellA.mass * 1.15) {
+                        predator = cellB;
+                        prey = cellA; // FIXED: was incorrectly set to cellB
+                    } else {
+                        continue;
+                    }
+                    
+                    if (predator.name === prey.name) continue;
+
+                    let isPreyImmune = false;
+                    for (const virus of viruses) {
+                        const distToVirus = prey.position.subtract(virus.position).magnitude();
+                        
+                        if (distToVirus + prey.radius < virus.radius && prey.mass <= VIRUS_MASS) {
+                            isPreyImmune = true;
+                            break;
+                        }
+                    }
+                    
+                    if (isPreyImmune) {
+                        continue;
+                    }
+
+                    const deathDistance = predator.radius - prey.radius * 0.3;
+                    if (distance < deathDistance) {
+                        predator.mass += prey.mass;
+                        predator.radius = predator.calculateRadius();
+                        
+                        if (predator instanceof Player || !predator.isBot) {
+                            playCollect();
+                        }
+                        
+                        const preyIndexInPlayer = playerCells.indexOf(prey as Player);
+                        if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
+
+                        const preyIndexInBots = botCells.indexOf(prey);
+                        if (preyIndexInBots > -1) {
+                            botCells.splice(preyIndexInBots, 1);
+                            if (prey.isBot) {
+                                botNamesRef.current.push(prey.name);
+                            }
+                        }
+                        
+                        allCells.splice(allCells.indexOf(prey), 1);
+                        if (allCells.indexOf(predator) < i) i--;
+                        if (allCells.indexOf(predator) < j) j--;
+                    }
+                }
+            }
+        }
+        
+        // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
+        const totalBotCells = botCells.length;
+        if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
+            // Sort bot cells by mass (smallest first)
+            const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
+            
+            // Remove the smallest cells until we're under the limit
+            const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
+            cellsToRemove.forEach(cell => {
+                const index = botCells.indexOf(cell);
+                if (index > -1) {
+                    botCells.splice(index, 1);
+                    botNamesRef.current.push(cell.name); // Return name to pool
+                }
+            });
+            
+            console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
+        }
+        
+        // --- 7. Respawn de Bots (only if below initial count after all updates) ---
+        while (botCells.length < initialBotCount) {
+            const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
+            
+            const newBot = new Cell(
+                Math.random() * WORLD_SIZE,
+                Math.random() * WORLD_SIZE,
+                getRandomColor(),
+                MIN_CELL_MASS + 10,
+                newBotName,
+                getNextCellId(),
+                true
+            );
+            botCells.push(newBot);
+        }
+        
+        // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
+        
+        // 8. Atualização de Câmera e Score (necessário para definir a área de visão)
+        const initialMassForScore = MIN_CELL_MASS / 2; 
+        const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
+        
+        gameInstance.score = currentScore;
+        if (currentScore > gameInstance.maxScore) {
+            gameInstance.maxScore = currentScore;
+        }
+
+        let centerX = WORLD_SIZE / 2;
+        let centerY = WORLD_SIZE / 2;
+        let avgRadius = MIN_CELL_RADIUS;
+
+        if (playerCells.length > 0) {
+            centerX = playerCenterOfMass.x;
+            centerY = playerCenterOfMass.y;
+            avgRadius = avgPlayerRadius;
+            
+            camera.x += (centerX - camera.x) * 0.1;
+            camera.y += (centerY - camera.y) * 0.1;
+            camera.zoom = 40 / avgRadius + 0.4;
+        }
+        
+        // Calcula a área de visão (viewport)
+        const viewportWidth = canvas.width / camera.zoom;
+        const viewportHeight = canvas.height / camera.zoom;
+        const viewLeft = camera.x - viewportWidth / 2;
+        const viewTop = camera.y - viewportHeight / 2;
+        const viewRight = camera.x + viewportWidth / 2;
+        const viewBottom = camera.y + viewportHeight / 2;
+
+        // Colisão de Pellets (Otimizado)
+        for (let i = pellets.length - 1; i >= 0; i--) {
+            const pellet = pellets[i];
+            
+            // 1. Verifica se o pellet está na área de visão (otimização de renderização)
+            if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
+                pellet.position.y < viewTop || pellet.position.y > viewBottom) {
+                continue; // Pula a verificação de colisão se estiver fora da tela
+            }
+            
+            // 2. Verifica colisão com células
+            for (const cell of allCells) {
+                if (!pellet) continue;
+                const dist = cell.position.subtract(pellet.position).magnitude();
+                if (dist < cell.radius) {
+                    cell.mass += 10;
+                    cell.radius = cell.calculateRadius();
+                    pellets.splice(i, 1);
+                    
+                    if (cell instanceof Player || !cell.isBot) {
+                        playCollect();
+                    }
+                    break; 
+                }
+            }
+        }
+        
+        // Respawn de Pellets
+        if (pellets.length < PELLET_COUNT) {
+          pellets.push(new Pellet(getRandomColor()));
+        }
+        
+        // Respawn Viruses (always maintain VIRUS_COUNT viruses)
+        while (viruses.length < VIRUS_COUNT) {
+            const safePos = findSafeVirusPosition(allCells, viruses);
+            
+            viruses.push(new Virus(
+                safePos.x,
+                safePos.y,
+                viruses.length + 1
+            ));
+        }
+
+
+        // Prepare minimap data
+        const visibleBots = botCells
+            .map(bot => ({
+                x: bot.position.x,
+                y: bot.position.y,
+                mass: bot.mass,
+                color: bot.color,
+                radius: bot.radius,
+            }));
+
+        setMinimapData({
+            playerCenter: { x: centerX, y: centerY },
+            playerRadius: avgRadius, 
+            visibleBots: visibleBots,
+        });
+        
+        // --- 9. Leaderboard Logic ---
+        
+        const botMassMap = new Map<string, number>();
+        botCells.forEach(bot => {
+            botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
+        });
+        
+        const botEntries = Array.from(botMassMap.entries()).map(([name, mass]) => ({
+            name: name,
+            mass: mass,
+            isPlayer: false,
+            id: 0, 
+        }));
+        
+        const playerEntry = {
+            name: playerName,
+            mass: totalPlayerMass,
+            isPlayer: true,
+            id: 0, 
+        };
+        
+        const leaderboardData = [...botEntries, playerEntry]
+            .sort((a, b) => b.mass - a.mass)
+            .slice(0, 5); 
+
+
+        // Drawing
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(camera.zoom, camera.zoom);
+        ctx.translate(-camera.x, -camera.y);
+        
+        // --- Desenho do Fundo do Mundo ---
+        
+        // 1. Desenha a imagem de fundo com opacidade
+        if (bgImgRef.current) {
+            const img = bgImgRef.current;
+            const opacity = 0.4;
+            
+            ctx.globalAlpha = opacity;
+            ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
+            ctx.globalAlpha = 1.0;
+        } else {
+            // Fallback para cor de fundo se a imagem não carregar
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+        }
+        // --- FIM: Desenho do Fundo do Mundo ---
+
+
+        // Draw World Grid
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
+        for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
+
+        // Draw World Border
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 20; 
+        ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+
+        // Otimização de Renderização de Pellets
+        pellets.forEach(p => {
+            if (p.position.x >= viewLeft && p.position.x <= viewRight &&
+                p.position.y >= viewTop && p.position.y <= viewBottom) {
+                p.draw(ctx);
             }
         });
         
-        console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
-    }
-    
-    // --- 7. Respawn de Bots (only if below initial count after all updates) ---
-    while (botCells.length < initialBotCount) {
-        const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
+        // --- Lógica de Desenho de Camadas ---
         
-        const newBot = new Cell(
-            Math.random() * WORLD_SIZE,
-            Math.random() * WORLD_SIZE,
-            getRandomColor(),
-            MIN_CELL_MASS + 10,
-            newBotName,
-            getNextCellId(),
-            true
-        );
-        botCells.push(newBot);
-    }
-    
-    // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
-    
-    // 8. Atualização de Câmera e Score (necessário para definir a área de visão)
-    const initialMassForScore = MIN_CELL_MASS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
-    
-    gameInstance.score = currentScore;
-    if (currentScore > gameInstance.maxScore) {
-        gameInstance.maxScore = currentScore;
-    }
-
-    let centerX = WORLD_SIZE / 2;
-    let centerY = WORLD_SIZE / 2;
-    let avgRadius = MIN_CELL_RADIUS;
-
-    if (playerCells.length > 0) {
-        centerX = playerCenterOfMass.x;
-        centerY = playerCenterOfMass.y;
-        avgRadius = avgPlayerRadius;
+        const cellsInsideVirus: Cell[] = [];
+        const cellsOutsideVirus: Cell[] = [];
         
-        camera.x += (centerX - camera.x) * 0.1;
-        camera.y += (centerY - camera.y) * 0.1;
-        camera.zoom = 40 / avgRadius + 0.4;
-    }
-    
-    // Calcula a área de visão (viewport)
-    const viewportWidth = canvas.width / camera.zoom;
-    const viewportHeight = canvas.height / camera.zoom;
-    const viewLeft = camera.x - viewportWidth / 2;
-    const viewTop = camera.y - viewportHeight / 2;
-    const viewRight = camera.x + viewportWidth / 2;
-    const viewBottom = camera.y + viewportHeight / 2;
-
-    // Colisão de Pellets (Otimizado)
-    for (let i = pellets.length - 1; i >= 0; i--) {
-        const pellet = pellets[i];
-        
-        // 1. Verifica se o pellet está na área de visão (otimização de renderização)
-        if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
-            pellet.position.y < viewTop || pellet.position.y > viewBottom) {
-            continue; // Pula a verificação de colisão se estiver fora da tela
-        }
-        
-        // 2. Verifica colisão com células
-        for (const cell of allCells) {
-            if (!pellet) continue;
-            const dist = cell.position.subtract(pellet.position).magnitude();
-            if (dist < cell.radius) {
-                cell.mass += 10;
-                cell.radius = cell.calculateRadius();
-                pellets.splice(i, 1);
-                
-                if (cell instanceof Player || !cell.isBot) {
-                    playCollect();
-                }
-                break; 
-            }
-        }
-    }
-    
-    // Respawn de Pellets
-    if (pellets.length < PELLET_COUNT) {
-      pellets.push(new Pellet(getRandomColor()));
-    }
-    
-    // Respawn Viruses (always maintain VIRUS_COUNT viruses)
-    while (viruses.length < VIRUS_COUNT) {
-        const safePos = findSafeVirusPosition(allCells, viruses);
-        
-        viruses.push(new Virus(
-            safePos.x,
-            safePos.y,
-            viruses.length + 1
-        ));
-    }
-
-
-    // Prepare minimap data
-    const visibleBots = botCells
-        .map(bot => ({
-            x: bot.position.x,
-            y: bot.position.y,
-            mass: bot.mass,
-            color: bot.color,
-            radius: bot.radius,
-        }));
-
-    setMinimapData({
-        playerCenter: { x: centerX, y: centerY },
-        playerRadius: avgRadius, 
-        visibleBots: visibleBots,
-    });
-    
-    // --- 9. Leaderboard Logic ---
-    
-    const botMassMap = new Map<string, number>();
-    botCells.forEach(bot => {
-        botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
-    });
-    
-    const botEntries = Array.from(botMassMap.entries()).map(([name, mass]) => ({
-        name: name,
-        mass: mass,
-        isPlayer: false,
-        id: 0, 
-    }));
-    
-    const playerEntry = {
-        name: playerName,
-        mass: totalPlayerMass,
-        isPlayer: true,
-        id: 0, 
-    };
-    
-    const leaderboardData = [...botEntries, playerEntry]
-        .sort((a, b) => b.mass - a.mass)
-        .slice(0, 5); 
-
-
-    // Drawing
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.scale(camera.zoom, camera.zoom);
-    ctx.translate(-camera.x, -camera.y);
-    
-    // --- Desenho do Fundo do Mundo ---
-    
-    // 1. Desenha a imagem de fundo com opacidade
-    if (bgImgRef.current) {
-        const img = bgImgRef.current;
-        const opacity = 0.4;
-        
-        ctx.globalAlpha = opacity;
-        ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
-        ctx.globalAlpha = 1.0;
-    } else {
-        // Fallback para cor de fundo se a imagem não carregar
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-    }
-    // --- FIM: Desenho do Fundo do Mundo ---
-
-
-    // Draw World Grid
-    ctx.strokeStyle = '#eee';
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
-    for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
-
-    // Draw World Border
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 20; 
-    ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-
-    // Otimização de Renderização de Pellets
-    pellets.forEach(p => {
-        if (p.position.x >= viewLeft && p.position.x <= viewRight &&
-            p.position.y >= viewTop && p.position.y <= viewBottom) {
-            p.draw(ctx);
-        }
-    });
-    
-    // --- Lógica de Desenho de Camadas ---
-    
-    const cellsInsideVirus: Cell[] = [];
-    const cellsOutsideVirus: Cell[] = [];
-    
-    allCells.forEach(cell => {
-        let isInside = false;
-        if (cell.mass <= VIRUS_MASS) {
-            for (const virus of viruses) {
-                const distToVirus = cell.position.subtract(virus.position).magnitude();
-                if (distToVirus + cell.radius < virus.radius) {
-                    isInside = true;
-                    break;
+        allCells.forEach(cell => {
+            let isInside = false;
+            if (cell.mass <= VIRUS_MASS) {
+                for (const virus of viruses) {
+                    const distToVirus = cell.position.subtract(virus.position).magnitude();
+                    if (distToVirus + cell.radius < virus.radius) {
+                        isInside = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (isInside) {
-            cellsInsideVirus.push(cell);
-        } else {
-            cellsOutsideVirus.push(cell);
-        }
-    });
-    
-    cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
-        c.draw(ctx, c instanceof Player);
-    });
-
-    // Otimização de Renderização de Vírus
-    viruses.forEach(v => {
-        if (v.position.x + v.radius >= viewLeft && v.position.x - v.radius <= viewRight &&
-            v.position.y + v.radius >= viewTop && v.position.y - v.radius <= viewBottom) {
-            v.draw(ctx);
-        }
-    }); 
-    
-    // --- FIM: Lógica de Desenho de Camadas ---
-
-    ctx.restore();
-
-    // Draw UI elements (Score and Leaderboard)
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px Quicksand';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
-    
-    ctx.textAlign = 'right';
-    ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
-    
-    // Draw Leaderboard
-    const leaderboardWidth = 180; 
-    const leaderboardX = canvas.width - leaderboardWidth - 20;
-    const lineHeight = 20; 
-    const leaderboardY = 50; 
-    const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
-    ctx.strokeStyle = '#ccc';
-    ctx.strokeRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
-
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 16px Quicksand';
-    ctx.textAlign = 'left';
-    ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
-    
-    ctx.font = '14px Quicksand';
-    leaderboardData.forEach((entry, index) => {
-        const y = leaderboardY + 40 + index * lineHeight; 
-        ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
+            if (isInside) {
+                cellsInsideVirus.push(cell);
+            } else {
+                cellsOutsideVirus.push(cell);
+            }
+        });
         
-        const nameDisplay = entry.name.length > 10 ? entry.name.substring(0, 8) + '...' : entry.name;
+        cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
+            c.draw(ctx, c instanceof Player);
+        });
+
+        // Otimização de Renderização de Vírus
+        viruses.forEach(v => {
+            if (v.position.x + v.radius >= viewLeft && v.position.x - v.radius <= viewRight &&
+                v.position.y + v.radius >= viewTop && v.position.y - v.radius <= viewBottom) {
+                v.draw(ctx);
+            }
+        }); 
+        
+        // --- FIM: Lógica de Desenho de Camadas ---
+
+        ctx.restore();
+
+        // Draw UI elements (Score and Leaderboard)
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 20px Quicksand';
         ctx.textAlign = 'left';
-        ctx.fillText(`${index + 1}. ${nameDisplay}`, leaderboardX + 10, y);
+        ctx.fillText(`Pontuação: ${gameInstance.score}`, 20, 30);
         
         ctx.textAlign = 'right';
-        ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
-    });
+        ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
+        
+        // Draw Leaderboard
+        const leaderboardWidth = 180; 
+        const leaderboardX = canvas.width - leaderboardWidth - 20;
+        const lineHeight = 20; 
+        const leaderboardY = 50; 
+        const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
 
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
+        ctx.strokeStyle = '#ccc';
+        ctx.strokeRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
 
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 16px Quicksand';
+        ctx.textAlign = 'left';
+        ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
+        
+        ctx.font = '14px Quicksand';
+        leaderboardData.forEach((entry, index) => {
+            const y = leaderboardY + 40 + index * lineHeight; 
+            ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
+            
+            const nameDisplay = entry.name.length > 10 ? entry.name.substring(0, 8) + '...' : entry.name;
+            ctx.textAlign = 'left';
+            ctx.fillText(`${index + 1}. ${nameDisplay}`, leaderboardX + 10, y);
+            
+            ctx.textAlign = 'right';
+            ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
+        });
+
+    } catch (error) {
+        console.error('Error in game loop:', error);
+        // Continue the game loop despite the error
+    }
+
+    // Always schedule the next frame
     animationFrameId.current = requestAnimationFrame(gameLoop);
   }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile]);
 
