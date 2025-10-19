@@ -1213,9 +1213,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             centerY = playerCenterOfMass.y;
             avgRadius = avgPlayerRadius;
             
-            camera.x += (centerX - camera.x) * 0.1;
-            camera.y += (centerY - camera.y) * 0.1;
-            camera.zoom = 40 / avgRadius + 0.4;
+            // UPDATED: Smoother camera following (reduced from 0.1 to 0.05 for less jittery movement)
+            camera.x += (centerX - camera.x) * 0.05;
+            camera.y += (centerY - camera.y) * 0.05;
+            
+            // UPDATED: Less aggressive zoom calculation for better visibility when growing
+            // Original: camera.zoom = 40 / avgRadius + 0.4;
+            // New: More gradual zoom that maintains wider view, minimum zoom of 0.3
+            camera.zoom = Math.max(0.3, 1.5 / Math.sqrt(avgRadius));
         }
         
         // Calcula a área de visão (viewport)
