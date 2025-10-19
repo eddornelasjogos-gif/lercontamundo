@@ -70,6 +70,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const [nextCellId, setNextCellId] = useState(1);
   const [gameStartTime, setGameStartTime] = useState(Date.now());
   const [totalBotCells, setTotalBotCells] = useState(0);
+  const [isGameReady, setIsGameReady] = useState(false); // Novo estado para controlar a prontidão do jogo
   const isMobile = useIsMobile();
   const { playCollect, playSplit } = useGameAudio(!isPaused && !showVictory);
 
@@ -78,26 +79,24 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const botSplitChance = settings.botSplitChance;
   const maxBotCells = settings.botCount;
 
-  // Generate initial pellets
-  const generateInitialPellets = useCallback(() => {
-    const newPellets: Pellet[] = [];
+  // Reset game state function
+  const resetGame = useCallback(() => {
+    // 1. Gerar todas as entidades iniciais de forma síncrona
+    const initialPlayerCells = [new Player(WORLD_CENTER_X, WORLD_CENTER_Y, MIN_CELL_MASS, playerName, 1)];
+    
+    const initialPellets: Pellet[] = [];
     for (let i = 0; i < PELLET_COUNT; i++) {
       let x, y;
       do {
         x = Math.random() * WORLD_SIZE;
         y = Math.random() * WORLD_SIZE;
       } while (Math.sqrt((x - WORLD_CENTER_X) ** 2 + (y - WORLD_CENTER_Y) ** 2) > WORLD_RADIUS - 50);
-      
-      newPellets.push(new Pellet(x, y, getRandomColor()));
+      initialPellets.push(new Pellet(x, y, getRandomColor()));
     }
-    setPellets(newPellets);
-  }, []);
-  
-  // Generate initial bots
-  const generateInitialBots = useCallback((count: number) => {
-    const newBots: Bot[] = [];
+
+    const initialBots: Bot[] = [];
     let currentId = 2; // Começa após o jogador (ID 1)
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < settings.botCount; i++) {
       let x, y;
       do {
         x = Math.random() * WORLD_SIZE;
@@ -107,31 +106,23 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       const initialMass = MIN_CELL_MASS * (1 + Math.random() * 2); // Massa inicial aleatória
       const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
       
-      newBots.push(new Bot(x, y, initialMass, name, currentId++));
+      initialBots.push(new Bot(x, y, initialMass, name, currentId++));
     }
-    setBotCells(newBots);
-    setTotalBotCells(newBots.length);
-    setNextCellId(currentId);
-  }, []);
 
-  // Reset game state function
-  const resetGame = useCallback(() => {
+    // 2. Atualizar todos os estados de uma vez
     setScore(0);
-    setPlayerCells([new Player(WORLD_CENTER_X, WORLD_CENTER_Y, MIN_CELL_MASS, playerName, 1)]);
-    setBotCells([]);
-    setPellets([]);
+    setPlayerCells(initialPlayerCells);
+    setBotCells(initialBots);
+    setPellets(initialPellets);
     setCamera({ x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 1 });
-    setNextCellId(2); // O jogador é o ID 1, o próximo é 2
-    setTotalBotCells(0);
+    setNextCellId(currentId);
+    setTotalBotCells(initialBots.length);
     setGameStartTime(Date.now());
     clearGameState();
-    
-    // Inicializa os elementos do jogo
-    generateInitialPellets();
-    generateInitialBots(settings.botCount);
-  }, [playerName, generateInitialPellets, generateInitialBots, settings.botCount]);
+    setIsGameReady(true); // O jogo está pronto!
+  }, [playerName, settings.botCount]);
 
-  // Load saved game state on mount
+  // Load saved game state or initialize new game on mount
   useEffect(() => {
     const savedState = loadGameState();
     if (savedState) {
@@ -148,30 +139,29 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       setCamera(savedState.camera);
       setScore(savedState.score);
       
-      // Calcula o próximo ID baseado nos IDs existentes
       const maxPlayerId = savedState.playerCells.reduce((max, cell) => Math.max(max, cell.id || 0), 0);
       const maxBotId = savedState.botCells.reduce((max, cell) => Math.max(max, cell.id || 0), 0);
       setNextCellId(Math.max(maxPlayerId, maxBotId) + 1);
       
       setTotalBotCells(savedState.botCells.length);
+      setIsGameReady(true); // O jogo está pronto após carregar
     } else {
       // Se não houver estado salvo, inicia um novo jogo
-      resetGame();
+      resetGame(); // Esta função agora define isGameReady como true
     }
   }, [resetGame]);
 
   // Game loop
   useEffect(() => {
-    // Se playerCells estiver vazio, o jogo acabou (morte) ou ainda não foi inicializado.
-    // Se o jogo não estiver pausado e não houver células do jogador, chamamos onGameOver.
-    if (playerCells.length === 0 && !isPaused && !showVictory) {
-        // Isso garante que se o resetGame falhar ou o jogador morrer, ele volte para o menu.
+    // O loop só roda se o jogo estiver pronto e não pausado/vitorioso
+    if (!isGameReady || isPaused || showVictory) return;
+
+    // Se playerCells estiver vazio *após* a inicialização, significa que o jogador morreu
+    if (playerCells.length === 0) {
         onGameOver(score);
         return;
     }
     
-    if (isPaused || showVictory) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -374,7 +364,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [playerCells, botCells, pellets, score, nextCellId, botAggression, botSplitChance, maxBotCells, isPaused, showVictory, onGameOver, playerName, generateInitialPellets, generateInitialBots, settings.botCount]);
+  }, [isGameReady, playerCells, botCells, pellets, score, nextCellId, totalBotCells, botAggression, botSplitChance, maxBotCells, isPaused, showVictory, onGameOver, playerName]);
 
   // Handle pause/unpause
   const togglePause = () => {
@@ -383,27 +373,29 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
   // Handle restart from pause menu
   const handleRestart = () => {
+    setIsGameReady(false); // Define como falso para forçar re-inicialização completa
     resetGame();
     setIsPaused(false);
     setShowVictory(false);
-    // Não chama onGameOver, pois é reinício, não fim de jogo
   };
 
   // Handle exit from pause menu
   const handleExit = () => {
+    setIsGameReady(false); // Define como falso para garantir que o jogo não reinicie automaticamente
     onGameOver(score); // Chama com score atual para atualizar leaderboard
   };
 
   // Handle restart from victory screen
   const handleVictoryRestart = () => {
+    setIsGameReady(false); // Define como falso para forçar re-inicialização completa
     resetGame();
     setShowVictory(false);
     setIsPaused(false);
-    // Não chama onGameOver, pois é reinício
   };
 
   // Handle menu from victory screen
   const handleVictoryMenu = () => {
+    setIsGameReady(false); // Define como falso para garantir que o jogo não reinicie automaticamente
     setShowVictory(false);
     onGameOver(score); // Atualiza leaderboard com pontuação de vitória
   };
