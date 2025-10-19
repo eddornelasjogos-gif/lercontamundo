@@ -1,9 +1,18 @@
 import { Vector } from './Vector';
+import { Cell } from './Cell';
+
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
 
 export class Bot extends Cell {
   constructor(x: number, y: number, mass: number, name: string, id: number) {
     super(x, y, getRandomColor(), mass, name, id, true);
-    this.isBot = true;
   }
 
   update(playerPosition: Vector, playerRadius: number, botAggression: number) {

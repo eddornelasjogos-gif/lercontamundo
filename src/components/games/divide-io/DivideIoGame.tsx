@@ -13,7 +13,12 @@ import heroBgImage from '@/assets/hero-bg.jpg';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Pause } from 'lucide-react';
-import { saveGameState, loadGameState, clearGameState } from '@/utils/divide-io-storage'; // Importando utilitários
+import { saveGameState, loadGameState, clearGameState } from '@/utils/divide-io-storage';
+import { Vector } from './Vector';
+import { Cell } from './Cell';
+import { Player } from './Player';
+import { Bot } from './Bot';
+import { Pellet } from './Pellet';
 
 type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
@@ -47,181 +52,8 @@ const EJECTION_OFFSET = 30;
 
 const MAX_TOTAL_BOT_CELLS = 100;
 
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
-// Exportando classes para uso no utilitário de storage
-export class Vector {
-  constructor(public x: number, public y: number) {}
-
-  add(v: Vector) {
-    return new Vector(this.x + v.x, this.y + v.y);
-  }
-
-  subtract(v: Vector) {
-    return new Vector(this.x - v.x, this.y - v.y);
-  }
-
-  multiply(scalar: number) {
-    return new Vector(this.x * scalar, this.y * scalar);
-  }
-
-  magnitude() {
-    return Math.sqrt(this.x * this.x + this.y * this.y);
-  }
-
-  normalize() {
-    const mag = this.magnitude();
-    return mag > 0 ? new Vector(this.x / mag, this.y / mag) : new Vector(0, 0);
-  }
-}
-
 // Ref para a direção de movimento (usada por Joystick, Mouse ou Teclado)
 const movementDirectionRef: { current: { x: number; y: number } } = { current: { x: 0, y: 0 } };
-
-export class Cell {
-  public position: Vector;
-  public mass: number;
-  public radius: number;
-  public velocity: Vector;
-  public mergeCooldown = 0;
-  public name: string;
-  public id: number; 
-  public isBot: boolean;
-
-  constructor(x: number, y: number, public color: string, initialMass: number, name: string = 'Cell', id: number, isBot: boolean = false) {
-    this.position = new Vector(x, y);
-    this.mass = initialMass;
-    this.radius = this.calculateRadius();
-    this.velocity = new Vector(0, 0);
-    this.name = name;
-    this.id = id;
-    this.isBot = isBot;
-  }
-
-  calculateRadius() {
-    return Math.sqrt(this.mass / Math.PI) * MASS_TO_RADIUS_RATIO;
-  }
-
-  update() {
-    if (this.mergeCooldown > 0) {
-      this.mergeCooldown--;
-    }
-    this.velocity = this.velocity.multiply(0.92);
-    this.position = this.position.add(this.velocity);
-    
-    const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
-    const distanceFromCenter = this.position.subtract(center).magnitude();
-    if (distanceFromCenter + this.radius > WORLD_RADIUS) {
-      const direction = this.position.subtract(center).normalize();
-      this.position = center.add(direction.multiply(WORLD_RADIUS - this.radius));
-    }
-  }
-
-  draw(ctx: CanvasRenderingContext2D, isPlayer: boolean = false) {
-    ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = Math.max(1, this.radius * 0.05);
-    ctx.stroke();
-    ctx.closePath();
-    
-    if (this.radius > 15) {
-        ctx.fillStyle = isPlayer ? '#fff' : '#333';
-        ctx.font = `${Math.max(12, this.radius / 3)}px Quicksand`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.name, this.position.x, this.position.y);
-    }
-  }
-  
-  split(directionVector: Vector, nextCellId: number): Cell | null {
-    if (this.mass >= MIN_SPLIT_MASS) {
-        const splitMass = this.mass / 2;
-        this.mass = splitMass;
-        this.radius = this.calculateRadius();
-        this.mergeCooldown = MERGE_COOLDOWN_FRAMES;
-        
-        const direction = directionVector.magnitude() > 0.1
-            ? directionVector.normalize()
-            : this.velocity.magnitude() > 0.1
-            ? this.velocity.normalize()
-            : new Vector(Math.random() - 0.5, Math.random() - 0.5).normalize();
-        
-        const newCell = new Cell(
-            this.position.x + direction.x * this.radius * 1.5,
-            this.position.y + direction.y * this.radius * 1.5,
-            this.color,
-            splitMass,
-            this.name,
-            nextCellId,
-            this.isBot
-        );
-        newCell.velocity = direction.multiply(-EJECTION_IMPULSE / splitMass);
-        return newCell;
-    }
-    return null;
-  }
-}
-
-export class Player extends Cell {
-  constructor(x: number, y: number, initialMass: number, name: string, id: number) {
-    super(x, y, '#2196F3', initialMass, name, id);
-    this.isBot = false;
-  }
-}
-
-export class Bot extends Cell {
-  constructor(x: number, y: number, mass: number, name: string, id: number) {
-    super(x, y, getRandomColor(), mass, name, id, true);
-    this.isBot = true;
-  }
-
-  update(playerPosition: Vector, playerRadius: number, botAggression: number) {
-    super.update();
-    
-    const distanceToPlayer = this.position.subtract(playerPosition).magnitude();
-    const combinedRadius = this.radius + playerRadius;
-    
-    if (distanceToPlayer < combinedRadius * 1.5) {
-      // Foge do jogador se muito próximo
-      const fleeDirection = this.position.subtract(playerPosition).normalize();
-      this.velocity = this.velocity.add(fleeDirection.multiply(botAggression * 0.5));
-    } else if (distanceToPlayer < 300 && this.mass > playerRadius * 1.2) {
-      // Persegue o jogador se maior e próximo
-      const pursueDirection = playerPosition.subtract(this.position).normalize();
-      this.velocity = this.velocity.add(pursueDirection.multiply(botAggression));
-    } else {
-      // Movimento aleatório
-      if (Math.random() < 0.02) {
-        const randomAngle = Math.random() * Math.PI * 2;
-        this.velocity = new Vector(
-          Math.cos(randomAngle) * 50,
-          Math.sin(randomAngle) * 50
-        );
-      }
-    }
-    
-    // Limita velocidade máxima
-    const maxSpeed = 4;
-    const currentSpeed = this.velocity.magnitude();
-    if (currentSpeed > maxSpeed) {
-      this.velocity = this.velocity.multiply(maxSpeed / currentSpeed);
-    }
-  }
-}
-
-export class Pellet {
-  constructor(public x: number, public y: number, public color: string) {}
-}
 
 const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, playerName }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
