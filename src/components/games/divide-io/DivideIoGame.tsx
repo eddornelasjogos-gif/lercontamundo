@@ -1,4 +1,3 @@
-threshold) explode when touching a virus, generating pellets from the cell only. The virus remains intact. Adjusted the threshold calculation for better gameplay balance.">
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useDivideIoProgress } from '@/hooks/useDivideIoProgress';
 import VirtualJoystick from './VirtualJoystick';
@@ -32,12 +31,11 @@ const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
 const MERGE_COOLDOWN_FRAMES = 60 * 5;
 const MASS_TO_RADIUS_RATIO = 4;
 
-// New constants for Virus
+// Virus constants (stationary, consumed when eaten)
 const VIRUS_RADIUS = 60; 
 const VIRUS_MASS = VIRUS_RADIUS * VIRUS_RADIUS / MASS_TO_RADIUS_RATIO; 
 const VIRUS_COUNT = 8;
 const VIRUS_COLOR = '#FF4136';
-const EXPLOSION_THRESHOLD_MASS = VIRUS_MASS * 1.33;
 
 // Distância mínima de segurança para o respawn do vírus
 const MIN_VIRUS_RESPAWN_DISTANCE = VIRUS_RADIUS + 100; 
@@ -45,6 +43,9 @@ const MIN_VIRUS_RESPAWN_DISTANCE = VIRUS_RADIUS + 100;
 // Ajuste de Impulso para Divisão
 const EJECTION_IMPULSE = 400;
 const EJECTION_OFFSET = 30;
+
+// Ejection speed for split cells from virus
+const VIRUS_SPLIT_EJECTION_SPEED = 200;
 
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
@@ -233,7 +234,7 @@ class Player extends Cell {
     }
 }
 
-// New Virus class
+// Virus class (stationary, consumed when touched)
 class Virus {
   public position: Vector;
   public radius: number;
@@ -286,7 +287,6 @@ class Virus {
     ctx.restore();
   }
 }
-
 
 // Lógica de Bot
 const botLogic = {
@@ -891,7 +891,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     allCells = [...playerCells, ...botCells];
 
-    // --- 4. Detecção de Colisão (Vírus/Obstáculos) ---
+    // --- 4. Detecção de Colisão com Vírus (Split on Contact) ---
     
     for (let v = viruses.length - 1; v >= 0; v--) {
         const virus = viruses[v];
@@ -903,39 +903,83 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             const distance = distVec.magnitude();
             
             if (distance < cell.radius + virus.radius) {
+                // Virus is consumed and removed
+                viruses.splice(v, 1);
                 
-                if (cell.mass > EXPLOSION_THRESHOLD_MASS) {
-                    // FIXED: Explode the large cell when it touches the virus
-                    // The virus remains intact
+                // Split the cell into 4 smaller cells
+                const splitMass = cell.mass / 4;
+                const awayDirection = distVec.normalize(); // Direction away from virus center
+                
+                for (let k = 0; k < 4; k++) {
+                    const angle = (k * Math.PI / 2); // 0°, 90°, 180°, 270°
+                    const perpendicular = new Vector(
+                        Math.cos(angle) * 50,
+                        Math.sin(angle) * 50
+                    );
                     
-                    // Generate pellets from the cell's mass
-                    const massToRedistribute = cell.mass / 2;
-                    const cellPellets = generatePelletsFromMass(massToRedistribute, cell.position);
-                    gameInstance.pellets.push(...cellPellets);
+                    // Position the new cells around the virus position
+                    const offsetX = Math.cos(angle) * 50;
+                    const offsetY = Math.sin(angle) * 50;
+                    const newPosition = virus.position.add(new Vector(offsetX, offsetY));
                     
-                    // Remove the cell (player or bot)
-                    const cellIndexInPlayer = playerCells.indexOf(cell as Player);
-                    if (cellIndexInPlayer > -1) {
-                        playerCells.splice(cellIndexInPlayer, 1);
+                    // Ensure boundary clamping for new cells
+                    newPosition.x = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.x));
+                    newPosition.y = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.y));
+                    
+                    let newCell: Cell;
+                    if (cell instanceof Player) {
+                        newCell = new Player(
+                            newPosition.x,
+                            newPosition.y,
+                            cell.color,
+                            splitMass,
+                            cell.name
+                        );
+                        // Add to player cells
+                        gameInstance.playerCells.push(newCell as Player);
                     } else {
-                        const cellIndexInBots = botCells.indexOf(cell);
-                        if (cellIndexInBots > -1) {
-                            botCells.splice(cellIndexInBots, 1);
-                            botNamesRef.current.push(cell.name);
-                        }
+                        newCell = new Cell(
+                            newPosition.x,
+                            newPosition.y,
+                            cell.color,
+                            splitMass,
+                            cell.name,
+                            getNextCellId(),
+                            cell.isBot
+                        );
+                        // Add to bot cells
+                        gameInstance.botCells.push(newCell);
                     }
                     
-                    // The virus stays, but we can add a slight push effect if desired
-                    // For now, just continue with the virus intact
-                    
-                    if (playerCells.length === 0) {
-                        setIsPlaying(false);
-                        onGameOver(gameInstance.maxScore); 
-                        return;
-                    }
-                    
-                    break; // Only one explosion per virus per frame
+                    // Apply ejection velocity away from virus
+                    const ejectionDir = awayDirection.multiply(VIRUS_SPLIT_EJECTION_SPEED);
+                    newCell.velocity = new Vector(
+                        ejectionDir.x + perpendicular.x,
+                        ejectionDir.y + perpendicular.y
+                    );
+                    newCell.mergeCooldown = MERGE_COOLDOWN_FRAMES;
                 }
+                
+                // Remove the original cell
+                const cellIndexInPlayer = playerCells.indexOf(cell as Player);
+                if (cellIndexInPlayer > -1) {
+                    playerCells.splice(cellIndexInPlayer, 1);
+                } else {
+                    const cellIndexInBots = botCells.indexOf(cell);
+                    if (cellIndexInBots > -1) {
+                        botCells.splice(cellIndexInBots, 1);
+                        botNamesRef.current.push(cell.name);
+                    }
+                }
+                
+                // Check if player has no cells left
+                if (playerCells.length === 0) {
+                    setIsPlaying(false);
+                    onGameOver(gameInstance.maxScore); 
+                    return;
+                }
+                
+                break; // Only one split per virus per frame
             }
         }
     }
@@ -960,7 +1004,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     prey = cellB;
                 } else if (cellB.mass > cellA.mass * 1.15) {
                     predator = cellB;
-                    prey = cellB;
+                    prey = cellA;
                 } else {
                     continue;
                 }
@@ -1090,7 +1134,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       pellets.push(new Pellet(getRandomColor()));
     }
     
-    // Respawn Viruses
+    // Respawn Viruses (always maintain VIRUS_COUNT viruses)
     while (viruses.length < VIRUS_COUNT) {
         const safePos = findSafeVirusPosition(allCells, viruses);
         
