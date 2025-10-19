@@ -17,14 +17,14 @@ interface DivideIoGameProps {
 }
 
 const difficultySettings = {
-  'very-easy': { botCount: 8, botAggression: 0.1, botSplitChance: 0.0005 },
-  easy: { botCount: 12, botAggression: 0.2, botSplitChance: 0.001 },
-  medium: { botCount: 15, botAggression: 0.5, botSplitChance: 0.002 },
+  'very-easy': { botCount: 10, botAggression: 0.1, botSplitChance: 0.0005 },
+  easy: { botCount: 18, botAggression: 0.2, botSplitChance: 0.001 },
+  medium: { botCount: 18, botAggression: 0.5, botSplitChance: 0.002 },
   hard: { botCount: 18, botAggression: 0.8, botSplitChance: 0.005 },
 };
 
 const WORLD_SIZE = 3000;
-const PELLET_COUNT = 500; // REDUCED: from 1800 to 500 for better performance
+const PELLET_COUNT = 1800;
 const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
 const MIN_SPLIT_MASS = MIN_CELL_MASS * 2;
@@ -47,10 +47,8 @@ const EJECTION_OFFSET = 30;
 // Ejection speed for split cells from virus
 const VIRUS_SPLIT_EJECTION_SPEED = 200;
 
-// Safety limits to prevent performance issues
-const MAX_TOTAL_CELLS = 50; // Total cells (player + bots) limit
-const MAX_PLAYER_CELLS = 16; // Max player cells from splitting
-const COLLISION_CHECK_RADIUS = 200; // Only check collisions within this radius
+// Safety limit for total bot cells to prevent performance issues
+const MAX_TOTAL_BOT_CELLS = 100;
 
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
@@ -239,7 +237,7 @@ class Player extends Cell {
     }
 }
 
-// Virus class (stationary, consumed when eaten)
+// Virus class (stationary, consumed when touched)
 class Virus {
   public position: Vector;
   public radius: number;
@@ -723,8 +721,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   }, [isPlaying, handleSplit, isMobile, handleMouseMove]);
 
   const gameLoop = useCallback(() => {
-    const startTime = performance.now(); // Monitor frame time
-
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) {
@@ -744,29 +740,16 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
     const settings = difficultySettings[difficulty];
 
-    // --- PERFORMANCE OPTIMIZATION: Calculate viewport early ---
+    // --- 1. Lógica do Jogador ---
+    const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
+    
     const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
     const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
     const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
 
-    // Update camera
-    camera.x += (playerCenterOfMass.x - camera.x) * 0.1;
-    camera.y += (playerCenterOfMass.y - camera.y) * 0.1;
-    camera.zoom = 40 / avgPlayerRadius + 0.4;
-
-    const viewportWidth = canvas.width / camera.zoom;
-    const viewportHeight = canvas.height / camera.zoom;
-    const viewLeft = camera.x - viewportWidth / 2;
-    const viewTop = camera.y - viewportHeight / 2;
-    const viewRight = camera.x + viewportWidth / 2;
-    const viewBottom = camera.y + viewportHeight / 2;
-
-    // --- 1. Lógica do Jogador ---
-    const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
-    
     playerCells.forEach(playerCell => {
         // 1a. Movimento do Jogador (Input)
-        const acceleration = 0.5;
+        const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
         const force = playerDirection.multiply(acceleration);
         playerCell.velocity = playerCell.velocity.add(force);
 
@@ -821,7 +804,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         cells.forEach(cell => {
             // 2a. Movimento Coordenado
-            const acceleration = 0.5;
+            const acceleration = 0.5; // REDUCED: Halved from 1 to 0.5
             const force = targetDirection.multiply(acceleration);
             cell.velocity = cell.velocity.add(force);
             
@@ -852,7 +835,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             cell.update();
         });
         
-        // 2d. Fusão de Células de Bot (OPTIMIZED: proximity check)
+        // 2d. Fusão de Células de Bot
         for (let i = cells.length - 1; i >= 0; i--) {
             for (let j = i - 1; j >= 0; j--) {
                 const cellA = cells[i];
@@ -860,7 +843,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                 
                 if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
                     const dist = cellA.position.subtract(cellB.position).magnitude();
-                    if (dist < cellA.radius + cellB.radius && dist < COLLISION_CHECK_RADIUS) { 
+                    if (dist < cellA.radius + cellB.radius) { 
                         const bigger = cellA.mass > cellB.mass ? cellA : cellB;
                         const smaller = cellA.mass > cellB.mass ? cellB : cellA;
                         
@@ -882,7 +865,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     gameInstance.botCells.push(...newBotCells);
     
-    // --- 3. Atualização e Fusão do Jogador (OPTIMIZED: proximity check) ---
+    // --- 3. Atualização e Fusão do Jogador ---
     playerCells.forEach(cell => cell.update());
 
     for (let i = playerCells.length - 1; i >= 0; i--) {
@@ -892,7 +875,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
           const dist = cellA.position.subtract(cellB.position).magnitude();
-          if (dist < cellA.radius + cellB.radius && dist < COLLISION_CHECK_RADIUS) { 
+          if (dist < cellA.radius + cellB.radius) { 
             const bigger = cellA.mass > cellB.mass ? cellA : cellB;
             const smaller = cellA.mass > cellB.mass ? cellB : cellA;
             bigger.mass += smaller.mass;
@@ -910,34 +893,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     }
 
     allCells = [...playerCells, ...botCells];
-
-    // --- PERFORMANCE: Limit total cells ---
-    const totalCells = playerCells.length + botCells.length;
-    if (totalCells > MAX_TOTAL_CELLS) {
-        // Sort all cells by mass (smallest first)
-        const sortedCells = [...allCells].sort((a, b) => a.mass - b.mass);
-        
-        // Remove the smallest cells until we're under the limit (prioritize bots)
-        const cellsToRemove = sortedCells.slice(0, totalCells - MAX_TOTAL_CELLS);
-        cellsToRemove.forEach(cell => {
-            if (cell instanceof Player) {
-                // Only remove player cells if necessary (keep at least 1)
-                if (playerCells.length > 1) {
-                    const index = playerCells.indexOf(cell as Player);
-                    if (index > -1) playerCells.splice(index, 1);
-                }
-            } else {
-                // Remove bot cells
-                const index = botCells.indexOf(cell);
-                if (index > -1) {
-                    botCells.splice(index, 1);
-                    botNamesRef.current.push(cell.name); // Return name to pool
-                }
-            }
-        });
-        
-        console.log(`Performance: Limited total cells to ${MAX_TOTAL_CELLS}, removed ${cellsToRemove.length} cells.`);
-    }
 
     // --- 4. Detecção de Colisão com Vírus (Split on Contact) ---
     
@@ -983,10 +938,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                             splitMass,
                             cell.name
                         );
-                        // Add to player cells (but check max player cells)
-                        if (playerCells.length < MAX_PLAYER_CELLS) {
-                            gameInstance.playerCells.push(newCell as Player);
-                        }
+                        // Add to player cells
+                        gameInstance.playerCells.push(newCell as Player);
                     } else {
                         newCell = new Cell(
                             newPosition.x,
@@ -1036,25 +989,25 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     allCells = [...playerCells, ...botCells];
 
-    // --- 5. Detecção de Colisão (Comer) - OPTIMIZED with proximity check ---
+    // --- 5. Detecção de Colisão (Comer) ---
     
-    // Player vs Bot collisions
-    for (let i = playerCells.length - 1; i >= 0; i--) {
-        for (let j = botCells.length - 1; j >= 0; j--) {
-            const cellA = playerCells[i];
-            const cellB = botCells[j];
-            
+    for (let i = allCells.length - 1; i >= 0; i--) {
+        for (let j = i - 1; j >= 0; j--) {
+            const cellA = allCells[i];
+            const cellB = allCells[j];
+            if (!cellA || !cellB) continue;
+
             const distVec = cellA.position.subtract(cellB.position);
             const distance = distVec.magnitude();
-            
-            if (distance < Math.max(cellA.radius, cellB.radius) && distance < COLLISION_CHECK_RADIUS) {
+
+            if (distance < Math.max(cellA.radius, cellB.radius)) {
                 let predator, prey;
                 if (cellA.mass > cellB.mass * 1.15) {
                     predator = cellA;
                     prey = cellB;
                 } else if (cellB.mass > cellA.mass * 1.15) {
                     predator = cellB;
-                    prey = cellA;
+                    prey = cellA; // FIXED: was incorrectly set to cellB
                 } else {
                     continue;
                 }
@@ -1080,70 +1033,49 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     predator.mass += prey.mass;
                     predator.radius = predator.calculateRadius();
                     
-                    if (predator instanceof Player) {
+                    if (predator instanceof Player || !predator.isBot) {
                         playCollect();
                     }
                     
-                    // Remove prey from botCells
-                    botCells.splice(j, 1);
-                    botNamesRef.current.push(prey.name);
-                }
-            }
-        }
-    }
+                    const preyIndexInPlayer = playerCells.indexOf(prey as Player);
+                    if (preyIndexInPlayer > -1) playerCells.splice(preyIndexInPlayer, 1);
 
-    // Bot vs Bot collisions (only if necessary)
-    for (let i = botCells.length - 1; i >= 0; i--) {
-        for (let j = i - 1; j >= 0; j--) {
-            const cellA = botCells[i];
-            const cellB = botCells[j];
-            
-            if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-                const dist = cellA.position.subtract(cellB.position).magnitude();
-                if (dist < cellA.radius + cellB.radius && dist < COLLISION_CHECK_RADIUS) { 
-                    const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-                    const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-                    
-                    bigger.mass += smaller.mass;
-                    bigger.radius = bigger.calculateRadius();
-                    
-                    const smallerIndex = botCells.indexOf(smaller);
-                    if (smallerIndex > -1) {
-                        botCells.splice(smallerIndex, 1);
-                        if (smallerIndex <= i) i--;
-                        if (smallerIndex <= j) j--;
+                    const preyIndexInBots = botCells.indexOf(prey);
+                    if (preyIndexInBots > -1) {
+                        botCells.splice(preyIndexInBots, 1);
+                        if (prey.isBot) {
+                            botNamesRef.current.push(prey.name);
+                        }
                     }
-                }
-            }
-        }
-    }
-
-    // Player vs Player collisions (unlikely but possible after splits)
-    for (let i = playerCells.length - 1; i >= 0; i--) {
-        for (let j = i - 1; j >= 0; j--) {
-            const cellA = playerCells[i];
-            const cellB = playerCells[j];
-            
-            if (cellA.mergeCooldown <= 0 && cellB.mergeCooldown <= 0) {
-                const dist = cellA.position.subtract(cellB.position).magnitude();
-                if (dist < cellA.radius + cellB.radius && dist < COLLISION_CHECK_RADIUS) { 
-                    const bigger = cellA.mass > cellB.mass ? cellA : cellB;
-                    const smaller = cellA.mass > cellB.mass ? cellB : cellA;
-                    bigger.mass += smaller.mass;
-                    bigger.radius = bigger.calculateRadius();
                     
-                    const smallerIndex = playerCells.indexOf(smaller);
-                    if (smallerIndex > -1) {
-                        playerCells.splice(smallerIndex, 1);
-                        if (smallerIndex <= i) i--;
-                        if (smallerIndex <= j) j--;
-                    }
+                    allCells.splice(allCells.indexOf(prey), 1);
+                    if (allCells.indexOf(predator) < i) i--;
+                    if (allCells.indexOf(predator) < j) j--;
                 }
             }
         }
     }
     
-    // --- 6. Respawn de Bots (only if below initial count after all updates) ---
+    // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
+    const totalBotCells = botCells.length;
+    if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
+        // Sort bot cells by mass (smallest first)
+        const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
+        
+        // Remove the smallest cells until we're under the limit
+        const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
+        cellsToRemove.forEach(cell => {
+            const index = botCells.indexOf(cell);
+            if (index > -1) {
+                botCells.splice(index, 1);
+                botNamesRef.current.push(cell.name); // Return name to pool
+            }
+        });
+        
+        console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
+    }
+    
+    // --- 7. Respawn de Bots (only if below initial count after all updates) ---
     while (botCells.length < initialBotCount) {
         const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
         
@@ -1159,30 +1091,59 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         botCells.push(newBot);
     }
     
-    // --- 7. Eating Pellets - OPTIMIZED: only visible pellets ---
-    // Filter visible pellets first
-    const visiblePellets = pellets.filter(pellet => {
-        return pellet.position.x >= viewLeft && pellet.position.x <= viewRight &&
-               pellet.position.y >= viewTop && pellet.position.y <= viewBottom;
-    });
+    // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
+    
+    // 8. Atualização de Câmera e Score (necessário para definir a área de visão)
+    const initialMassForScore = MIN_CELL_MASS / 2; 
+    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
+    
+    gameInstance.score = currentScore;
+    if (currentScore > gameInstance.maxScore) {
+        gameInstance.maxScore = currentScore;
+    }
 
-    for (let i = visiblePellets.length - 1; i >= 0; i--) {
-        const pellet = visiblePellets[i];
+    let centerX = WORLD_SIZE / 2;
+    let centerY = WORLD_SIZE / 2;
+    let avgRadius = MIN_CELL_RADIUS;
+
+    if (playerCells.length > 0) {
+        centerX = playerCenterOfMass.x;
+        centerY = playerCenterOfMass.y;
+        avgRadius = avgPlayerRadius;
         
-        // Check collision with all cells, but only if pellet is visible
+        camera.x += (centerX - camera.x) * 0.1;
+        camera.y += (centerY - camera.y) * 0.1;
+        camera.zoom = 40 / avgRadius + 0.4;
+    }
+    
+    // Calcula a área de visão (viewport)
+    const viewportWidth = canvas.width / camera.zoom;
+    const viewportHeight = canvas.height / camera.zoom;
+    const viewLeft = camera.x - viewportWidth / 2;
+    const viewTop = camera.y - viewportHeight / 2;
+    const viewRight = camera.x + viewportWidth / 2;
+    const viewBottom = camera.y + viewportHeight / 2;
+
+    // Colisão de Pellets (Otimizado)
+    for (let i = pellets.length - 1; i >= 0; i--) {
+        const pellet = pellets[i];
+        
+        // 1. Verifica se o pellet está na área de visão (otimização de renderização)
+        if (pellet.position.x < viewLeft || pellet.position.x > viewRight ||
+            pellet.position.y < viewTop || pellet.position.y > viewBottom) {
+            continue; // Pula a verificação de colisão se estiver fora da tela
+        }
+        
+        // 2. Verifica colisão com células
         for (const cell of allCells) {
+            if (!pellet) continue;
             const dist = cell.position.subtract(pellet.position).magnitude();
             if (dist < cell.radius) {
                 cell.mass += 10;
                 cell.radius = cell.calculateRadius();
+                pellets.splice(i, 1);
                 
-                // Remove from both arrays
-                const pelletIndex = pellets.indexOf(pellet);
-                if (pelletIndex > -1) {
-                    pellets.splice(pelletIndex, 1);
-                }
-                
-                if (cell instanceof Player) {
+                if (cell instanceof Player || !cell.isBot) {
                     playCollect();
                 }
                 break; 
@@ -1206,16 +1167,25 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         ));
     }
 
-    // --- 8. Atualização de Câmera e Score ---
-    const initialMassForScore = MIN_CELL_MASS / 2; 
-    const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
-    
-    gameInstance.score = currentScore;
-    if (currentScore > gameInstance.maxScore) {
-        gameInstance.maxScore = currentScore;
-    }
 
-    // --- 9. Leaderboard Logic (moved outside loop for performance) ---
+    // Prepare minimap data
+    const visibleBots = botCells
+        .map(bot => ({
+            x: bot.position.x,
+            y: bot.position.y,
+            mass: bot.mass,
+            color: bot.color,
+            radius: bot.radius,
+        }));
+
+    setMinimapData({
+        playerCenter: { x: centerX, y: centerY },
+        playerRadius: avgRadius, 
+        visibleBots: visibleBots,
+    });
+    
+    // --- 9. Leaderboard Logic ---
+    
     const botMassMap = new Map<string, number>();
     botCells.forEach(bot => {
         botMassMap.set(bot.name, (botMassMap.get(bot.name) || 0) + bot.mass);
@@ -1239,125 +1209,87 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         .sort((a, b) => b.mass - a.mass)
         .slice(0, 5); 
 
-    // --- PERFORMANCE MONITORING ---
-    const endTime = performance.now();
-    const frameTime = endTime - startTime;
-    if (frameTime > 16) { // If frame takes >16ms (60fps target)
-        console.warn(`Game loop took ${frameTime.toFixed(1)}ms. Total cells: ${totalCells}, Pellets: ${pellets.length}`);
-    }
 
-    // Drawing - OPTIMIZED: only draw visible elements
+    // Drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // FIXED: Draw tiled background to fill entire canvas
-    if (bgImgRef.current) {
-        const img = bgImgRef.current;
-        
-        // Create pattern that repeats the image
-        const pattern = ctx.createPattern(img, 'repeat');
-        if (pattern) {
-            // Save current context state
-            ctx.save();
-            
-            // Calculate how many tiles fit in the canvas
-            const tileWidth = img.width;
-            const tileHeight = img.height;
-            const canvasWidth = canvas.width;
-            const canvasHeight = canvas.height;
-            
-            // Draw the pattern to fill the entire canvas
-            ctx.fillStyle = pattern;
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-            
-            // Restore context state
-            ctx.restore();
-        } else {
-            // Fallback: draw single image scaled to canvas size
-            ctx.save();
-            ctx.scale(canvas.width / WORLD_SIZE, canvas.height / WORLD_SIZE);
-            ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
-            ctx.restore();
-        }
-    } else {
-        // Fallback: solid color background
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // Apply game world transformations
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.scale(camera.zoom, camera.zoom);
     ctx.translate(-camera.x, -camera.y);
     
-    // Draw World Grid (simplified for performance)
+    // --- Desenho do Fundo do Mundo ---
+    
+    // 1. Desenha a imagem de fundo com opacidade
+    if (bgImgRef.current) {
+        const img = bgImgRef.current;
+        const opacity = 0.4;
+        
+        ctx.globalAlpha = opacity;
+        ctx.drawImage(img, 0, 0, WORLD_SIZE, WORLD_SIZE);
+        ctx.globalAlpha = 1.0;
+    } else {
+        // Fallback para cor de fundo se a imagem não carregar
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+    }
+    // --- FIM: Desenho do Fundo do Mundo ---
+
+
+    // Draw World Grid
     ctx.strokeStyle = '#eee';
     ctx.lineWidth = 1;
-    for (let x = Math.floor(viewLeft / 50) * 50; x <= viewRight; x += 50) { 
-        ctx.beginPath(); 
-        ctx.moveTo(x, viewTop); 
-        ctx.lineTo(x, viewBottom); 
-        ctx.stroke(); 
-    }
-    for (let y = Math.floor(viewTop / 50) * 50; y <= viewBottom; y += 50) { 
-        ctx.beginPath(); 
-        ctx.moveTo(viewLeft, y); 
-        ctx.lineTo(viewRight, y); 
-        ctx.stroke(); 
-    }
+    for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
+    for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
 
-    // Draw World Border (only visible parts)
+    // Draw World Border
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 20; 
-    ctx.strokeRect(viewLeft, viewTop, viewportWidth, viewportHeight);
+    ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
-    // --- Lógica de Desenho de Camadas - OPTIMIZED ---
-    
-    // Filter visible cells and viruses
-    const visibleCells = allCells.filter(cell => {
-        return cell.position.x >= viewLeft && cell.position.x <= viewRight &&
-               cell.position.y >= viewTop && cell.position.y <= viewBottom;
+    // Otimização de Renderização de Pellets
+    pellets.forEach(p => {
+        if (p.position.x >= viewLeft && p.position.x <= viewRight &&
+            p.position.y >= viewTop && p.position.y <= viewBottom) {
+            p.draw(ctx);
+        }
     });
-
-    const visibleViruses = viruses.filter(virus => {
-        return virus.position.x + virus.radius >= viewLeft && virus.position.x - virus.radius <= viewRight &&
-               virus.position.y + virus.radius >= viewTop && virus.position.y - virus.radius <= viewBottom;
-    });
-
-    // Separate visible cells into inside/outside virus for layering
-    const visibleCellsInsideVirus: Cell[] = [];
-    const visibleCellsOutsideVirus: Cell[] = [];
     
-    visibleCells.forEach(cell => {
+    // --- Lógica de Desenho de Camadas ---
+    
+    const cellsInsideVirus: Cell[] = [];
+    const cellsOutsideVirus: Cell[] = [];
+    
+    allCells.forEach(cell => {
         let isInside = false;
-        for (const virus of visibleViruses) {
-            const distToVirus = cell.position.subtract(virus.position).magnitude();
-            if (distToVirus + cell.radius < virus.radius) {
-                isInside = true;
-                break;
+        if (cell.mass <= VIRUS_MASS) {
+            for (const virus of viruses) {
+                const distToVirus = cell.position.subtract(virus.position).magnitude();
+                if (distToVirus + cell.radius < virus.radius) {
+                    isInside = true;
+                    break;
+                }
             }
         }
         if (isInside) {
-            visibleCellsInsideVirus.push(cell);
+            cellsInsideVirus.push(cell);
         } else {
-            visibleCellsOutsideVirus.push(cell);
+            cellsOutsideVirus.push(cell);
         }
     });
     
-    // Sort outside cells by mass (smallest first) for proper layering
-    visibleCellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
+    cellsOutsideVirus.sort((a, b) => a.mass - b.mass).forEach(c => {
         c.draw(ctx, c instanceof Player);
     });
 
-    // Draw visible viruses
-    visibleViruses.forEach(v => {
-        v.draw(ctx);
+    // Otimização de Renderização de Vírus
+    viruses.forEach(v => {
+        if (v.position.x + v.radius >= viewLeft && v.position.x - v.radius <= viewRight &&
+            v.position.y + v.radius >= viewTop && v.position.y - v.radius <= viewBottom) {
+            v.draw(ctx);
+        }
     }); 
     
-    // Draw cells inside viruses (smaller, on top)
-    visibleCellsInsideVirus.forEach(c => {
-        c.draw(ctx, c instanceof Player);
-    });
+    // --- FIM: Lógica de Desenho de Camadas ---
 
     ctx.restore();
 
@@ -1370,12 +1302,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.textAlign = 'right';
     ctx.fillText(`Recorde: ${highScore}`, canvas.width - 20, 30);
     
-    // Draw Leaderboard (only top 5)
+    // Draw Leaderboard
     const leaderboardWidth = 180; 
     const leaderboardX = canvas.width - leaderboardWidth - 20;
     const lineHeight = 20; 
     const leaderboardY = 50; 
-    const leaderboardHeight = 20 + Math.min(5, leaderboardData.length) * lineHeight;
+    const leaderboardHeight = 20 + leaderboardData.length * lineHeight;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.fillRect(leaderboardX, leaderboardY, leaderboardWidth, leaderboardHeight);
@@ -1388,7 +1320,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     ctx.fillText('Top 5', leaderboardX + 10, leaderboardY + 20);
     
     ctx.font = '14px Quicksand';
-    leaderboardData.slice(0, 5).forEach((entry, index) => {
+    leaderboardData.forEach((entry, index) => {
         const y = leaderboardY + 40 + index * lineHeight; 
         ctx.fillStyle = entry.isPlayer ? '#2196F3' : '#333';
         
@@ -1399,6 +1331,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         ctx.textAlign = 'right';
         ctx.fillText(Math.floor(entry.mass).toString(), leaderboardX + leaderboardWidth - 10, y);
     });
+
 
     animationFrameId.current = requestAnimationFrame(gameLoop);
   }, [difficulty, onGameOver, highScore, gameInstance, playerName, playCollect, playSplit, initialBotCount, isMobile]);
