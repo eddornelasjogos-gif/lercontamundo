@@ -1308,12 +1308,12 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', touchAction: isMobile ? 'none' : 'auto' }}>
       <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
       
-      {/* Botão de Pausa (sempre visível) */}
+      {/* Botão de Pausa (z-index aumentado para garantir clique) */}
       <Button 
         variant="secondary" 
         size="icon" 
         onClick={handlePause} 
-        className="fixed top-4 left-4 z-50 shadow-lg"
+        className="fixed top-4 left-4 z-60 shadow-lg"
         disabled={!isPlaying || isPaused}
       >
         <Pause className="w-5 h-5" />
