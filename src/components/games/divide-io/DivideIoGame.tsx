@@ -14,12 +14,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Pause } from 'lucide-react';
 import { saveGameState, loadGameState, clearGameState } from '@/utils/divide-io-storage';
+import type { SavedGameState } from '@/utils/divide-io-storage'; // Import the type
+
+// Importações das classes de seus novos arquivos
 import { Vector } from './Vector';
-import { Cell } from './Cell';
+import { Cell, getRandomColor } from './Cell';
 import { Player } from './Player';
 import { Bot } from './Bot';
 import { Pellet } from './Pellet';
-import { getRandomColor } from './Bot';
 
 type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
@@ -94,8 +96,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
       initialPellets.push(new Pellet(x, y, getRandomColor()));
     }
 
-    const initialBots: Bot[] = [];
     let currentId = 2; // Começa após o jogador (ID 1)
+    const initialBots: Bot[] = [];
     for (let i = 0; i < settings.botCount; i++) {
       let x, y;
       do {
@@ -127,20 +129,20 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     const savedState = loadGameState();
     if (savedState) {
       // Se houver estado salvo, carrega
-      setPlayerCells(savedState.playerCells.map((cell: any, index: number) => 
-        new Player(cell.x, cell.y, cell.mass, cell.name, index + 1)
+      setPlayerCells(savedState.playerCells.map(cell => 
+        new Player(cell.x, cell.y, cell.mass, cell.name, cell.id)
       ));
-      setBotCells(savedState.botCells.map((cell: any, index: number) => 
-        new Bot(cell.x, cell.y, cell.mass, cell.name, index + 1)
+      setBotCells(savedState.botCells.map(cell => 
+        new Bot(cell.x, cell.y, cell.mass, cell.name, cell.id)
       ));
-      setPellets(savedState.pellets.map((pellet: any) => 
+      setPellets(savedState.pellets.map(pellet => 
         new Pellet(pellet.x, pellet.y, pellet.color)
       ));
       setCamera(savedState.camera);
       setScore(savedState.score);
       
-      const maxPlayerId = savedState.playerCells.reduce((max, cell) => Math.max(max, cell.id || 0), 0);
-      const maxBotId = savedState.botCells.reduce((max, cell) => Math.max(max, cell.id || 0), 0);
+      const maxPlayerId = savedState.playerCells.reduce((max, cell) => Math.max(max, cell.id), 0);
+      const maxBotId = savedState.botCells.reduce((max, cell) => Math.max(max, cell.id), 0);
       setNextCellId(Math.max(maxPlayerId, maxBotId) + 1);
       
       setTotalBotCells(savedState.botCells.length);
@@ -187,7 +189,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
       // Update bot cells
       botCells.forEach(bot => {
-        bot.update(playerCells[0]?.position, playerCells[0]?.radius, botAggression);
+        bot.update(); // Call base Cell update
+        bot.updateAI(playerCells[0]?.position, playerCells[0]?.radius, botAggression); // Call bot-specific AI update
         // Draw bot cells
         ctx.save();
         ctx.translate(canvas.width / 2 - bot.position.x, canvas.height / 2 - bot.position.y);
