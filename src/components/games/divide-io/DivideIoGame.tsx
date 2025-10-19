@@ -987,7 +987,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
         
         // 9. Atualização de Câmera e Score (necessário para definir a área de visão)
-        const initialMassForScore = MIN_CELL_MASS / 2; 
+        const initialMassForScore = MIN_CELL_RADIUS * MIN_CELL_RADIUS / 2; 
         const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
         
         gameInstance.score = currentScore;
@@ -1313,7 +1313,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         variant="secondary" 
         size="icon" 
         onClick={handlePause} 
-        className="fixed top-4 left-4 z-60 shadow-lg"
+        className="fixed top-4 left-4 z-[100] shadow-lg"
         disabled={!isPlaying || isPaused}
       >
         <Pause className="w-5 h-5" />
@@ -1321,10 +1321,11 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
 
       {/* Controles visíveis apenas em dispositivos móveis E QUANDO NÃO ESTIVER PAUSADO */}
       {isMobile && !isPaused && (
-        <>
+        // Wrapper para garantir que o joystick não bloqueie o botão de pausa (z-index 100)
+        <div className="fixed inset-0 z-50"> 
           <VirtualJoystick onMove={handleJoystickMove} />
           <SplitButton onSplit={handleSplit} />
-        </>
+        </div>
       )}
       
       <Minimap {...minimapData} />
