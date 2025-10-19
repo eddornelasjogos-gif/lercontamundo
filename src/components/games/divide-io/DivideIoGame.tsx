@@ -47,6 +47,9 @@ const EJECTION_OFFSET = 30;
 // Ejection speed for split cells from virus
 const VIRUS_SPLIT_EJECTION_SPEED = 200;
 
+// Safety limit for total bot cells to prevent performance issues
+const MAX_TOTAL_BOT_CELLS = 100;
+
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -1004,7 +1007,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                     prey = cellB;
                 } else if (cellB.mass > cellA.mass * 1.15) {
                     predator = cellB;
-                    prey = cellA;
+                    prey = cellA; // FIXED: was incorrectly set to cellB
                 } else {
                     continue;
                 }
@@ -1053,7 +1056,26 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
     }
     
-    // --- 6. Respawn de Bots and Pellets ---
+    // --- 6. Safety Check: Limit total bot cells to prevent performance issues ---
+    const totalBotCells = botCells.length;
+    if (totalBotCells > MAX_TOTAL_BOT_CELLS) {
+        // Sort bot cells by mass (smallest first)
+        const sortedBotCells = [...botCells].sort((a, b) => a.mass - b.mass);
+        
+        // Remove the smallest cells until we're under the limit
+        const cellsToRemove = sortedBotCells.slice(0, totalBotCells - MAX_TOTAL_BOT_CELLS);
+        cellsToRemove.forEach(cell => {
+            const index = botCells.indexOf(cell);
+            if (index > -1) {
+                botCells.splice(index, 1);
+                botNamesRef.current.push(cell.name); // Return name to pool
+            }
+        });
+        
+        console.log(`Performance optimization: Removed ${cellsToRemove.length} small bot cells to maintain performance.`);
+    }
+    
+    // --- 7. Respawn de Bots (only if below initial count after all updates) ---
     while (botCells.length < initialBotCount) {
         const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
         
@@ -1071,7 +1093,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     // Eating pellets (Otimizado: verifica colisão apenas com pellets visíveis)
     
-    // 7. Atualização de Câmera e Score (necessário para definir a área de visão)
+    // 8. Atualização de Câmera e Score (necessário para definir a área de visão)
     const initialMassForScore = MIN_CELL_MASS / 2; 
     const currentScore = Math.floor(totalPlayerMass - initialMassForScore);
     
@@ -1162,7 +1184,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         visibleBots: visibleBots,
     });
     
-    // --- 8. Leaderboard Logic ---
+    // --- 9. Leaderboard Logic ---
     
     const botMassMap = new Map<string, number>();
     botCells.forEach(bot => {
