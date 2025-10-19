@@ -14,7 +14,7 @@ type Difficulty = 'very-easy' | 'easy' | 'medium' | 'hard';
 
 interface DivideIoGameProps {
   difficulty: Difficulty;
-  onGameOver: (score: number, isVictory: boolean) => void; // UPDATED: Added isVictory flag
+  onGameOver: (score: number) => void;
   playerName: string;
 }
 
@@ -29,8 +29,6 @@ const WORLD_SIZE = 3000;
 const WORLD_CENTER_X = WORLD_SIZE / 2;
 const WORLD_CENTER_Y = WORLD_SIZE / 2;
 const WORLD_RADIUS = WORLD_SIZE / 2;
-const WORLD_AREA = Math.PI * WORLD_RADIUS * WORLD_RADIUS; // Área total do mundo
-const VICTORY_MASS_THRESHOLD = WORLD_AREA * 0.85 / MASS_TO_RADIUS_RATIO; // 85% da área do mundo, convertida para massa
 const PELLET_COUNT = 800;
 const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
@@ -782,7 +780,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     if (playerCells.length === 0) {
       setIsPlaying(false);
-      onGameOver(gameInstance.maxScore, false); // Game Over (Loss)
+      onGameOver(gameInstance.maxScore);
       animationFrameId.current = requestAnimationFrame(gameLoop); // Continue loop even if game over
       return;
     }
@@ -796,16 +794,6 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         const playerDirection = new Vector(movementDirectionRef.current.x, movementDirectionRef.current.y);
         
         const totalPlayerMass = playerCells.reduce((sum, cell) => sum + cell.mass, 0);
-        
-        // --- VICTORY CHECK ---
-        if (totalPlayerMass >= VICTORY_MASS_THRESHOLD) {
-            setIsPlaying(false);
-            onGameOver(gameInstance.maxScore, true); // Game Over (Victory)
-            animationFrameId.current = requestAnimationFrame(gameLoop);
-            return;
-        }
-        // --- END VICTORY CHECK ---
-        
         const playerCenterOfMass = playerCells.reduce((sum, c) => sum.add(c.position.multiply(c.mass)), new Vector(0, 0)).multiply(1 / totalPlayerMass);
         const avgPlayerRadius = playerCells.reduce((sum, cell) => sum + cell.radius, 0) / playerCells.length;
 
@@ -1047,7 +1035,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         // Check if player has no cells left
                         if (playerCells.length === 0) {
                             setIsPlaying(false);
-                            onGameOver(gameInstance.maxScore, false); 
+                            onGameOver(gameInstance.maxScore); 
                             break; // Exit inner loop
                         }
                         

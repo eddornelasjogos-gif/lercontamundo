@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Gamepad2, Trophy, User, CheckCircle } from "lucide-react";
+import { Gamepad2, Trophy, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,18 +10,9 @@ import { useDivideIoProgress } from "@/hooks/useDivideIoProgress";
 import DivideIoGame from "@/components/games/divide-io/DivideIoGame";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Mascot } from "@/components/Mascot";
-import { cn } from "@/lib/utils";
 
 type GameStatus = "menu" | "playing" | "gameover";
 type Difficulty = "very-easy" | "easy" | "medium" | "hard";
-
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-    'very-easy': 'Muito Fácil',
-    easy: 'Fácil',
-    medium: 'Médio',
-    hard: 'Difícil',
-};
 
 const Games = () => {
   const [gameStatus, setGameStatus] = useState<GameStatus>("menu");
@@ -39,7 +30,6 @@ const Games = () => {
   const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>(lastDifficulty);
   const [lastScore, setLastScore] = useState(0);
   const [inputName, setInputName] = useState(playerName);
-  const [isVictory, setIsVictory] = useState(false); // Novo estado para vitória
 
   const handlePlay = () => {
     if (inputName.trim() === "") {
@@ -51,11 +41,10 @@ const Games = () => {
     setGameStatus("playing");
   };
 
-  const handleGameOver = (score: number, victory: boolean) => {
+  const handleGameOver = (score: number) => {
     setLastScore(score);
     updateHighScore(score);
     updateLeaderboard(inputName.trim(), score);
-    setIsVictory(victory);
     setGameStatus("gameover");
   };
 
@@ -71,34 +60,6 @@ const Games = () => {
     // Retorna apenas o jogo para ocupar a tela inteira, sem a navegação
     return <DivideIoGame difficulty={currentDifficulty} onGameOver={handleGameOver} playerName={inputName.trim()} />;
   }
-  
-  const renderGameOverScreen = () => {
-    if (isVictory) {
-        return (
-            <div className="text-center space-y-6 p-4 bg-success/10 rounded-lg animate-scale-in border border-success/30">
-                <Trophy className="w-16 h-16 mx-auto text-amber-500 fill-amber-200 animate-bounce-gentle" />
-                <h2 className="text-3xl font-display font-bold text-success">VITÓRIA!</h2>
-                <p className="text-lg font-body text-foreground">Você dominou {DIFFICULTY_LABELS[currentDifficulty]}!</p>
-                <p className="text-md font-body text-muted-foreground">Pontuação Final: <span className="font-bold text-xl text-foreground">{lastScore}</span></p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                    <Button size="lg" className="w-full sm:w-auto gradient-primary" onClick={handlePlayAgain}>
-                        Jogar Novamente
-                    </Button>
-                    <Button size="lg" variant="secondary" className="w-full sm:w-auto" onClick={handleBackToMenu}>
-                        Mudar Nível
-                    </Button>
-                </div>
-            </div>
-        );
-    }
-    
-    return (
-        <div className="p-4 bg-destructive/10 rounded-lg animate-scale-in border border-destructive/30">
-            <h2 className="text-2xl font-display font-bold text-destructive">Fim de Jogo!</h2>
-            <p className="text-lg font-body text-foreground">Sua pontuação: <span className="font-bold">{lastScore}</span></p>
-        </div>
-    );
-  };
 
   return (
     <div className="min-h-screen pb-20 md:pb-8 md:pt-20 flex flex-col">
@@ -115,10 +76,11 @@ const Games = () => {
                 </div>
               </div>
 
-              {gameStatus === "gameover" && renderGameOverScreen()}
-              
-              {gameStatus === "menu" && (
-                <Mascot message="Pronto para dominar o mapa?" className="mx-auto" />
+              {gameStatus === "gameover" && (
+                <div className="p-4 bg-primary/10 rounded-lg animate-scale-in">
+                  <h2 className="text-2xl font-display font-bold text-primary">Fim de Jogo!</h2>
+                  <p className="text-lg font-body text-foreground">Sua pontuação: <span className="font-bold">{lastScore}</span></p>
+                </div>
               )}
 
               <div className="space-y-2">
@@ -146,7 +108,7 @@ const Games = () => {
                       onClick={() => setCurrentDifficulty(d)}
                       className="w-full max-w-xs font-display font-semibold"
                     >
-                      {DIFFICULTY_LABELS[d]}
+                      {d === 'very-easy' ? 'Muito Fácil' : d === 'easy' ? 'Fácil' : d === 'medium' ? 'Médio' : 'Difícil'}
                     </Button>
                   ))}
                 </div>
@@ -158,7 +120,7 @@ const Games = () => {
                     Jogar
                   </Button>
                 )}
-                {gameStatus === "gameover" && !isVictory && (
+                {gameStatus === "gameover" && (
                   <>
                     <Button size="lg" className="w-full sm:w-auto" onClick={handlePlayAgain}>
                       Jogar Novamente
@@ -168,7 +130,6 @@ const Games = () => {
                     </Button>
                   </>
                 )}
-                {/* Se for vitória, as opções de botão já estão no renderGameOverScreen */}
               </div>
               
               {/* Leaderboard */}
