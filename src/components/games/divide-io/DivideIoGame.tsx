@@ -24,6 +24,9 @@ const difficultySettings = {
 };
 
 const WORLD_SIZE = 3000;
+const WORLD_CENTER_X = WORLD_SIZE / 2;
+const WORLD_CENTER_Y = WORLD_SIZE / 2;
+const WORLD_RADIUS = WORLD_SIZE / 2;
 const PELLET_COUNT = 800;
 const MIN_CELL_RADIUS = 10;
 const MIN_CELL_MASS = MIN_CELL_RADIUS * MIN_CELL_RADIUS;
@@ -122,9 +125,13 @@ class Cell {
     this.velocity = this.velocity.multiply(0.95);
     this.position = this.position.add(this.velocity);
     
-    // Boundary clamping (Clamping the cell position to the world boundaries)
-    this.position.x = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.x));
-    this.position.y = Math.max(this.radius, Math.min(WORLD_SIZE - this.radius, this.position.y));
+    // UPDATED: Circular boundary clamping
+    const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+    const distanceFromCenter = this.position.subtract(center).magnitude();
+    if (distanceFromCenter + this.radius > WORLD_RADIUS) {
+      const direction = this.position.subtract(center).normalize();
+      this.position = center.add(direction.multiply(WORLD_RADIUS - this.radius));
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D, isPlayer: boolean = false) {
@@ -183,6 +190,14 @@ class Cell {
         // Apply a slight counter-impulse to the original cell
         this.velocity = this.velocity.add(direction.multiply(-EJECTION_IMPULSE * 0.1));
 
+        // UPDATED: Ensure new cell is within circular bounds
+        const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+        const distanceFromCenter = newCell.position.subtract(center).magnitude();
+        if (distanceFromCenter + newCell.radius > WORLD_RADIUS) {
+          const directionToCenter = newCell.position.subtract(center).normalize();
+          newCell.position = center.add(directionToCenter.multiply(WORLD_RADIUS - newCell.radius));
+        }
+
         return newCell;
     }
     return null;
@@ -235,6 +250,14 @@ class Player extends Cell {
         
         // Aplica contra-impulso na célula original
         this.velocity = this.velocity.add(direction.multiply(-EJECTION_IMPULSE * 0.1));
+
+        // UPDATED: Ensure new cell is within circular bounds
+        const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+        const distanceFromCenter = newCell.position.subtract(center).magnitude();
+        if (distanceFromCenter + newCell.radius > WORLD_RADIUS) {
+          const directionToCenter = newCell.position.subtract(center).normalize();
+          newCell.position = center.add(directionToCenter.multiply(WORLD_RADIUS - newCell.radius));
+        }
 
         return newCell;
     }
@@ -356,10 +379,13 @@ const botLogic = {
         if (!bestTarget) {
             let currentExplorationTarget = this.explorationTarget.get(botName);
             
-            if (!currentExplorationTarget || center.subtract(currentExplorationTarget).magnitude() < WORLD_SIZE * 0.1) {
-                const newTarget = new Vector(
-                    Math.random() * (WORLD_SIZE * 0.8) + WORLD_SIZE * 0.1,
-                    Math.random() * (WORLD_SIZE * 0.8) + WORLD_SIZE * 0.1
+            if (!currentExplorationTarget || center.subtract(currentExplorationTarget).magnitude() < WORLD_RADIUS * 0.1) {
+                // UPDATED: Spawn within circular bounds
+                let angle = Math.random() * Math.PI * 2;
+                let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+                let newTarget = new Vector(
+                    WORLD_CENTER_X + Math.cos(angle) * distance,
+                    WORLD_CENTER_Y + Math.sin(angle) * distance
                 );
                 this.explorationTarget.set(botName, newTarget);
             }
@@ -390,7 +416,13 @@ class Pellet {
   public position: Vector;
   public radius = 3;
   constructor(public color: string) {
-    this.position = new Vector(Math.random() * WORLD_SIZE, Math.random() * WORLD_SIZE);
+    // UPDATED: Spawn within circular bounds
+    let angle = Math.random() * Math.PI * 2;
+    let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+    this.position = new Vector(
+      WORLD_CENTER_X + Math.cos(angle) * distance,
+      WORLD_CENTER_Y + Math.sin(angle) * distance
+    );
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -417,9 +449,13 @@ const generatePelletsFromMass = (mass: number, position: Vector) => {
         
         pellet.position = position.add(new Vector(Math.cos(angle) * distance, Math.sin(angle) * distance));
         
-        // Boundary clamping for pellets
-        pellet.position.x = Math.max(pellet.radius, Math.min(WORLD_SIZE - pellet.radius, pellet.position.x));
-        pellet.position.y = Math.max(pellet.radius, Math.min(WORLD_SIZE - pellet.radius, pellet.position.y));
+        // UPDATED: Circular boundary clamping for pellets
+        const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+        const distanceFromCenter = pellet.position.subtract(center).magnitude();
+        if (distanceFromCenter + pellet.radius > WORLD_RADIUS) {
+          const direction = pellet.position.subtract(center).normalize();
+          pellet.position = center.add(direction.multiply(WORLD_RADIUS - pellet.radius));
+        }
         
         pellets.push(pellet);
     }
@@ -473,9 +509,13 @@ const findSafeVirusPosition = (allCells: Cell[], viruses: Virus[]): Vector => {
     while (safePosition === null && attempts < maxAttempts) {
         attempts++;
         
-        const x = Math.random() * (WORLD_SIZE - 2 * VIRUS_RADIUS) + VIRUS_RADIUS;
-        const y = Math.random() * (WORLD_SIZE - 2 * VIRUS_RADIUS) + VIRUS_RADIUS;
-        const potentialPosition = new Vector(x, y);
+        // UPDATED: Spawn within circular bounds
+        let angle = Math.random() * Math.PI * 2;
+        let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+        const potentialPosition = new Vector(
+          WORLD_CENTER_X + Math.cos(angle) * distance,
+          WORLD_CENTER_Y + Math.sin(angle) * distance
+        );
         
         let isSafe = true;
 
@@ -504,9 +544,12 @@ const findSafeVirusPosition = (allCells: Cell[], viruses: Virus[]): Vector => {
 
     if (safePosition === null) {
         console.warn("Failed to find a safe virus spawn position, using random fallback.");
+        // UPDATED: Fallback within circular bounds
+        let angle = Math.random() * Math.PI * 2;
+        let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
         return new Vector(
-            Math.random() * WORLD_SIZE,
-            Math.random() * WORLD_SIZE
+            WORLD_CENTER_X + Math.cos(angle) * distance,
+            WORLD_CENTER_Y + Math.sin(angle) * distance
         );
     }
     
@@ -529,7 +572,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
   const bgImgRef = useRef<HTMLImageElement | null>(null);
 
   const [minimapData, setMinimapData] = React.useState({
-    playerCenter: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 },
+    playerCenter: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y },
     playerRadius: MIN_CELL_RADIUS, 
     visibleBots: [] as Array<{ x: number; y: number; mass: number; color: string; radius: number }>,
   });
@@ -539,7 +582,7 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     botCells: [] as Cell[], 
     pellets: [] as Pellet[],
     viruses: [] as Virus[],
-    camera: { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2, zoom: 1 },
+    camera: { x: WORLD_CENTER_X, y: WORLD_CENTER_Y, zoom: 1 },
     score: 0,
     maxScore: 0, 
     mousePosition: new Vector(0, 0), // Posição do mouse na tela
@@ -932,9 +975,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                             const offsetY = Math.sin(angle) * 50;
                             const newPosition = virus.position.add(new Vector(offsetX, offsetY));
                             
-                            // Ensure boundary clamping for new cells
-                            newPosition.x = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.x));
-                            newPosition.y = Math.max(splitMass / MASS_TO_RADIUS_RATIO, Math.min(WORLD_SIZE - splitMass / MASS_TO_RADIUS_RATIO, newPosition.y));
+                            // UPDATED: Ensure boundary clamping for new cells (circular)
+                            const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+                            let distanceFromCenter = newPosition.subtract(center).magnitude();
+                            if (distanceFromCenter + splitMass / MASS_TO_RADIUS_RATIO > WORLD_RADIUS) {
+                              const directionToCenter = newPosition.subtract(center).normalize();
+                              newPosition.x = center.x + directionToCenter.x * (WORLD_RADIUS - splitMass / MASS_TO_RADIUS_RATIO);
+                              newPosition.y = center.y + directionToCenter.y * (WORLD_RADIUS - splitMass / MASS_TO_RADIUS_RATIO);
+                            }
                             
                             let newCell: Cell;
                             if (cell instanceof Player) {
@@ -999,9 +1047,14 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
                         // Move cell to a position behind the virus (opposite to approach direction)
                         const behindPosition = virus.position.add(repelDirection.multiply(virus.radius + cell.radius + repelDistance));
                         
-                        // Ensure the position is within bounds
-                        behindPosition.x = Math.max(cell.radius, Math.min(WORLD_SIZE - cell.radius, behindPosition.x));
-                        behindPosition.y = Math.max(cell.radius, Math.min(WORLD_SIZE - cell.radius, behindPosition.y));
+                        // UPDATED: Ensure the position is within circular bounds
+                        const center = new Vector(WORLD_CENTER_X, WORLD_CENTER_Y);
+                        const distanceFromCenter = behindPosition.subtract(center).magnitude();
+                        if (distanceFromCenter + cell.radius > WORLD_RADIUS) {
+                          const directionToCenter = behindPosition.subtract(center).normalize();
+                          behindPosition.x = center.x + directionToCenter.x * (WORLD_RADIUS - cell.radius);
+                          behindPosition.y = center.y + directionToCenter.y * (WORLD_RADIUS - cell.radius);
+                        }
                         
                         // Apply repulsion velocity
                         cell.position = behindPosition;
@@ -1107,9 +1160,17 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         while (botCells.length < initialBotCount) {
             const newBotName = botNamesRef.current.shift() || `Bot ${Math.random().toString(36).substring(7)}`;
             
+            // UPDATED: Spawn within circular bounds
+            let angle = Math.random() * Math.PI * 2;
+            let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+            const newPosition = new Vector(
+              WORLD_CENTER_X + Math.cos(angle) * distance,
+              WORLD_CENTER_Y + Math.sin(angle) * distance
+            );
+            
             const newBot = new Cell(
-                Math.random() * WORLD_SIZE,
-                Math.random() * WORLD_SIZE,
+                newPosition.x,
+                newPosition.y,
                 getRandomColor(),
                 MIN_CELL_MASS + 10,
                 newBotName,
@@ -1141,8 +1202,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
             gameInstance.maxScore = currentScore;
         }
 
-        let centerX = WORLD_SIZE / 2;
-        let centerY = WORLD_SIZE / 2;
+        let centerX = WORLD_CENTER_X;
+        let centerY = WORLD_CENTER_Y;
         let avgRadius = MIN_CELL_RADIUS;
 
         if (playerCells.length > 0) {
@@ -1192,7 +1253,15 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         
         // Respawn de Pellets
         if (pellets.length < PELLET_COUNT) {
-          pellets.push(new Pellet(getRandomColor()));
+          // UPDATED: Spawn within circular bounds
+          let angle = Math.random() * Math.PI * 2;
+          let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+          const newPellet = new Pellet(getRandomColor());
+          newPellet.position = new Vector(
+            WORLD_CENTER_X + Math.cos(angle) * distance,
+            WORLD_CENTER_Y + Math.sin(angle) * distance
+          );
+          pellets.push(newPellet);
         }
 
         // Prepare minimap data
@@ -1261,17 +1330,30 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         }
         // --- FIM: Desenho do Fundo do Mundo ---
 
-
-        // Draw World Grid
+        // Draw World Grid (circular pattern)
         ctx.strokeStyle = '#eee';
         ctx.lineWidth = 1;
-        for (let x = 0; x <= WORLD_SIZE; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke(); }
-        for (let y = 0; y <= WORLD_SIZE; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke(); }
+        for (let r = 50; r <= WORLD_RADIUS; r += 50) {
+            ctx.beginPath();
+            ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, r, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+            ctx.beginPath();
+            ctx.moveTo(WORLD_CENTER_X, WORLD_CENTER_Y);
+            ctx.lineTo(
+                WORLD_CENTER_X + Math.cos(angle) * WORLD_RADIUS,
+                WORLD_CENTER_Y + Math.sin(angle) * WORLD_RADIUS
+            );
+            ctx.stroke();
+        }
 
-        // Draw World Border
+        // UPDATED: Draw circular world border
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 20; 
-        ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+        ctx.beginPath();
+        ctx.arc(WORLD_CENTER_X, WORLD_CENTER_Y, WORLD_RADIUS, 0, Math.PI * 2);
+        ctx.stroke();
 
         // Otimização de Renderização de Pellets
         pellets.forEach(p => {
@@ -1390,7 +1472,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     
     const initialPlayerMass = MIN_CELL_RADIUS * MIN_CELL_RADIUS / 2; 
     
-    gameInstance.playerCells = [new Player(WORLD_SIZE / 2, WORLD_SIZE / 2, '#2196F3', initialPlayerMass, playerName)];
+    // UPDATED: Spawn player within circular bounds (center)
+    gameInstance.playerCells = [new Player(WORLD_CENTER_X, WORLD_CENTER_Y, '#2196F3', initialPlayerMass, playerName)];
     
     gameInstance.viruses = Array.from({ length: VIRUS_COUNT }, (_, i) => {
         const safePos = findSafeVirusPosition(gameInstance.playerCells, gameInstance.viruses);
@@ -1409,11 +1492,19 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
     gameInstance.botCells = Array.from({ length: botCount }, (_, i) => {
         const name = finalBotNames[i];
         
+        // UPDATED: Spawn bots within circular bounds
+        let angle = Math.random() * Math.PI * 2;
+        let distance = Math.random() * (WORLD_RADIUS * 0.8) + WORLD_RADIUS * 0.1;
+        const spawnPosition = new Vector(
+          WORLD_CENTER_X + Math.cos(angle) * distance,
+          WORLD_CENTER_Y + Math.sin(angle) * distance
+        );
+        
         const initialBotMass = Math.random() * 1000 + 250; 
         
         return new Cell(
-            Math.random() * WORLD_SIZE,
-            Math.random() * WORLD_SIZE,
+            spawnPosition.x,
+            spawnPosition.y,
             getRandomColor(),
             initialBotMass,
             name,

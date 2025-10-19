@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import heroBgImage from '@/assets/hero-bg.jpg'; // Importa a imagem de fundo
+import heroBgImage from '@/assets/hero-bg.jpg';
 
 const MINIMAP_SIZE = 120; // Tamanho fixo do minimapa em pixels
-const WORLD_SIZE = 3000; // Deve ser o mesmo valor de DivideIoGame.tsx
+const WORLD_SIZE = 3000;
+const WORLD_CENTER_X = WORLD_SIZE / 2;
+const WORLD_CENTER_Y = WORLD_SIZE / 2;
+const WORLD_RADIUS = WORLD_SIZE / 2;
 const SCALE_FACTOR = MINIMAP_SIZE / WORLD_SIZE;
 
 interface MinimapProps {
@@ -29,11 +32,13 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
   // Função para mapear coordenadas do mundo (0 a WORLD_SIZE) para coordenadas do minimapa (0 a MINIMAP_SIZE)
   const mapToMinimap = (coord: number) => coord * SCALE_FACTOR;
 
-  // Raio do jogador no minimapa é proporcional ao seu raio real
-  const minimapPlayerRadius = Math.max(2, playerRadius * SCALE_FACTOR); 
-  
-  // Define um raio mínimo para que mesmo as células pequenas sejam visíveis
-  const MIN_DOT_RADIUS = 1.5; 
+  // Função para verificar se está dentro do raio circular do mundo
+  const isWithinWorldBounds = (x: number, y: number, radius: number) => {
+    const distanceFromCenter = Math.sqrt(
+      Math.pow(x - WORLD_CENTER_X, 2) + Math.pow(y - WORLD_CENTER_Y, 2)
+    );
+    return distanceFromCenter + radius <= WORLD_RADIUS;
+  };
 
   return (
     <div
@@ -45,63 +50,70 @@ const Minimap: React.FC<MinimapProps> = ({ playerCenter, playerRadius, visibleBo
     >
       <svg width={MINIMAP_SIZE} height={MINIMAP_SIZE} viewBox={`0 0 ${MINIMAP_SIZE} ${MINIMAP_SIZE}`}>
         
-        {/* Desenha a imagem de fundo esticada se estiver carregada */}
+        {/* UPDATED: Desenha a imagem de fundo circular */}
         {isImageLoaded && (
-            <image 
-                href={heroBgImage} 
-                x="0" 
-                y="0" 
-                width={MINIMAP_SIZE} 
-                height={MINIMAP_SIZE} 
-                preserveAspectRatio="none" // Estica a imagem para preencher
-                style={{ opacity: 0.6 }} // Opacidade para não ofuscar os pontos
+            <circle 
+                cx={MINIMAP_SIZE / 2} 
+                cy={MINIMAP_SIZE / 2} 
+                r={MINIMAP_SIZE / 2} 
+                fill="url(#bgGradient)" 
+                opacity="0.6"
             />
         )}
         
-        {/* Desenha o fundo do mapa (fallback se a imagem não carregar) */}
-        {!isImageLoaded && <rect width={MINIMAP_SIZE} height={MINIMAP_SIZE} fill="#f0f0f0" />}
+        {/* Fallback para cor de fundo se a imagem não carregar */}
+        {!isImageLoaded && (
+            <circle 
+                cx={MINIMAP_SIZE / 2} 
+                cy={MINIMAP_SIZE / 2} 
+                r={MINIMAP_SIZE / 2} 
+                fill="#f0f0f0" 
+            />
+        )}
         
-        {/* Desenha todos os bots ativos */}
+        {/* UPDATED: Borda circular do minimapa */}
+        <circle 
+            cx={MINIMAP_SIZE / 2} 
+            cy={MINIMAP_SIZE / 2} 
+            r={MINIMAP_SIZE / 2} 
+            fill="none" 
+            stroke="#333" 
+            strokeWidth="2" 
+        />
+        
+        {/* Desenha todos os bots visíveis (apenas se dentro dos limites circulares) */}
         {visibleBots.map((bot, index) => {
           const minimapX = mapToMinimap(bot.x);
           const minimapY = mapToMinimap(bot.y);
+          const minimapRadius = mapToMinimap(bot.radius);
           
-          // Usa o raio real do bot, mapeado para o minimapa, com um mínimo para visibilidade
-          const minimapBotRadius = Math.max(MIN_DOT_RADIUS, bot.radius * SCALE_FACTOR);
-
-          return (
-            <circle
-              key={index}
-              cx={minimapX}
-              cy={minimapY}
-              r={minimapBotRadius}
-              fill={bot.color}
-              stroke="#000"
-              strokeWidth="0.2"
-            />
-          );
+          // Verifica se o bot está dentro dos limites circulares do mundo
+          if (isWithinWorldBounds(bot.x, bot.y, bot.radius)) {
+            return (
+              <circle
+                key={index}
+                cx={minimapX}
+                cy={minimapY}
+                r={Math.max(1, minimapRadius)} // Raio mínimo de 1px
+                fill={bot.color}
+                stroke="#000"
+                strokeWidth="0.5"
+              />
+            );
+          }
+          return null;
         })}
 
         {/* Desenha o jogador (célula principal) */}
         <circle
           cx={mapToMinimap(playerCenter.x)}
           cy={mapToMinimap(playerCenter.y)}
-          r={minimapPlayerRadius} // Raio dinâmico
+          r={Math.max(2, mapToMinimap(playerRadius))} // Raio dinâmico
           fill="#2196F3" // Cor do jogador
           stroke="#000"
           strokeWidth="1"
         />
         
-        {/* Desenha a borda do minimapa */}
-        <rect 
-            x="0" 
-            y="0" 
-            width={MINIMAP_SIZE} 
-            height={MINIMAP_SIZE} 
-            fill="none" 
-            stroke="#333" 
-            strokeWidth="2" 
-        />
       </svg>
     </div>
   );
