@@ -1319,8 +1319,8 @@ const DivideIoGame: React.FC<DivideIoGameProps> = ({ difficulty, onGameOver, pla
         <Pause className="w-5 h-5" />
       </Button>
 
-      {/* Controles visíveis apenas em dispositivos móveis */}
-      {isMobile && (
+      {/* Controles visíveis apenas em dispositivos móveis E QUANDO NÃO ESTIVER PAUSADO */}
+      {isMobile && !isPaused && (
         <>
           <VirtualJoystick onMove={handleJoystickMove} />
           <SplitButton onSplit={handleSplit} />
